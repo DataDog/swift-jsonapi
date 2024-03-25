@@ -1,7 +1,7 @@
 import Foundation
 
 public protocol Resource {
-  var type: String { get }
+  static var type: String { get }
   var id: String { get }
 }
 
@@ -11,6 +11,6 @@ public typealias CodableResource = DecodableResource & EncodableResource
 
 extension Resource {
   public var resourceIdentifier: ResourceIdentifier {
-    .init(type: self.type, id: self.id)
+    .init(type: Self.type, id: self.id)
   }
 }

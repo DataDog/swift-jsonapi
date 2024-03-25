@@ -1,12 +1,29 @@
-// The Swift Programming Language
-// https://docs.swift.org/swift-book
+@attached(member, names: named(type), named(id))
+@attached(
+  extension,
+  conformances: CodableResource,
+  names:
+    named(ResourceAttributeCodingKeys),
+  named(ResourceRelationshipCodingKeys),
+  named(init(from:)),
+  named(encode(to:))
+)
+public macro CodableResource(type: String) =
+  #externalMacro(
+    module: "JSONAPIMacros",
+    type: "CodableResourceMacro"
+  )
 
-/// A macro that produces both a value and a string containing the
-/// source code that generated the value. For example,
-///
-///     #stringify(x + y)
-///
-/// produces a tuple `(x + y, "x + y")`.
-@freestanding(expression)
-public macro stringify<T>(_ value: T) -> (T, String) =
-  #externalMacro(module: "JSONAPIMacros", type: "StringifyMacro")
+@attached(accessor, names: named(willSet))
+public macro ResourceAttribute(key: String? = nil) =
+  #externalMacro(
+    module: "JSONAPIMacros",
+    type: "ResourceAttributeMacro"
+  )
+
+@attached(accessor, names: named(willSet))
+public macro ResourceRelationship(key: String? = nil) =
+  #externalMacro(
+    module: "JSONAPIMacros",
+    type: "ResourceRelationshipMacro"
+  )

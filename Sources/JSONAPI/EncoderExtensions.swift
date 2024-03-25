@@ -3,11 +3,10 @@ import Foundation
 extension JSONEncoder {
   public var encodesIncludedResources: Bool {
     get {
-      userInfo.includedResourceEncoderStorage != nil
+      userInfo.includedResourceEncoder != nil
     }
     set {
-      userInfo.includedResourceEncoderStorage =
-        newValue ? IncludedResourceEncoderStorage() : nil
+      userInfo.includedResourceEncoder = newValue ? IncludedResourceEncoder() : nil
     }
   }
 
@@ -26,25 +25,17 @@ extension JSONEncoder {
 
 extension Encoder {
   public var includedResourceEncoder: IncludedResourceEncoder? {
-    userInfo.includedResourceEncoderStorage?.includedResourceEncoder
+    userInfo.includedResourceEncoder
   }
 }
 
 extension Dictionary where Key == CodingUserInfoKey, Value == Any {
-  var includedResourceEncoderStorage: IncludedResourceEncoderStorage? {
+  fileprivate var includedResourceEncoder: IncludedResourceEncoder? {
     get {
-      self[IncludedResourceEncoderStorage.key] as? IncludedResourceEncoderStorage
+      self[IncludedResourceEncoder.key] as? IncludedResourceEncoder
     }
     set {
-      self[IncludedResourceEncoderStorage.key] = newValue
+      self[IncludedResourceEncoder.key] = newValue
     }
   }
-}
-
-final class IncludedResourceEncoderStorage {
-  fileprivate static let key = CodingUserInfoKey(
-    rawValue: "JSONAPI.IncludedResourceEncoderStorage"
-  )!
-
-  var includedResourceEncoder: IncludedResourceEncoder?
 }

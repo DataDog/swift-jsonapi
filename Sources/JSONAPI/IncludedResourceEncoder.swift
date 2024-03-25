@@ -1,22 +1,48 @@
 import Foundation
 
 public final class IncludedResourceEncoder {
-  private var container: UnkeyedEncodingContainer
-  private var encodedIdentifiers: Set<ResourceIdentifier>
+    static let key = CodingUserInfoKey(rawValue: "JSONAPI.IncludedResourceEncoder")!
+    
+  private struct EncodeInvocation {
+    var invoke:
+      (
+        _ identifiers: inout Set<ResourceIdentifier>,
+        _ container: inout UnkeyedEncodingContainer
+      ) throws -> Void
 
-  init(container: UnkeyedEncodingContainer) {
-    self.container = container
-    self.encodedIdentifiers = []
+    init<T>(resource: T) where T: EncodableResource {
+      self.invoke = { encodedResources, container in
+        let resourceIdentifier = resource.resourceIdentifier
+
+        guard !encodedResources.contains(resourceIdentifier) else {
+          return
+        }
+
+        try container.encode(resource)
+        encodedResources.insert(resourceIdentifier)
+      }
+    }
   }
 
+  private var encodeInvocations: [EncodeInvocation] = []
+
   public func encode<T>(_ value: T) throws where T: EncodableResource {
-    let resourceIdentifier = value.resourceIdentifier
+    // Defer encoding to avoid simultaneous accesses
+    encodeInvocations.append(.init(resource: value))
+  }
 
-    guard !self.encodedIdentifiers.contains(resourceIdentifier) else {
-      return
+  public func encode<S>(_ sequence: S) throws where S: Sequence, S.Element: EncodableResource {
+    for element in sequence {
+      try self.encode(element)
     }
+  }
 
-    try self.container.encode(value)
-    encodedIdentifiers.insert(resourceIdentifier)
+  func encodeResources(into container: inout UnkeyedEncodingContainer) throws {
+    var encodedResources: Set<ResourceIdentifier> = []
+
+    // Invocations can enqueue more invocations
+    while !encodeInvocations.isEmpty {
+      try encodeInvocations.removeFirst().invoke(&encodedResources, &container)
+    }
   }
 }

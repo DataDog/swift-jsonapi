@@ -35,13 +35,10 @@ extension Document: Encodable where Content: Encodable {
   public func encode(to encoder: any Encoder) throws {
     var container = encoder.container(keyedBy: CodingKeys.self)
 
-    // Make the included resource container available to child encoders
-    encoder.userInfo.includedResourceEncoderStorage?.includedResourceEncoder =
-      IncludedResourceEncoder(
-        container: container.nestedUnkeyedContainer(forKey: .included)
-      )
-
     try container.encode(self.data, forKey: .data)
+
+    var includedContainer = container.nestedUnkeyedContainer(forKey: .included)
+    try encoder.includedResourceEncoder?.encodeResources(into: &includedContainer)
   }
 }
 

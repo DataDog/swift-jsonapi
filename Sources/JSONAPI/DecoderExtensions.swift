@@ -31,7 +31,7 @@ extension Decoder {
 }
 
 extension Dictionary where Key == CodingUserInfoKey, Value == Any {
-  var includedResourceDecoderStorage: IncludedResourceDecoderStorage? {
+  fileprivate(set) var includedResourceDecoderStorage: IncludedResourceDecoderStorage? {
     get {
       self[IncludedResourceDecoderStorage.key] as? IncludedResourceDecoderStorage
     }
