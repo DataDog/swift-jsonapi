@@ -1,9 +1,33 @@
 import Foundation
 import JSONAPI
 
+struct PersonID: Hashable {
+  var rawValue: String
+
+  init(rawValue: String) {
+    self.rawValue = rawValue
+  }
+}
+
+extension PersonID: RawRepresentable {}
+extension PersonID: Codable {}
+
+extension PersonID: CustomStringConvertible {
+  var description: String {
+    rawValue.description
+  }
+}
+
+extension PersonID: ExpressibleByStringLiteral {
+  init(stringLiteral value: String.StringLiteralType) {
+    self.init(rawValue: String(stringLiteral: value))
+  }
+}
+
 @CodableResource(type: "people")
 struct Person: Equatable {
-  var id: String
+  // Exercise a tagged type instead of a string
+  var id: PersonID
 
   @ResourceAttribute
   var firstName: String
