@@ -61,6 +61,15 @@ final class CodableResourceTests: XCTestCase {
             }
           },
           {
+            "type": "people",
+            "id": "9",
+            "attributes": {
+              "firstName": "Dan",
+              "lastName": "Gebhardt",
+              "twitter": "dgeb"
+            }
+          },
+          {
             "type": "comments",
             "id": "12",
             "attributes": {

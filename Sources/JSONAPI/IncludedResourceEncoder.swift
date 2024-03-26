@@ -1,8 +1,8 @@
 import Foundation
 
 public final class IncludedResourceEncoder {
-    static let key = CodingUserInfoKey(rawValue: "JSONAPI.IncludedResourceEncoder")!
-    
+  static let key = CodingUserInfoKey(rawValue: "JSONAPI.IncludedResourceEncoder")!
+
   private struct EncodeInvocation {
     var invoke:
       (

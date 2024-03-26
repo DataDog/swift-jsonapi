@@ -17,7 +17,8 @@ extension Document: Decodable where Content: Decodable {
 
     // Make the included resource decoder available to child decoders if there are any included resources
     if let identifiers = try container.decodeIfPresent(
-      [ResourceIdentifier].self, forKey: .included),
+      [ResourceIdentifier].self, forKey: .included
+    ),
       let includedResourceDecoderStorage = decoder.userInfo.includedResourceDecoderStorage
     {
       includedResourceDecoderStorage.includedResourceDecoder = IncludedResourceDecoder(

@@ -9,7 +9,8 @@ public final class IncludedResourceDecoder {
     container: @escaping () throws -> any UnkeyedDecodingContainer
   ) {
     self.indexByIdentifier = Dictionary(
-      uniqueKeysWithValues: zip(identifiers, identifiers.indices)
+      zip(identifiers, identifiers.indices),
+      uniquingKeysWith: { first, _ in first }
     )
     self.container = container
   }
