@@ -61,11 +61,13 @@ extension CodableResourceMacro {
   }
 
   private static func decodeAttribute(_ variable: VariableDeclSyntax) -> DeclSyntax {
-    let method = variable.isOptional ? "decodeIfPresent" : "decode"
+    let method = variable.isOptional || variable.isArray ? "decodeIfPresent" : "decode"
     let type = variable.isOptional ? variable.optionalWrappedType : variable.type
+    let arrayNilCoalesce: DeclSyntax = variable.isArray ? " ?? []" : ""
 
     return """
-      self.\(variable.identifier) = try attributesContainer.\(raw: method)(\(type).self, forKey: .\(variable.identifier))
+      self.\(variable.identifier) = try attributesContainer.\
+      \(raw: method)(\(type).self, forKey: .\(variable.identifier))\(arrayNilCoalesce)
       """
   }
 

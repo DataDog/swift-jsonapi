@@ -122,6 +122,121 @@ final class CodableResourceTests: XCTestCase {
     )
   }
 
+  func testDecodeNull() throws {
+    // given
+    let json = """
+      {
+        "data": null
+      }
+      """.data(using: .utf8)!
+
+    // when
+    let articles = try JSONDecoder().decode([Article].self, from: json)
+
+    // then
+    XCTAssertEqual([], articles)
+  }
+
+  func testDecodeNullRelationshipToMany() throws {
+    // given
+    let json = """
+      {
+        "data": [
+          {
+            "type": "articles",
+            "id": "1",
+            "attributes": {
+              "title": "JSON:API paints my bikeshed!"
+            },
+            "relationships": {
+              "author": {
+                "data": {
+                  "type": "people",
+                  "id": "9"
+                }
+              },
+              "comments": {
+                "data": null
+              }
+            }
+          }
+        ],
+        "included": [
+          {
+            "type": "people",
+            "id": "9",
+            "attributes": {
+              "firstName": "Dan",
+              "lastName": "Gebhardt",
+              "twitter": "dgeb"
+            }
+          }
+        ]
+      }
+      """.data(using: .utf8)!
+
+    // when
+    let articles = try JSONDecoder().decode([Article].self, from: json)
+
+    // then
+    XCTAssertEqual(
+      [
+        Article(
+          id: "1",
+          title: "JSON:API paints my bikeshed!",
+          author: Person(
+            id: "9",
+            firstName: "Dan",
+            lastName: "Gebhardt",
+            twitter: "dgeb"
+          ),
+          comments: []
+        )
+      ],
+      articles
+    )
+  }
+
+  func testDecodeNullArrayAttribute() throws {
+    // given
+    let json = """
+      {
+        "data": [
+          {
+            "type": "schedules",
+            "id": "1",
+            "attributes": {
+              "name": "Some schedule",
+              "tags": [
+                "some tag"
+              ]
+            }
+          },
+          {
+            "type": "schedules",
+            "id": "2",
+            "attributes": {
+              "name": "Some other schedule",
+              "tags": null
+            }
+          }
+        ]
+      }
+      """.data(using: .utf8)!
+
+    // when
+    let schedules = try JSONDecoder().decode([Schedule].self, from: json)
+
+    // then
+    XCTAssertEqual(
+      [
+        Schedule(id: "1", name: "Some schedule", tags: ["some tag"]),
+        Schedule(id: "2", name: "Some other schedule", tags: []),
+      ],
+      schedules
+    )
+  }
+
   func testEncodingRoundtrip() throws {
     // given
     let articles: [Article] = [

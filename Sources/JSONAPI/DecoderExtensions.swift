@@ -18,9 +18,9 @@ extension JSONDecoder {
   public func decode<T>(
     _ type: T.Type,
     from data: Data
-  ) throws -> T where T: Collection, T: Decodable, T.Element: DecodableResource {
+  ) throws -> T where T: RangeReplaceableCollection, T: Decodable, T.Element: DecodableResource {
     self.decodesIncludedResources = true
-    return try self.decode(Document<T>.self, from: data).data
+    return try self.decode(Document<T?>.self, from: data).data ?? T()
   }
 }
 
