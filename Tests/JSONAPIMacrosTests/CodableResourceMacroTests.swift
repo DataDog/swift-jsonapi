@@ -32,6 +32,9 @@ final class CodableResourceMacroTests: XCTestCase {
 
         @ResourceAttribute
         var birthday: Date?
+
+        @ResourceAttribute
+        var tags: [String]
       }
       """
     } expansion: {
@@ -42,6 +45,7 @@ final class CodableResourceMacroTests: XCTestCase {
         var firstName: String
         var lastName: String
         var birthday: Date?
+        var tags: [String]
 
         static let type = "people"
       }
@@ -51,6 +55,7 @@ final class CodableResourceMacroTests: XCTestCase {
             case firstName
             case lastName = "last_name"
             case birthday
+            case tags
         }
 
         init(from decoder: any Decoder) throws {
@@ -61,6 +66,7 @@ final class CodableResourceMacroTests: XCTestCase {
             self.firstName = try attributesContainer.decode(String.self, forKey: .firstName)
             self.lastName = try attributesContainer.decode(String.self, forKey: .lastName)
             self.birthday = try attributesContainer.decodeIfPresent(Date.self, forKey: .birthday)
+            self.tags = try attributesContainer.decodeIfPresent([String].self, forKey: .tags) ?? []
         }
         func encode(to encoder: any Encoder) throws {
             var container = encoder.container(keyedBy: ResourceCodingKeys.self)
@@ -70,6 +76,7 @@ final class CodableResourceMacroTests: XCTestCase {
             try attributesContainer.encode(self.firstName, forKey: .firstName)
             try attributesContainer.encode(self.lastName, forKey: .lastName)
             try attributesContainer.encodeIfPresent(self.birthday, forKey: .birthday)
+            try attributesContainer.encode(self.tags, forKey: .tags)
         }
       }
       """
@@ -82,7 +89,10 @@ final class CodableResourceMacroTests: XCTestCase {
       @CodableResource(type: "articles")
       struct Article {
         @ResourceRelationship
-        var author: Author?
+        var author: Person
+
+        @ResourceRelationship
+        var coauthor: Person?
 
         @ResourceRelationship
         var comments: [Comment]
@@ -94,7 +104,8 @@ final class CodableResourceMacroTests: XCTestCase {
     } expansion: {
       """
       struct Article {
-        var author: Author?
+        var author: Person
+        var coauthor: Person?
         var comments: [Comment]
         var related: [Article]?
 
@@ -107,6 +118,7 @@ final class CodableResourceMacroTests: XCTestCase {
 
         private enum ResourceRelationshipCodingKeys: String, CodingKey {
             case author
+            case coauthor
             case comments
             case related = "related_articles"
         }
@@ -118,16 +130,14 @@ final class CodableResourceMacroTests: XCTestCase {
               throw DocumentDecodingError.includedResourceDecodingNotEnabled
             }
             let relationshipsContainer = try container.nestedContainer(keyedBy: ResourceRelationshipCodingKeys.self, forKey: .relationships)
-            let authorRelationship = try relationshipsContainer.decodeIfPresent(RelationshipToOne.self, forKey: .author)
-            if let authorRelationship {
-              self.author = try includedResourceDecoder.decodeIfPresent(Author.self, forIdentifier: authorRelationship.data)
-            }
+            let authorRelationship = try relationshipsContainer.decode(RelationshipToOne.self, forKey: .author)
+            self.author = try includedResourceDecoder.decode(Person.self, forRelationship: authorRelationship)
+            let coauthorRelationship = try relationshipsContainer.decodeIfPresent(OptionalRelationshipToOne.self, forKey: .coauthor)
+            self.coauthor = try includedResourceDecoder.decodeIfPresent(Person.self, forRelationship: coauthorRelationship)
             let commentsRelationship = try relationshipsContainer.decode(RelationshipToMany.self, forKey: .comments)
-            self.comments = try includedResourceDecoder.decode([Comment].self, forIdentifiers: commentsRelationship.data)
+            self.comments = try includedResourceDecoder.decode([Comment].self, forRelationship: commentsRelationship)
             let relatedRelationship = try relationshipsContainer.decodeIfPresent(RelationshipToMany.self, forKey: .related)
-            if let relatedRelationship {
-              self.related = try includedResourceDecoder.decodeIfPresent([Article].self, forIdentifiers: relatedRelationship.data)
-            }
+            self.related = try includedResourceDecoder.decodeIfPresent([Article].self, forRelationship: relatedRelationship)
         }
         func encode(to encoder: any Encoder) throws {
             var container = encoder.container(keyedBy: ResourceCodingKeys.self)
@@ -137,16 +147,14 @@ final class CodableResourceMacroTests: XCTestCase {
               throw DocumentEncodingError.includedResourceEncodingNotEnabled
             }
             var relationshipsContainer = container.nestedContainer(keyedBy: ResourceRelationshipCodingKeys.self, forKey: .relationships)
-            if let author {
-                    try relationshipsContainer.encode(RelationshipToOne(resource: author), forKey: .author)
-                    try includedResourceEncoder.encode(author)
-                  }
-            try relationshipsContainer.encode(RelationshipToMany(resources: comments), forKey: .comments)
-            try includedResourceEncoder.encode(comments)
-            if let related {
-              try relationshipsContainer.encode(RelationshipToMany(resources: related), forKey: .related)
-              try includedResourceEncoder.encode(related)
-            }
+            try relationshipsContainer.encode(RelationshipToOne(resource: self.author), forKey: .author)
+            includedResourceEncoder.encode(self.author)
+            try relationshipsContainer.encodeIfPresent(RelationshipToOne(resource: self.coauthor), forKey: .coauthor)
+            includedResourceEncoder.encodeIfPresent(self.coauthor)
+            try relationshipsContainer.encode(RelationshipToMany(resources: self.comments), forKey: .comments)
+            includedResourceEncoder.encode(self.comments)
+            try relationshipsContainer.encodeIfPresent(RelationshipToMany(resources: self.related), forKey: .related)
+            includedResourceEncoder.encodeIfPresent(self.related)
         }
       }
       """

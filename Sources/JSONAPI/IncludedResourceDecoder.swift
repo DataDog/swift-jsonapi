@@ -17,6 +17,44 @@ public final class IncludedResourceDecoder {
 
   public func decode<T>(
     _ type: T.Type,
+    forRelationship relationship: RelationshipToOne
+  ) throws -> T where T: DecodableResource {
+    try self.decode(type, forIdentifier: relationship.data)
+  }
+
+  public func decode<T>(
+    _ type: [T].Type,
+    forRelationship relationship: RelationshipToMany
+  ) throws -> [T] where T: DecodableResource {
+    try relationship.data.map {
+      try self.decode(T.self, forIdentifier: $0)
+    }
+  }
+
+  public func decodeIfPresent<T>(
+    _ type: T.Type,
+    forRelationship relationship: OptionalRelationshipToOne?
+  ) throws -> T? where T: DecodableResource {
+    guard let data = relationship?.data else {
+      return nil
+    }
+    return try decodeIfPresent(type, forIdentifier: data)
+  }
+
+  public func decodeIfPresent<T>(
+    _ type: [T].Type,
+    forRelationship relationship: RelationshipToMany?
+  ) throws -> [T]? where T: DecodableResource {
+    guard let data = relationship?.data else {
+      return nil
+    }
+    return try data.compactMap {
+      try self.decodeIfPresent(T.self, forIdentifier: $0)
+    }
+  }
+
+  private func decode<T>(
+    _ type: T.Type,
     forIdentifier identifier: ResourceIdentifier
   ) throws -> T where T: DecodableResource {
     guard let resource = try self.decodeIfPresent(type, forIdentifier: identifier) else {
@@ -33,7 +71,7 @@ public final class IncludedResourceDecoder {
     return resource
   }
 
-  public func decodeIfPresent<T>(
+  private func decodeIfPresent<T>(
     _ type: T.Type,
     forIdentifier identifier: ResourceIdentifier
   ) throws -> T? where T: DecodableResource {
@@ -42,15 +80,6 @@ public final class IncludedResourceDecoder {
     }
 
     return try self.decode(T.self, at: index)
-  }
-
-  public func decode<T>(
-    _ type: [T].Type,
-    forIdentifiers identifiers: [ResourceIdentifier]
-  ) throws -> [T] where T: DecodableResource {
-    try identifiers.map {
-      try self.decode(T.self, forIdentifier: $0)
-    }
   }
 
   private func decode<T>(_ type: T.Type, at index: Int) throws -> T where T: DecodableResource {

@@ -106,43 +106,29 @@ extension CodableResourceMacro {
   }
 
   private static func encodeRelationship(_ variable: VariableDeclSyntax) -> DeclSyntax {
-    var encodeModelAndResource: DeclSyntax = """
-      \(encodeRelationshipModel(variable))
-      \(encodeIncludedResource(variable))
-      """
-
-    if variable.isOptional {
-      encodeModelAndResource = optionalBinding(variable, body: encodeModelAndResource)
-    }
-
-    return encodeModelAndResource
+    """
+    \(encodeRelationshipModel(variable))
+    \(encodeIncludedResource(variable))
+    """
   }
 
   private static func encodeRelationshipModel(_ variable: VariableDeclSyntax) -> DeclSyntax {
+    let method = variable.isOptional ? "encodeIfPresent" : "encode"
     let type = variable.isOptional ? variable.optionalWrappedType : variable.type
-    let relationshipType = (type?.isArray ?? false) ? "RelationshipToMany" : "RelationshipToOne"
-    let parameterLabel = (type?.isArray ?? false) ? "resources" : "resource"
+    let isArray = (type?.isArray ?? false)
+    let relationshipType = isArray ? "RelationshipToMany" : "RelationshipToOne"
+    let parameterLabel = isArray ? "resources" : "resource"
 
     return """
-      try relationshipsContainer.encode\
-      (\(raw: relationshipType)(\(raw: parameterLabel): \(variable.identifier)), forKey: .\(variable.identifier))
+      try relationshipsContainer.\(raw: method)\
+      (\(raw: relationshipType)(\(raw: parameterLabel): self.\(variable.identifier)), forKey: .\(variable.identifier))
       """
   }
 
   private static func encodeIncludedResource(_ variable: VariableDeclSyntax) -> DeclSyntax {
-    """
-    try includedResourceEncoder.encode(\(variable.identifier))
-    """
-  }
-
-  private static func optionalBinding(
-    _ variable: VariableDeclSyntax,
-    body: DeclSyntax
-  ) -> DeclSyntax {
-    """
-    if let \(variable.identifier) {
-      \(body)
-    }
-    """
+    let method = variable.isOptional ? "encodeIfPresent" : "encode"
+    return """
+      includedResourceEncoder.\(raw: method)(self.\(variable.identifier))
+      """
   }
 }

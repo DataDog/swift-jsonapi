@@ -63,3 +63,14 @@ struct Article: Equatable {
   @ResourceRelationship
   var comments: [Comment]
 }
+
+@CodableResource(type: "schedules")
+struct Schedule: Equatable {
+  var id: String
+
+  @ResourceAttribute
+  var name: String
+
+  @ResourceAttribute
+  var tags: [String]
+}

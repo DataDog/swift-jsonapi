@@ -61,11 +61,13 @@ extension CodableResourceMacro {
   }
 
   private static func decodeAttribute(_ variable: VariableDeclSyntax) -> DeclSyntax {
-    let method = variable.isOptional ? "decodeIfPresent" : "decode"
+    let method = variable.isOptional || variable.isArray ? "decodeIfPresent" : "decode"
     let type = variable.isOptional ? variable.optionalWrappedType : variable.type
+    let arrayNilCoalesce: DeclSyntax = variable.isArray ? " ?? []" : ""
 
     return """
-      self.\(variable.identifier) = try attributesContainer.\(raw: method)(\(type).self, forKey: .\(variable.identifier))
+      self.\(variable.identifier) = try attributesContainer.\
+      \(raw: method)(\(type).self, forKey: .\(variable.identifier))\(arrayNilCoalesce)
       """
   }
 
@@ -110,26 +112,22 @@ extension CodableResourceMacro {
   }
 
   private static func decodeRelationship(_ variable: VariableDeclSyntax) -> DeclSyntax {
-    let decodeIncluded =
-      if variable.isOptional {
-        relationshipModelOptionalBinding(
-          variable,
-          decodeIncluded: self.decodeIncluded(variable)
-        )
-      } else {
-        self.decodeIncluded(variable)
-      }
-
-    return """
-      \(decodeRelationshipModel(variable))
-      \(decodeIncluded)
-      """
+    """
+    \(decodeRelationshipModel(variable))
+    \(decodeIncluded(variable))
+    """
   }
 
   private static func decodeRelationshipModel(_ variable: VariableDeclSyntax) -> DeclSyntax {
     let method = variable.isOptional ? "decodeIfPresent" : "decode"
     let type = variable.isOptional ? variable.optionalWrappedType : variable.type
-    let relationshipType = (type?.isArray ?? false) ? "RelationshipToMany" : "RelationshipToOne"
+    let isArray = (type?.isArray ?? false)
+    let relationshipType =
+      if variable.isOptional, !isArray {
+        "OptionalRelationshipToOne"
+      } else {
+        isArray ? "RelationshipToMany" : "RelationshipToOne"
+      }
 
     return """
       let \(variable.identifier)Relationship = try relationshipsContainer.\
@@ -140,22 +138,10 @@ extension CodableResourceMacro {
   private static func decodeIncluded(_ variable: VariableDeclSyntax) -> DeclSyntax {
     let method = variable.isOptional ? "decodeIfPresent" : "decode"
     let type = variable.isOptional ? variable.optionalWrappedType : variable.type
-    let parameterLabel = (type?.isArray ?? false) ? "forIdentifiers" : "forIdentifier"
 
     return """
       self.\(variable.identifier) = try includedResourceDecoder.\(raw: method)\
-      (\(type).self, \(raw: parameterLabel): \(variable.identifier)Relationship.data)
+      (\(type).self, forRelationship: \(variable.identifier)Relationship)
       """
-  }
-
-  private static func relationshipModelOptionalBinding(
-    _ variable: VariableDeclSyntax,
-    decodeIncluded: DeclSyntax
-  ) -> DeclSyntax {
-    """
-    if let \(variable.identifier)Relationship {
-      \(decodeIncluded)
-    }
-    """
   }
 }
