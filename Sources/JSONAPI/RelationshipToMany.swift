@@ -15,4 +15,11 @@ public struct RelationshipToMany: Equatable, Codable {
   public init<T>(resources: T) where T: Sequence, T.Element: Resource {
     self.init(data: resources.map(\.resourceIdentifier))
   }
+
+  public init?<T>(resources: T?) where T: Sequence, T.Element: Resource {
+    guard let resources else {
+      return nil
+    }
+    self.init(data: resources.map(\.resourceIdentifier))
+  }
 }

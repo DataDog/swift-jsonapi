@@ -197,6 +197,35 @@ final class CodableResourceTests: XCTestCase {
     )
   }
 
+  func testNullRelationshipToOne() throws {
+    // given
+    let json = """
+      {
+        "data": {
+          "type": "comments",
+          "id": "12",
+          "attributes": {
+            "body": "I like XML better"
+          },
+          "relationships": {
+            "author": {
+              "data": null
+            }
+          }
+        }
+      }
+      """.data(using: .utf8)!
+
+    // when
+    let comment = try JSONDecoder().decode(Comment.self, from: json)
+
+    // then
+    XCTAssertEqual(
+      Comment(id: "12", body: "I like XML better"),
+      comment
+    )
+  }
+
   func testDecodeNullArrayAttribute() throws {
     // given
     let json = """

@@ -26,15 +26,25 @@ public final class IncludedResourceEncoder {
 
   private var encodeInvocations: [EncodeInvocation] = []
 
-  public func encode<T>(_ value: T) throws where T: EncodableResource {
+  public func encode<T>(_ value: T) where T: EncodableResource {
     // Defer encoding to avoid simultaneous accesses
     encodeInvocations.append(.init(resource: value))
   }
 
-  public func encode<S>(_ sequence: S) throws where S: Sequence, S.Element: EncodableResource {
+  public func encodeIfPresent<T>(_ value: T?) where T: EncodableResource {
+    guard let value else { return }
+    self.encode(value)
+  }
+
+  public func encode<S>(_ sequence: S) where S: Sequence, S.Element: EncodableResource {
     for element in sequence {
-      try self.encode(element)
+      self.encode(element)
     }
+  }
+
+  public func encodeIfPresent<S>(_ sequence: S?) where S: Sequence, S.Element: EncodableResource {
+    guard let sequence else { return }
+    self.encode(sequence)
   }
 
   func encodeResources(into container: inout UnkeyedEncodingContainer) throws {

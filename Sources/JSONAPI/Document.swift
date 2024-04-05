@@ -16,16 +16,13 @@ extension Document: Decodable where Content: Decodable {
     let container = try decoder.container(keyedBy: CodingKeys.self)
 
     // Make the included resource decoder available to child decoders if there are any included resources
-    if let identifiers = try container.decodeIfPresent(
-      [ResourceIdentifier].self, forKey: .included
-    ),
-      let includedResourceDecoderStorage = decoder.userInfo.includedResourceDecoderStorage
-    {
-      includedResourceDecoderStorage.includedResourceDecoder = IncludedResourceDecoder(
-        identifiers: identifiers
-      ) {
+    if let includedResourceDecoderStorage = decoder.userInfo.includedResourceDecoderStorage {
+      let identifiers =
+        try container.decodeIfPresent([ResourceIdentifier].self, forKey: .included) ?? []
+      let includedResourceDecoder = IncludedResourceDecoder(identifiers: identifiers) {
         try container.nestedUnkeyedContainer(forKey: .included)
       }
+      includedResourceDecoderStorage.includedResourceDecoder = includedResourceDecoder
     }
 
     self.data = try container.decode(Content.self, forKey: .data)
