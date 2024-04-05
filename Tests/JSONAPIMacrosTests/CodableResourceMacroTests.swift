@@ -32,6 +32,9 @@ final class CodableResourceMacroTests: XCTestCase {
 
         @ResourceAttribute
         var birthday: Date?
+
+        @ResourceAttribute
+        var tags: [String]
       }
       """
     } expansion: {
@@ -42,6 +45,7 @@ final class CodableResourceMacroTests: XCTestCase {
         var firstName: String
         var lastName: String
         var birthday: Date?
+        var tags: [String]
 
         static let type = "people"
       }
@@ -51,6 +55,7 @@ final class CodableResourceMacroTests: XCTestCase {
             case firstName
             case lastName = "last_name"
             case birthday
+            case tags
         }
 
         init(from decoder: any Decoder) throws {
@@ -61,6 +66,7 @@ final class CodableResourceMacroTests: XCTestCase {
             self.firstName = try attributesContainer.decode(String.self, forKey: .firstName)
             self.lastName = try attributesContainer.decode(String.self, forKey: .lastName)
             self.birthday = try attributesContainer.decodeIfPresent(Date.self, forKey: .birthday)
+            self.tags = try attributesContainer.decodeIfPresent([String].self, forKey: .tags) ?? []
         }
         func encode(to encoder: any Encoder) throws {
             var container = encoder.container(keyedBy: ResourceCodingKeys.self)
@@ -70,6 +76,7 @@ final class CodableResourceMacroTests: XCTestCase {
             try attributesContainer.encode(self.firstName, forKey: .firstName)
             try attributesContainer.encode(self.lastName, forKey: .lastName)
             try attributesContainer.encodeIfPresent(self.birthday, forKey: .birthday)
+            try attributesContainer.encode(self.tags, forKey: .tags)
         }
       }
       """
