@@ -9,11 +9,7 @@
 	named(init(from:)),
 	named(encode(to:))
 )
-public macro CodableResource(type: String) =
-	#externalMacro(
-		module: "JSONAPIMacros",
-		type: "CodableResourceMacro"
-	)
+public macro CodableResource(type: String) = #externalMacro(module: "JSONAPIMacros", type: "CodableResourceMacro")
 
 @attached(accessor, names: named(willSet))
 public macro ResourceAttribute(key: String? = nil) =
@@ -28,3 +24,10 @@ public macro ResourceRelationship(key: String? = nil) =
 		module: "JSONAPIMacros",
 		type: "ResourceRelationshipMacro"
 	)
+
+@attached(
+	extension,
+	conformances: CodableResource,
+	names: named(type), named(id), named(init(from:)), named(encode(to:))
+)
+public macro CodableResourceUnion() = #externalMacro(module: "JSONAPIMacros", type: "CodableResourceUnionMacro")

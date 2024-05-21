@@ -7,5 +7,6 @@ struct JSONAPIPlugin: CompilerPlugin {
 		CodableResourceMacro.self,
 		ResourceAttributeMacro.self,
 		ResourceRelationshipMacro.self,
+		CodableResourceUnionMacro.self,
 	]
 }

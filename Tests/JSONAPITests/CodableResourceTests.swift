@@ -357,4 +357,88 @@ final class CodableResourceTests: XCTestCase {
 		// then
 		XCTAssertEqual(decodedArticles, articles)
 	}
+
+	func testPolymorphicRelationships() throws {
+		// given
+		let json = """
+			{
+				"data": {
+					"type": "messages",
+					"id": "1",
+					"attributes": {
+						"text": "Look what I just found!"
+					},
+					"relationships": {
+						"attachments": {
+							"data": [
+								{
+									"type": "images",
+									"id": "42"
+								},
+								{
+									"type": "audios",
+									"id": "66"
+								}
+							]
+						}
+					}
+				},
+				"included": [
+					{
+						"type": "images",
+						"id": "42",
+						"attributes": {
+							"url": "https://via.placeholder.com/640x480",
+							"width": 640,
+							"height": 480
+						}
+					},
+					{
+						"type": "audios",
+						"id": "66",
+						"attributes": {
+							"url": "https://audio.com/NeverGonnaGiveYouUp.mp3",
+							"title": "Never Gonna Give You Up"
+						}
+					}
+				]
+			}
+			""".data(using: .utf8)!
+
+		// when
+		let message = try JSONDecoder().decode(Message.self, from: json)
+
+		// then
+		XCTAssertEqual(
+			Message(
+				id: "1",
+				text: "Look what I just found!",
+				attachments: [
+					.image(
+						Image(
+							id: "42",
+							url: URL(string: "https://via.placeholder.com/640x480")!,
+							width: 640,
+							height: 480
+						)
+					),
+					.audio(
+						Audio(
+							id: "66",
+							url: URL(string: "https://audio.com/NeverGonnaGiveYouUp.mp3")!,
+							title: "Never Gonna Give You Up"
+						)
+					),
+				]
+			),
+			message
+		)
+
+		// when
+		let data = try JSONEncoder().encode(message)
+		let decodedMessage = try JSONDecoder().decode(Message.self, from: data)
+
+		// then
+		XCTAssertEqual(decodedMessage, message)
+	}
 }

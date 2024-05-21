@@ -74,3 +74,45 @@ struct Schedule: Equatable {
 	@ResourceAttribute
 	var tags: [String]
 }
+
+@CodableResource(type: "images")
+struct Image: Equatable {
+	var id: String
+
+	@ResourceAttribute
+	var url: URL
+
+	@ResourceAttribute
+	var width: Int
+
+	@ResourceAttribute
+	var height: Int
+}
+
+@CodableResource(type: "audios")
+struct Audio: Equatable {
+	var id: String
+
+	@ResourceAttribute
+	var url: URL
+
+	@ResourceAttribute
+	var title: String
+}
+
+@CodableResourceUnion
+enum Attachment: Equatable {
+	case image(Image)
+	case audio(Audio)
+}
+
+@CodableResource(type: "messages")
+struct Message: Equatable {
+	var id: String
+
+	@ResourceAttribute
+	var text: String
+
+	@ResourceRelationship
+	var attachments: [Attachment]
+}
