@@ -1,5 +1,5 @@
 import Foundation
 
 public enum ResourceCodingKeys: String, CodingKey {
-  case type, id, attributes, relationships
+	case type, id, attributes, relationships
 }

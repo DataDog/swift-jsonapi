@@ -1,9 +1,9 @@
 import Foundation
 
 public enum DocumentDecodingError: Error {
-  case includedResourceDecodingNotEnabled
+	case includedResourceDecodingNotEnabled
 }
 
 public enum DocumentEncodingError: Error {
-  case includedResourceEncodingNotEnabled
+	case includedResourceEncodingNotEnabled
 }
