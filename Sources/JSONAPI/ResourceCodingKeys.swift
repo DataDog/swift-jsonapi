@@ -5,14 +5,14 @@ public enum ResourceCodingKeys: String, CodingKey {
 }
 
 extension KeyedDecodingContainer where Key == ResourceCodingKeys {
-	public func checkResourceType<T>(_: T.Type, _ expectedType: String) throws {
+	public func checkResourceType<T>(_: T.Type) throws where T: ResourceType {
 		let type = try self.decode(String.self, forKey: .type)
-		if type != expectedType {
+		if type != T.resourceType {
 			throw DecodingError.typeMismatch(
 				T.self,
 				.init(
 					codingPath: [ResourceCodingKeys.type],
-					debugDescription: "Resource type '\(type)' does not match expected type '\(expectedType)'"
+					debugDescription: "Resource type '\(type)' does not match expected type '\(T.resourceType)'"
 				)
 			)
 		}

@@ -47,7 +47,11 @@ final class CodableResourceMacroTests: XCTestCase {
 			  var birthday: Date?
 			  var tags: [String]
 
-			  let type = "people"
+			  let type = Self.resourceType
+			}
+
+			extension Person: JSONAPI.ResourceType {
+			  static let resourceType = "people"
 			}
 
 			extension Person: JSONAPI.CodableResource {
@@ -60,7 +64,7 @@ final class CodableResourceMacroTests: XCTestCase {
 
 			  init(from decoder: any Decoder) throws {
 			    let container = try decoder.container(keyedBy: ResourceCodingKeys.self)
-			    try container.checkResourceType(Self.self, self.type)
+			    try container.checkResourceType(Self.self)
 			    self.id = try container.decode(String.self, forKey: .id)
 			    let attributesContainer = try container.nestedContainer(keyedBy: ResourceAttributeCodingKeys.self, forKey: .attributes)
 			    self.firstName = try attributesContainer.decode(String.self, forKey: .firstName)
@@ -109,9 +113,13 @@ final class CodableResourceMacroTests: XCTestCase {
 			  var comments: [Comment]
 			  var related: [Article]?
 
-			  let type = "articles"
+			  let type = Self.resourceType
 
 			  var id: String
+			}
+
+			extension Article: JSONAPI.ResourceType {
+			  static let resourceType = "articles"
 			}
 
 			extension Article: JSONAPI.CodableResource {
@@ -123,7 +131,7 @@ final class CodableResourceMacroTests: XCTestCase {
 			  }
 			  init(from decoder: any Decoder) throws {
 			    let container = try decoder.container(keyedBy: ResourceCodingKeys.self)
-			    try container.checkResourceType(Self.self, self.type)
+			    try container.checkResourceType(Self.self)
 			    self.id = try container.decode(String.self, forKey: .id)
 			    guard let includedResourceDecoder = decoder.includedResourceDecoder else {
 			      throw DocumentDecodingError.includedResourceDecodingNotEnabled
@@ -171,9 +179,13 @@ final class CodableResourceMacroTests: XCTestCase {
 			"""
 			public struct Person {
 
-			    public let type = "people"
+			    public let type = Self.resourceType
 
 			    public var id: String
+			}
+
+			extension Person: JSONAPI.ResourceType {
+			    public  static let resourceType = "people"
 			}
 
 			extension Person: JSONAPI.CodableResource {
@@ -181,7 +193,7 @@ final class CodableResourceMacroTests: XCTestCase {
 
 			    public init(from decoder: any Decoder) throws {
 			        let container = try decoder.container(keyedBy: ResourceCodingKeys.self)
-			        try container.checkResourceType(Self.self, self.type)
+			        try container.checkResourceType(Self.self)
 			        self.id = try container.decode(String.self, forKey: .id)
 			    }
 
@@ -212,14 +224,18 @@ final class CodableResourceMacroTests: XCTestCase {
 
 			  var id: Id
 
-			  let type = "people"
+			  let type = Self.resourceType
+			}
+
+			extension Person: JSONAPI.ResourceType {
+			  static let resourceType = "people"
 			}
 
 			extension Person: JSONAPI.CodableResource {
 
 			  init(from decoder: any Decoder) throws {
 			    let container = try decoder.container(keyedBy: ResourceCodingKeys.self)
-			    try container.checkResourceType(Self.self, self.type)
+			    try container.checkResourceType(Self.self)
 			    self.id = try container.decode(Id.self, forKey: .id)
 			  }
 			  func encode(to encoder: any Encoder) throws {
@@ -245,9 +261,14 @@ final class CodableResourceMacroTests: XCTestCase {
 			@available(macOS, unavailable)
 			struct Person {
 
-			    let type = "people"
+			    let type = Self.resourceType
 
 			    var id: String
+			}
+
+			@available(macOS, unavailable)
+			extension Person: JSONAPI.ResourceType {
+			    static let resourceType = "people"
 			}
 
 			@available(macOS, unavailable)
@@ -255,7 +276,7 @@ final class CodableResourceMacroTests: XCTestCase {
 
 			    init(from decoder: any Decoder) throws {
 			        let container = try decoder.container(keyedBy: ResourceCodingKeys.self)
-			        try container.checkResourceType(Self.self, self.type)
+			        try container.checkResourceType(Self.self)
 			        self.id = try container.decode(String.self, forKey: .id)
 			    }
 			    func encode(to encoder: any Encoder) throws {

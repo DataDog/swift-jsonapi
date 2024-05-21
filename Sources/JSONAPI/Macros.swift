@@ -1,9 +1,10 @@
 @attached(member, names: named(type), named(id))
 @attached(
 	extension,
-	conformances: CodableResource,
+	conformances: ResourceType, CodableResource,
 	names:
-		named(ResourceAttributeCodingKeys),
+		named(resourceType),
+	named(ResourceAttributeCodingKeys),
 	named(ResourceRelationshipCodingKeys),
 	named(init(from:)),
 	named(encode(to:))

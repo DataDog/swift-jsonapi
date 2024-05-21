@@ -19,7 +19,7 @@ extension CodableResourceMacro {
 	) -> DeclSyntax {
 		return """
 			let container = try decoder.container(keyedBy: ResourceCodingKeys.self)
-			try container.checkResourceType(Self.self, self.\(raw: typeVariableIdentifier))
+			try container.checkResourceType(Self.self)
 			self.\(raw: idVariableIdentifier) = try container.decode(\(idType).self, forKey: .\(raw: idVariableIdentifier))
 			\(attributesDecodingContainer(attributes))\
 			\(decodeAttributes(attributes))\

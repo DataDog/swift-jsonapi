@@ -18,20 +18,25 @@ extension CodableResourceMacro {
 	static let resourceRelationshipMacroName = "ResourceRelationship"
 	static let resourceRelationshipCodingKeysName = "ResourceRelationshipCodingKeys"
 
-	static func type(
-		modifier: DeclModifierSyntax?,
-		value: StringSegmentSyntax
-	) -> DeclSyntax {
-		"""
-		\(modifier)let \(raw: typeVariableIdentifier) = "\(value)"
-		"""
+	static func resourceType(modifier: DeclModifierSyntax?, value: StringSegmentSyntax?) -> DeclSyntax? {
+		guard let value else {
+			return nil
+		}
+
+		return """
+			\(modifier) static let resourceType = "\(value)"
+			"""
+	}
+
+	static func type(modifier: DeclModifierSyntax?) -> DeclSyntax {
+		"\(modifier)let \(raw: typeVariableIdentifier) = Self.resourceType"
 	}
 
 	static func id(modifier: DeclModifierSyntax?) -> DeclSyntax {
 		"\(modifier)var \(raw: idVariableIdentifier): String"
 	}
 
-	static func extensionMembers(
+	static func codableResourceMembers(
 		modifier: DeclModifierSyntax?,
 		idType: TypeSyntax,
 		attributes: [VariableDeclSyntax],
