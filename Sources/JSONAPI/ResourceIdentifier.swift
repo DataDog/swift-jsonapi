@@ -8,4 +8,8 @@ public struct ResourceIdentifier: Hashable, Codable {
 		self.type = type
 		self.id = id
 	}
+
+	public init<T>(_ resource: T) where T: Resource {
+		self.init(type: resource.type, id: String(describing: resource.id))
+	}
 }

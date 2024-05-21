@@ -23,7 +23,7 @@ extension CodableResourceMacro {
 		value: StringSegmentSyntax
 	) -> DeclSyntax {
 		"""
-		\(modifier)static let \(raw: typeVariableIdentifier) = "\(value)"
+		\(modifier)let \(raw: typeVariableIdentifier) = "\(value)"
 		"""
 	}
 

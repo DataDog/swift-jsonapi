@@ -61,11 +61,11 @@ extension CodableResourceMacro: MemberMacro {
 
 		// Add required properties
 		declaration.addIfNeeded(
-			self.id(modifier: declaration.publicModifier),
+			self.type(modifier: declaration.publicModifier, value: resourceType),
 			to: &declarations
 		)
 		declaration.addIfNeeded(
-			self.type(modifier: declaration.publicModifier, value: resourceType),
+			self.id(modifier: declaration.publicModifier),
 			to: &declarations
 		)
 

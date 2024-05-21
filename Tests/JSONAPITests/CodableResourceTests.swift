@@ -266,6 +266,36 @@ final class CodableResourceTests: XCTestCase {
 		)
 	}
 
+	func testDecodeTypeMismatch() throws {
+		// given
+		let json = """
+			{
+			  "data": {
+			    "type": "people",
+			    "id": "9",
+			    "attributes": {
+			  	"firstName": "Dan",
+			  	"lastName": "Gebhardt",
+			  	"twitter": "dgeb"
+			    }
+			  }
+			}
+			""".data(using: .utf8)!
+
+		do {
+			// when
+			_ = try JSONDecoder().decode(Comment.self, from: json)
+			XCTFail("Should throw DecodingError.typeMismatch.")
+		} catch let DecodingError.typeMismatch(type, context) {
+			// then
+			XCTAssertEqual(String(describing: type), String(describing: Comment.self))
+			XCTAssertEqual(
+				context.debugDescription, "Resource type 'people' does not match expected type 'comments'")
+		} catch {
+			XCTFail("Expected DecodingError.typeMismatch but got \(error).")
+		}
+	}
+
 	func testEncodingRoundtrip() throws {
 		// given
 		let articles: [Article] = [

@@ -12,7 +12,7 @@ public final class IncludedResourceEncoder {
 
 		init<T>(resource: T) where T: EncodableResource {
 			self.invoke = { encodedResources, container in
-				let resourceIdentifier = resource.resourceIdentifier
+				let resourceIdentifier = ResourceIdentifier(resource)
 
 				guard !encodedResources.contains(resourceIdentifier) else {
 					return
