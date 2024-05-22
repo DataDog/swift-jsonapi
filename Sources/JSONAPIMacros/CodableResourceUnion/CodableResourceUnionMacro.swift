@@ -113,17 +113,7 @@ extension CodableResourceUnionMacro {
 				}
 			}
 			SwitchCaseSyntax("default:") {
-				ExprSyntax(
-					"""
-					throw DecodingError.typeMismatch(
-						Self.self,
-						.init(
-							codingPath: [ResourceCodingKeys.type],
-							debugDescription: "Resource type '\\(type)' not found in union."
-						)
-					)
-					"""
-				)
+				ExprSyntax("throw JSONAPIDecodingError.unhandledResourceType(Self.self, type)")
 			}
 		}.formatted()
 		let body = DeclSyntax(
