@@ -358,7 +358,61 @@ final class CodableResourceTests: XCTestCase {
 		XCTAssertEqual(decodedArticles, articles)
 	}
 
-	func testPolymorphicRelationships() throws {
+	func testPolymorphicToOneRelationship() throws {
+		// given
+		let json = """
+		{
+			"data": {
+				"type": "single_attachment_messages",
+				"id": "1",
+				"attributes": {
+					"text": "Look what I just found!"
+				},
+				"relationships": {
+					"attachment": {
+						"data": {
+							"type": "images",
+							"id": "42"
+						}
+					}
+				}
+			},
+			"included": [
+				{
+					"type": "images",
+					"id": "42",
+					"attributes": {
+						"url": "https://via.placeholder.com/640x480",
+						"width": 640,
+						"height": 480
+					}
+				}
+			]
+		}
+		""".data(using: .utf8)!
+		
+		// when
+		let message = try JSONAPIDecoder().decode(SingleAttachmentMessage.self, from: json)
+		
+		// then
+		XCTAssertEqual(
+			SingleAttachmentMessage(
+				id: "1",
+				text: "Look what I just found!",
+				attachment: .image(
+					Image(
+						   id: "42",
+						   url: URL(string: "https://via.placeholder.com/640x480")!,
+						   width: 640,
+						   height: 480
+					   )
+				   )
+			),
+			message
+		)
+	}
+	
+	func testPolymorphicToManyRelationship() throws {
 		// given
 		let json = """
 			{
@@ -440,5 +494,160 @@ final class CodableResourceTests: XCTestCase {
 
 		// then
 		XCTAssertEqual(decodedMessage, message)
+	}
+	
+	func testPolymorphicRelationshipUnhandledResourceType() throws {
+		// given
+		let json = """
+		{
+			"data": {
+				"type": "single_attachment_messages",
+				"id": "1",
+				"attributes": {
+					"text": "Look what I just found!"
+				},
+				"relationships": {
+					"attachment": {
+						"data": {
+							"type": "videos",
+							"id": "42"
+						}
+					}
+				}
+			},
+			"included": [
+				{
+					"type": "videos",
+					"id": "42",
+					"attributes": {
+						"url": "https://example.com/video.mp4",
+					}
+				}
+			]
+		}
+		""".data(using: .utf8)!
+		
+		do {
+			// when
+			_ = try JSONAPIDecoder().decode(SingleAttachmentMessage.self, from: json)
+			XCTFail("Should throw JSONAPIDecodingError.unhandledResourceType.")
+		} catch let JSONAPIDecodingError.unhandledResourceType(unionType, resourceType) {
+			// then
+			XCTAssertEqual(String(describing: unionType), String(describing: Attachment.self))
+			XCTAssertEqual(resourceType, "videos")
+		} catch {
+			XCTFail("Expected JSONAPIDecodingError.unhandledResourceType but got \(error).")
+		}
+	}
+	
+	func testPolymorphicRelationshipIgnoresUnhandledResourceType() throws {
+		// given
+		let json = """
+		{
+			"data": {
+				"type": "single_attachment_messages",
+				"id": "1",
+				"attributes": {
+					"text": "Look what I just found!"
+				},
+				"relationships": {
+					"attachment": {
+						"data": {
+							"type": "videos",
+							"id": "42"
+						}
+					}
+				}
+			},
+			"included": [
+				{
+					"type": "videos",
+					"id": "42",
+					"attributes": {
+						"url": "https://example.com/video.mp4"
+					}
+				}
+			]
+		}
+		""".data(using: .utf8)!
+		
+		let decoder = JSONAPIDecoder()
+		decoder.ignoresUnhandledResourceTypes = true
+		
+		// when
+		let message = try decoder.decode(SingleAttachmentMessage.self, from: json)
+		
+		// then
+		XCTAssertEqual(SingleAttachmentMessage(id: "1", text: "Look what I just found!"), message)
+	}
+	
+	func testPolymorphicToManyRelationshipIgnoresUnhandledResourceType() throws {
+		// given
+		let json = """
+		{
+			"data": {
+				"type": "messages",
+				"id": "1",
+				"attributes": {
+					"text": "Look what I just found!"
+				},
+				"relationships": {
+					"attachments": {
+						"data": [
+							{
+								"type": "videos",
+								"id": "42"
+							},
+							{
+								"type": "audios",
+								"id": "66"
+							}
+						]
+					}
+				}
+			},
+			"included": [
+				{
+					"type": "videos",
+					"id": "42",
+					"attributes": {
+						"url": "https://example.com/video.mp4"
+					}
+				},
+				{
+					"type": "audios",
+					"id": "66",
+					"attributes": {
+						"url": "https://audio.com/NeverGonnaGiveYouUp.mp3",
+						"title": "Never Gonna Give You Up"
+					}
+				}
+			]
+		}
+		""".data(using: .utf8)!
+		
+		let decoder = JSONAPIDecoder()
+		decoder.ignoresUnhandledResourceTypes = true
+		
+		// when
+		let message = try decoder.decode(Message.self, from: json)
+		
+		// then
+		XCTAssertEqual(
+			Message(
+				id: "1",
+				text: "Look what I just found!",
+				attachments: [
+					.audio(
+						Audio(
+							id: "66",
+							url: URL(string: "https://audio.com/NeverGonnaGiveYouUp.mp3")!,
+							title: "Never Gonna Give You Up"
+						)
+					)
+				]
+			),
+			message
+		)
 	}
 }

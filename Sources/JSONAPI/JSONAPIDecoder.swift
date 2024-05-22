@@ -1,6 +1,11 @@
 import Foundation
 
 public class JSONAPIDecoder: JSONDecoder {
+	public var ignoresUnhandledResourceTypes: Bool {
+		get { userInfo.ignoresUnhandledResourceTypes }
+		set { userInfo.ignoresUnhandledResourceTypes = newValue }
+	}
+	
 	public override init() {
 		super.init()
 		self.userInfo.includedResourceDecoderStorage = IncludedResourceDecoderStorage()
@@ -25,20 +30,30 @@ extension Decoder {
 }
 
 extension Dictionary where Key == CodingUserInfoKey, Value == Any {
-	fileprivate(set) var includedResourceDecoderStorage: IncludedResourceDecoderStorage? {
+	fileprivate(set) var ignoresUnhandledResourceTypes: Bool {
 		get {
-			self[IncludedResourceDecoderStorage.key] as? IncludedResourceDecoderStorage
+			(self[.ignoresUnhandledResourceTypes] as? Bool) ?? false
 		}
 		set {
-			self[IncludedResourceDecoderStorage.key] = newValue
+			self[.ignoresUnhandledResourceTypes] = newValue
+		}
+	}
+	
+	fileprivate(set) var includedResourceDecoderStorage: IncludedResourceDecoderStorage? {
+		get {
+			self[.includedResourceDecoderStorage] as? IncludedResourceDecoderStorage
+		}
+		set {
+			self[.includedResourceDecoderStorage] = newValue
 		}
 	}
 }
 
 final class IncludedResourceDecoderStorage {
-	fileprivate static let key = CodingUserInfoKey(
-		rawValue: "JSONAPI.IncludedResourceDecoderStorage"
-	)!
-
 	var includedResourceDecoder: IncludedResourceDecoder?
+}
+
+extension CodingUserInfoKey {
+	fileprivate static let ignoresUnhandledResourceTypes = Self(rawValue: "JSONAPI.ignoresUnhandledResourceTypes")!
+	fileprivate static let includedResourceDecoderStorage = Self(rawValue: "JSONAPI.IncludedResourceDecoderStorage")!
 }

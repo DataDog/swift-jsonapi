@@ -1,13 +1,16 @@
 import Foundation
 
 public final class IncludedResourceDecoder {
-	private let container: () throws -> any UnkeyedDecodingContainer
+	private let userInfo: [CodingUserInfoKey: Any]
 	private let indexByIdentifier: [ResourceIdentifier: Int]
+	private let container: () throws -> any UnkeyedDecodingContainer
 
 	init(
+		userInfo: [CodingUserInfoKey: Any],
 		identifiers: [ResourceIdentifier],
 		container: @escaping () throws -> any UnkeyedDecodingContainer
 	) {
+		self.userInfo = userInfo
 		self.indexByIdentifier = Dictionary(
 			zip(identifiers, identifiers.indices),
 			uniquingKeysWith: { first, _ in first }
@@ -26,8 +29,12 @@ public final class IncludedResourceDecoder {
 		_ type: [T].Type,
 		forRelationship relationship: RelationshipToMany
 	) throws -> [T] where T: DecodableResource {
-		try relationship.data.map {
-			try self.decode(T.self, forIdentifier: $0)
+		try relationship.data.compactMap {
+			do {
+				return try self.decode(T.self, forIdentifier: $0)
+			} catch JSONAPIDecodingError.unhandledResourceType where userInfo.ignoresUnhandledResourceTypes {
+				return nil
+			}
 		}
 	}
 
@@ -38,7 +45,12 @@ public final class IncludedResourceDecoder {
 		guard let data = relationship?.data else {
 			return nil
 		}
-		return try decodeIfPresent(type, forIdentifier: data)
+		
+		do {
+			return try decodeIfPresent(type, forIdentifier: data)
+		} catch JSONAPIDecodingError.unhandledResourceType where userInfo.ignoresUnhandledResourceTypes {
+			return nil
+		}
 	}
 
 	public func decodeIfPresent<T>(

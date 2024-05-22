@@ -116,3 +116,14 @@ struct Message: Equatable {
 	@ResourceRelationship
 	var attachments: [Attachment]
 }
+
+@CodableResource(type: "single_attachment_messages")
+struct SingleAttachmentMessage: Equatable {
+	var id: String
+
+	@ResourceAttribute
+	var text: String
+
+	@ResourceRelationship
+	var attachment: Attachment?
+}
