@@ -62,7 +62,6 @@ extension CodableResourceUnionMacro {
 		modifier: DeclModifierSyntax?,
 		enumCaseElements: [EnumCaseElementSyntax]
 	) -> DeclSyntax {
-		// TODO: implement
 		return """
 			\(typeComputedProperty(modifier: modifier, enumCaseElements: enumCaseElements))\
 			\(idComputedProperty(modifier: modifier, enumCaseElements: enumCaseElements))\
