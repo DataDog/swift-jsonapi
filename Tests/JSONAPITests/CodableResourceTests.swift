@@ -89,7 +89,7 @@ final class CodableResourceTests: XCTestCase {
 			""".data(using: .utf8)!
 
 		// when
-		let articles = try JSONDecoder().decode([Article].self, from: json)
+		let articles = try JSONAPIDecoder().decode([Article].self, from: json)
 
 		// then
 		XCTAssertEqual(
@@ -131,7 +131,7 @@ final class CodableResourceTests: XCTestCase {
 			""".data(using: .utf8)!
 
 		// when
-		let articles = try JSONDecoder().decode([Article].self, from: json)
+		let articles = try JSONAPIDecoder().decode([Article].self, from: json)
 
 		// then
 		XCTAssertEqual([], articles)
@@ -176,7 +176,7 @@ final class CodableResourceTests: XCTestCase {
 			""".data(using: .utf8)!
 
 		// when
-		let articles = try JSONDecoder().decode([Article].self, from: json)
+		let articles = try JSONAPIDecoder().decode([Article].self, from: json)
 
 		// then
 		XCTAssertEqual(
@@ -217,7 +217,7 @@ final class CodableResourceTests: XCTestCase {
 			""".data(using: .utf8)!
 
 		// when
-		let comment = try JSONDecoder().decode(Comment.self, from: json)
+		let comment = try JSONAPIDecoder().decode(Comment.self, from: json)
 
 		// then
 		XCTAssertEqual(
@@ -254,7 +254,7 @@ final class CodableResourceTests: XCTestCase {
 			""".data(using: .utf8)!
 
 		// when
-		let schedules = try JSONDecoder().decode([Schedule].self, from: json)
+		let schedules = try JSONAPIDecoder().decode([Schedule].self, from: json)
 
 		// then
 		XCTAssertEqual(
@@ -284,7 +284,7 @@ final class CodableResourceTests: XCTestCase {
 
 		do {
 			// when
-			_ = try JSONDecoder().decode(Comment.self, from: json)
+			_ = try JSONAPIDecoder().decode(Comment.self, from: json)
 			XCTFail("Should throw DecodingError.typeMismatch.")
 		} catch let DecodingError.typeMismatch(type, context) {
 			// then
@@ -351,8 +351,8 @@ final class CodableResourceTests: XCTestCase {
 		]
 
 		// when
-		let data = try JSONEncoder().encode(articles)
-		let decodedArticles = try JSONDecoder().decode([Article].self, from: data)
+		let data = try JSONAPIEncoder().encode(articles)
+		let decodedArticles = try JSONAPIDecoder().decode([Article].self, from: data)
 
 		// then
 		XCTAssertEqual(decodedArticles, articles)
@@ -406,7 +406,7 @@ final class CodableResourceTests: XCTestCase {
 			""".data(using: .utf8)!
 
 		// when
-		let message = try JSONDecoder().decode(Message.self, from: json)
+		let message = try JSONAPIDecoder().decode(Message.self, from: json)
 
 		// then
 		XCTAssertEqual(
@@ -435,8 +435,8 @@ final class CodableResourceTests: XCTestCase {
 		)
 
 		// when
-		let data = try JSONEncoder().encode(message)
-		let decodedMessage = try JSONDecoder().decode(Message.self, from: data)
+		let data = try JSONAPIEncoder().encode(message)
+		let decodedMessage = try JSONAPIDecoder().decode(Message.self, from: data)
 
 		// then
 		XCTAssertEqual(decodedMessage, message)

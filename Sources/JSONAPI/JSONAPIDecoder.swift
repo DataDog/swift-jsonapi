@@ -1,26 +1,20 @@
 import Foundation
 
-extension JSONDecoder {
-	public var decodesIncludedResources: Bool {
-		get {
-			userInfo.includedResourceDecoderStorage != nil
-		}
-		set {
-			userInfo.includedResourceDecoderStorage = newValue ? IncludedResourceDecoderStorage() : nil
-		}
+public class JSONAPIDecoder: JSONDecoder {
+	public override init() {
+		super.init()
+		self.userInfo.includedResourceDecoderStorage = IncludedResourceDecoderStorage()
 	}
 
 	public func decode<T>(_ type: T.Type, from data: Data) throws -> T where T: DecodableResource {
-		self.decodesIncludedResources = true
-		return try self.decode(Document<T>.self, from: data).data
+		try self.decode(Document<T>.self, from: data).data
 	}
 
 	public func decode<T>(
 		_ type: T.Type,
 		from data: Data
 	) throws -> T where T: RangeReplaceableCollection, T: Decodable, T.Element: DecodableResource {
-		self.decodesIncludedResources = true
-		return try self.decode(Document<T?>.self, from: data).data ?? T()
+		try self.decode(Document<T?>.self, from: data).data ?? T()
 	}
 }
 

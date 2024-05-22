@@ -1,25 +1,19 @@
 import Foundation
 
-extension JSONEncoder {
-	public var encodesIncludedResources: Bool {
-		get {
-			userInfo.includedResourceEncoder != nil
-		}
-		set {
-			userInfo.includedResourceEncoder = newValue ? IncludedResourceEncoder() : nil
-		}
+public class JSONAPIEncoder: JSONEncoder {
+	public override init() {
+		super.init()
+		self.userInfo.includedResourceEncoder = IncludedResourceEncoder()
 	}
 
 	public func encode<T>(_ value: T) throws -> Data where T: EncodableResource {
-		self.encodesIncludedResources = true
-		return try self.encode(Document(data: value))
+		try self.encode(Document(data: value))
 	}
 
 	public func encode<T>(
 		_ value: T
 	) throws -> Data where T: Collection, T: Encodable, T.Element: EncodableResource {
-		self.encodesIncludedResources = true
-		return try self.encode(Document(data: value))
+		try self.encode(Document(data: value))
 	}
 }
 

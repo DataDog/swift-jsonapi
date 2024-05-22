@@ -67,7 +67,7 @@ extension CodableResourceMacro {
 		}
 		return """
 			guard let includedResourceEncoder = encoder.includedResourceEncoder else {\
-			throw DocumentEncodingError.includedResourceEncodingNotEnabled}
+			fatalError("You must use a 'JSONAPIEncoder' instance to encode a JSON:API resource.")}
 			"""
 	}
 
