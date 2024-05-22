@@ -34,6 +34,8 @@ public final class IncludedResourceDecoder {
 				return try self.decode(T.self, forIdentifier: $0)
 			} catch JSONAPIDecodingError.unhandledResourceType where userInfo.ignoresUnhandledResourceTypes {
 				return nil
+			} catch DecodingError.valueNotFound where userInfo.ignoresMissingResources {
+				return nil
 			}
 		}
 	}
@@ -45,7 +47,7 @@ public final class IncludedResourceDecoder {
 		guard let data = relationship?.data else {
 			return nil
 		}
-		
+
 		do {
 			return try decodeIfPresent(type, forIdentifier: data)
 		} catch JSONAPIDecodingError.unhandledResourceType where userInfo.ignoresUnhandledResourceTypes {

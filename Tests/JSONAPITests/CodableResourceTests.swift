@@ -358,42 +358,42 @@ final class CodableResourceTests: XCTestCase {
 		XCTAssertEqual(decodedArticles, articles)
 	}
 
-	func testPolymorphicToOneRelationship() throws {
+	func testRelationshipToOnePolymorphic() throws {
 		// given
 		let json = """
-		{
-			"data": {
-				"type": "single_attachment_messages",
-				"id": "1",
-				"attributes": {
-					"text": "Look what I just found!"
-				},
-				"relationships": {
-					"attachment": {
-						"data": {
-							"type": "images",
-							"id": "42"
+			{
+				"data": {
+					"type": "single_attachment_messages",
+					"id": "1",
+					"attributes": {
+						"text": "Look what I just found!"
+					},
+					"relationships": {
+						"attachment": {
+							"data": {
+								"type": "images",
+								"id": "42"
+							}
 						}
 					}
-				}
-			},
-			"included": [
-				{
-					"type": "images",
-					"id": "42",
-					"attributes": {
-						"url": "https://via.placeholder.com/640x480",
-						"width": 640,
-						"height": 480
+				},
+				"included": [
+					{
+						"type": "images",
+						"id": "42",
+						"attributes": {
+							"url": "https://via.placeholder.com/640x480",
+							"width": 640,
+							"height": 480
+						}
 					}
-				}
-			]
-		}
-		""".data(using: .utf8)!
-		
+				]
+			}
+			""".data(using: .utf8)!
+
 		// when
 		let message = try JSONAPIDecoder().decode(SingleAttachmentMessage.self, from: json)
-		
+
 		// then
 		XCTAssertEqual(
 			SingleAttachmentMessage(
@@ -401,18 +401,18 @@ final class CodableResourceTests: XCTestCase {
 				text: "Look what I just found!",
 				attachment: .image(
 					Image(
-						   id: "42",
-						   url: URL(string: "https://via.placeholder.com/640x480")!,
-						   width: 640,
-						   height: 480
-					   )
-				   )
+						id: "42",
+						url: URL(string: "https://via.placeholder.com/640x480")!,
+						width: 640,
+						height: 480
+					)
+				)
 			),
 			message
 		)
 	}
-	
-	func testPolymorphicToManyRelationship() throws {
+
+	func testRelationshipToManyPolymorphic() throws {
 		// given
 		let json = """
 			{
@@ -495,38 +495,38 @@ final class CodableResourceTests: XCTestCase {
 		// then
 		XCTAssertEqual(decodedMessage, message)
 	}
-	
-	func testPolymorphicRelationshipUnhandledResourceType() throws {
+
+	func testUnhandledResourceType() throws {
 		// given
 		let json = """
-		{
-			"data": {
-				"type": "single_attachment_messages",
-				"id": "1",
-				"attributes": {
-					"text": "Look what I just found!"
-				},
-				"relationships": {
-					"attachment": {
-						"data": {
-							"type": "videos",
-							"id": "42"
+			{
+				"data": {
+					"type": "single_attachment_messages",
+					"id": "1",
+					"attributes": {
+						"text": "Look what I just found!"
+					},
+					"relationships": {
+						"attachment": {
+							"data": {
+								"type": "videos",
+								"id": "42"
+							}
 						}
 					}
-				}
-			},
-			"included": [
-				{
-					"type": "videos",
-					"id": "42",
-					"attributes": {
-						"url": "https://example.com/video.mp4",
+				},
+				"included": [
+					{
+						"type": "videos",
+						"id": "42",
+						"attributes": {
+							"url": "https://example.com/video.mp4",
+						}
 					}
-				}
-			]
-		}
-		""".data(using: .utf8)!
-		
+				]
+			}
+			""".data(using: .utf8)!
+
 		do {
 			// when
 			_ = try JSONAPIDecoder().decode(SingleAttachmentMessage.self, from: json)
@@ -539,99 +539,99 @@ final class CodableResourceTests: XCTestCase {
 			XCTFail("Expected JSONAPIDecodingError.unhandledResourceType but got \(error).")
 		}
 	}
-	
-	func testPolymorphicRelationshipIgnoresUnhandledResourceType() throws {
+
+	func testIgnoresUnhandledResourceTypeRelationshipToOne() throws {
 		// given
 		let json = """
-		{
-			"data": {
-				"type": "single_attachment_messages",
-				"id": "1",
-				"attributes": {
-					"text": "Look what I just found!"
-				},
-				"relationships": {
-					"attachment": {
-						"data": {
-							"type": "videos",
-							"id": "42"
+			{
+				"data": {
+					"type": "single_attachment_messages",
+					"id": "1",
+					"attributes": {
+						"text": "Look what I just found!"
+					},
+					"relationships": {
+						"attachment": {
+							"data": {
+								"type": "videos",
+								"id": "42"
+							}
 						}
 					}
-				}
-			},
-			"included": [
-				{
-					"type": "videos",
-					"id": "42",
-					"attributes": {
-						"url": "https://example.com/video.mp4"
+				},
+				"included": [
+					{
+						"type": "videos",
+						"id": "42",
+						"attributes": {
+							"url": "https://example.com/video.mp4"
+						}
 					}
-				}
-			]
-		}
-		""".data(using: .utf8)!
-		
+				]
+			}
+			""".data(using: .utf8)!
+
 		let decoder = JSONAPIDecoder()
 		decoder.ignoresUnhandledResourceTypes = true
-		
+
 		// when
 		let message = try decoder.decode(SingleAttachmentMessage.self, from: json)
-		
+
 		// then
 		XCTAssertEqual(SingleAttachmentMessage(id: "1", text: "Look what I just found!"), message)
 	}
-	
-	func testPolymorphicToManyRelationshipIgnoresUnhandledResourceType() throws {
+
+	func testIgnoresUnhandledResourceTypeRelationshipToMany() throws {
 		// given
 		let json = """
-		{
-			"data": {
-				"type": "messages",
-				"id": "1",
-				"attributes": {
-					"text": "Look what I just found!"
-				},
-				"relationships": {
-					"attachments": {
-						"data": [
-							{
-								"type": "videos",
-								"id": "42"
-							},
-							{
-								"type": "audios",
-								"id": "66"
-							}
-						]
-					}
-				}
-			},
-			"included": [
-				{
-					"type": "videos",
-					"id": "42",
+			{
+				"data": {
+					"type": "messages",
+					"id": "1",
 					"attributes": {
-						"url": "https://example.com/video.mp4"
+						"text": "Look what I just found!"
+					},
+					"relationships": {
+						"attachments": {
+							"data": [
+								{
+									"type": "videos",
+									"id": "42"
+								},
+								{
+									"type": "audios",
+									"id": "66"
+								}
+							]
+						}
 					}
 				},
-				{
-					"type": "audios",
-					"id": "66",
-					"attributes": {
-						"url": "https://audio.com/NeverGonnaGiveYouUp.mp3",
-						"title": "Never Gonna Give You Up"
+				"included": [
+					{
+						"type": "videos",
+						"id": "42",
+						"attributes": {
+							"url": "https://example.com/video.mp4"
+						}
+					},
+					{
+						"type": "audios",
+						"id": "66",
+						"attributes": {
+							"url": "https://audio.com/NeverGonnaGiveYouUp.mp3",
+							"title": "Never Gonna Give You Up"
+						}
 					}
-				}
-			]
-		}
-		""".data(using: .utf8)!
-		
+				]
+			}
+			""".data(using: .utf8)!
+
 		let decoder = JSONAPIDecoder()
 		decoder.ignoresUnhandledResourceTypes = true
-		
+
 		// when
 		let message = try decoder.decode(Message.self, from: json)
-		
+
 		// then
 		XCTAssertEqual(
 			Message(
@@ -648,6 +648,124 @@ final class CodableResourceTests: XCTestCase {
 				]
 			),
 			message
+		)
+	}
+
+	func testMissingResource() throws {
+		// given
+		let json = """
+			{
+				"data": {
+					"type": "articles",
+					"id": "1",
+					"attributes": {
+						"title": "JSON:API paints my bikeshed!"
+					},
+					"relationships": {
+						"author": {
+							"data": {
+								"type": "people",
+								"id": "9"
+							}
+						},
+						"comments": {
+							"data": [
+								{
+									"type": "comments",
+									"id": "5"
+								}
+							]
+						}
+					}
+				},
+				"included": [
+					{
+						"type": "people",
+						"id": "9",
+						"attributes": {
+							"firstName": "Dan",
+							"lastName": "Gebhardt",
+							"twitter": "dgeb"
+						}
+					}
+				]
+			}
+			""".data(using: .utf8)!
+
+		do {
+			// when
+			_ = try JSONAPIDecoder().decode(Article.self, from: json)
+			XCTFail("Should throw DecodingError.valueNotFound.")
+		} catch let DecodingError.valueNotFound(type, context) {
+			// then
+			XCTAssertEqual(String(describing: type), String(describing: Comment.self))
+			XCTAssertEqual(context.debugDescription, "Could not find resource of type 'comments' with id '5'.")
+		} catch {
+			XCTFail("Expected DecodingError.valueNotFound but got \(error).")
+		}
+	}
+
+	func testIgnoresMissingResources() throws {
+		// given
+		let json = """
+			{
+				"data": {
+					"type": "articles",
+					"id": "1",
+					"attributes": {
+						"title": "JSON:API paints my bikeshed!"
+					},
+					"relationships": {
+						"author": {
+							"data": {
+								"type": "people",
+								"id": "9"
+							}
+						},
+						"comments": {
+							"data": [
+								{
+									"type": "comments",
+									"id": "5"
+								}
+							]
+						}
+					}
+				},
+				"included": [
+					{
+						"type": "people",
+						"id": "9",
+						"attributes": {
+							"firstName": "Dan",
+							"lastName": "Gebhardt",
+							"twitter": "dgeb"
+						}
+					}
+				]
+			}
+			""".data(using: .utf8)!
+
+		let decoder = JSONAPIDecoder()
+		decoder.ignoresMissingResources = true
+
+		// when
+		let article = try decoder.decode(Article.self, from: json)
+
+		// then
+		XCTAssertEqual(
+			Article(
+				id: "1",
+				title: "JSON:API paints my bikeshed!",
+				author: Person(
+					id: .init(rawValue: "9"),
+					firstName: "Dan",
+					lastName: "Gebhardt",
+					twitter: "dgeb"
+				),
+				comments: []
+			),
+			article
 		)
 	}
 }
