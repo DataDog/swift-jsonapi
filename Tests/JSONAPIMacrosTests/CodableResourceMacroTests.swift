@@ -134,7 +134,7 @@ final class CodableResourceMacroTests: XCTestCase {
 			    try container.checkResourceType(Self.self)
 			    self.id = try container.decode(String.self, forKey: .id)
 			    guard let includedResourceDecoder = decoder.includedResourceDecoder else {
-			      throw DocumentDecodingError.includedResourceDecodingNotEnabled
+			      fatalError("You must use a 'JSONAPIDecoder' instance to decode a JSON:API response.")
 			    }
 			    let relationshipsContainer = try container.nestedContainer(keyedBy: ResourceRelationshipCodingKeys.self, forKey: .relationships)
 			    let authorRelationship = try relationshipsContainer.decode(RelationshipToOne.self, forKey: .author)
@@ -151,7 +151,7 @@ final class CodableResourceMacroTests: XCTestCase {
 			    try container.encode(self.type, forKey: .type)
 			    try container.encode(self.id, forKey: .id)
 			    guard let includedResourceEncoder = encoder.includedResourceEncoder else {
-			      throw DocumentEncodingError.includedResourceEncodingNotEnabled
+			      fatalError("You must use a 'JSONAPIEncoder' instance to encode a JSON:API resource.")
 			    }
 			    var relationshipsContainer = container.nestedContainer(keyedBy: ResourceRelationshipCodingKeys.self, forKey: .relationships)
 			    try relationshipsContainer.encode(RelationshipToOne(resource: self.author), forKey: .author)

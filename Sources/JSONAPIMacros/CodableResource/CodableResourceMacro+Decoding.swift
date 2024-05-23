@@ -73,7 +73,7 @@ extension CodableResourceMacro {
 
 		return """
 			guard let includedResourceDecoder = decoder.includedResourceDecoder else {\
-			throw DocumentDecodingError.includedResourceDecodingNotEnabled}
+			fatalError("You must use a 'JSONAPIDecoder' instance to decode a JSON:API response.")}
 			"""
 	}
 

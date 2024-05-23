@@ -23,7 +23,7 @@ final class CodableResourceUnionMacroTests: XCTestCase {
 			}
 			"""
 		} expansion: {
-			#"""
+			"""
 			enum Attachment: Equatable {
 				case image(Image)
 				case audio(Audio)
@@ -55,13 +55,7 @@ final class CodableResourceUnionMacroTests: XCTestCase {
 					case Audio.resourceType:
 					    self = try .audio(Audio(from: decoder))
 					default:
-						throw DecodingError.typeMismatch(
-							Self.self,
-							.init(
-								codingPath: [ResourceCodingKeys.type],
-								debugDescription: "Resource type '\(type)' not found in union."
-							)
-						)
+						throw JSONAPIDecodingError.unhandledResourceType(Self.self, type)
 					}
 				}
 				func encode(to encoder: any Encoder) throws {
@@ -73,7 +67,7 @@ final class CodableResourceUnionMacroTests: XCTestCase {
 					}
 				}
 			}
-			"""#
+			"""
 		}
 	}
 
@@ -86,7 +80,7 @@ final class CodableResourceUnionMacroTests: XCTestCase {
 			}
 			"""
 		} expansion: {
-			#"""
+			"""
 			public enum Attachment: Equatable {
 				case image(Image), audio(Audio)
 			}
@@ -117,13 +111,7 @@ final class CodableResourceUnionMacroTests: XCTestCase {
 					case Audio.resourceType:
 					    self = try .audio(Audio(from: decoder))
 					default:
-						throw DecodingError.typeMismatch(
-							Self.self,
-							.init(
-								codingPath: [ResourceCodingKeys.type],
-								debugDescription: "Resource type '\(type)' not found in union."
-							)
-						)
+						throw JSONAPIDecodingError.unhandledResourceType(Self.self, type)
 					}
 				}
 				public func encode(to encoder: any Encoder) throws {
@@ -135,7 +123,7 @@ final class CodableResourceUnionMacroTests: XCTestCase {
 					}
 				}
 			}
-			"""#
+			"""
 		}
 	}
 
@@ -149,7 +137,7 @@ final class CodableResourceUnionMacroTests: XCTestCase {
 			}
 			"""
 		} expansion: {
-			#"""
+			"""
 			@available(macOS, unavailable)
 			public enum Attachment: Equatable {
 				case image(Image), audio(Audio)
@@ -182,13 +170,7 @@ final class CodableResourceUnionMacroTests: XCTestCase {
 					case Audio.resourceType:
 					    self = try .audio(Audio(from: decoder))
 					default:
-						throw DecodingError.typeMismatch(
-							Self.self,
-							.init(
-								codingPath: [ResourceCodingKeys.type],
-								debugDescription: "Resource type '\(type)' not found in union."
-							)
-						)
+						throw JSONAPIDecodingError.unhandledResourceType(Self.self, type)
 					}
 				}
 				public func encode(to encoder: any Encoder) throws {
@@ -200,7 +182,7 @@ final class CodableResourceUnionMacroTests: XCTestCase {
 					}
 				}
 			}
-			"""#
+			"""
 		}
 	}
 }
