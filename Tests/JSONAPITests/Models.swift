@@ -127,3 +127,8 @@ struct SingleAttachmentMessage: Equatable {
 	@ResourceRelationship
 	var attachment: Attachment?
 }
+
+struct CopyrightInfo: Equatable, Codable {
+	var copyright: String
+	var authors: [String]
+}

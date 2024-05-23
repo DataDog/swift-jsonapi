@@ -768,4 +768,103 @@ final class CodableResourceTests: XCTestCase {
 			article
 		)
 	}
+
+	func testMetaDecoding() throws {
+		// given
+		let json = """
+			{
+				"data": {
+					"type": "articles",
+					"id": "1",
+					"attributes": {
+						"title": "JSON:API paints my bikeshed!"
+					},
+					"relationships": {
+						"author": {
+							"data": {
+								"type": "people",
+								"id": "9"
+							}
+						},
+						"comments": {
+							"data": null
+						}
+					}
+				},
+				"meta": {
+					"copyright": "Copyright 2024 Datadog Inc.",
+						"authors": [
+							"Yassir Ramdani",
+							"Nicolas Mulet",
+							"Alan Fineberg",
+							"Guille González"
+						]
+				},
+				"included": [
+					{
+						"type": "people",
+						"id": "9",
+						"attributes": {
+							"firstName": "Dan",
+							"lastName": "Gebhardt",
+							"twitter": "dgeb"
+						}
+					}
+				]
+			}
+			""".data(using: .utf8)!
+
+		// when
+		let document = try JSONAPIDecoder().decode(Document<Article, CopyrightInfo>.self, from: json)
+
+		// then
+		XCTAssertEqual(
+			Document(
+				data: Article(
+					id: "1",
+					title: "JSON:API paints my bikeshed!",
+					author: Person(
+						id: "9",
+						firstName: "Dan",
+						lastName: "Gebhardt",
+						twitter: "dgeb"
+					),
+					comments: []
+				),
+				meta: CopyrightInfo(
+					copyright: "Copyright 2024 Datadog Inc.",
+					authors: ["Yassir Ramdani", "Nicolas Mulet", "Alan Fineberg", "Guille González"]
+				)
+			),
+			document
+		)
+	}
+
+	func testMetaEncodingRoundtrip() throws {
+		// given
+		let document = Document(
+			data: Article(
+				id: "1",
+				title: "JSON:API paints my bikeshed!",
+				author: Person(
+					id: "9",
+					firstName: "Dan",
+					lastName: "Gebhardt",
+					twitter: "dgeb"
+				),
+				comments: []
+			),
+			meta: CopyrightInfo(
+				copyright: "Copyright 2024 Datadog Inc.",
+				authors: ["Yassir Ramdani", "Nicolas Mulet", "Alan Fineberg", "Guille González"]
+			)
+		)
+
+		// when
+		let data = try JSONAPIEncoder().encode(document)
+		let decodedDocument = try JSONAPIDecoder().decode(Document<Article, CopyrightInfo>.self, from: data)
+
+		// then
+		XCTAssertEqual(decodedDocument, document)
+	}
 }

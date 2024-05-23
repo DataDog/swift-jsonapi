@@ -1,17 +1,23 @@
 import Foundation
 
-public struct Document<Content> {
-	public var data: Content
+public struct Document<PrimaryData, Meta> {
+	public var data: PrimaryData
+	public var meta: Meta
 
-	public init(data: Content) {
+	public init(data: PrimaryData, meta: Meta) {
 		self.data = data
+		self.meta = meta
+	}
+
+	public init(data: PrimaryData) where Meta == Unit {
+		self.init(data: data, meta: Unit())
 	}
 }
 
-extension Document: Equatable where Content: Equatable {
+extension Document: Equatable where PrimaryData: Equatable, Meta: Equatable {
 }
 
-extension Document: Decodable where Content: Decodable {
+extension Document: Decodable where PrimaryData: Decodable, Meta: Decodable {
 	public init(from decoder: any Decoder) throws {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 
@@ -27,15 +33,25 @@ extension Document: Decodable where Content: Decodable {
 			includedResourceDecoderStorage.includedResourceDecoder = includedResourceDecoder
 		}
 
-		self.data = try container.decode(Content.self, forKey: .data)
+		self.data = try container.decode(PrimaryData.self, forKey: .data)
+
+		if let meta = Unit() as? Meta {
+			self.meta = meta
+		} else {
+			self.meta = try container.decode(Meta.self, forKey: .meta)
+		}
 	}
 }
 
-extension Document: Encodable where Content: Encodable {
+extension Document: Encodable where PrimaryData: Encodable, Meta: Encodable {
 	public func encode(to encoder: any Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 
 		try container.encode(self.data, forKey: .data)
+
+		if Meta.self != Unit.self {
+			try container.encode(self.meta, forKey: .meta)
+		}
 
 		var includedContainer = container.nestedUnkeyedContainer(forKey: .included)
 		try encoder.includedResourceEncoder?.encodeResources(into: &includedContainer)
@@ -44,6 +60,6 @@ extension Document: Encodable where Content: Encodable {
 
 extension Document {
 	fileprivate enum CodingKeys: String, CodingKey {
-		case data, included
+		case data, meta, included
 	}
 }
