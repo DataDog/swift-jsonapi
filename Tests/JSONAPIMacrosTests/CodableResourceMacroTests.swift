@@ -47,36 +47,40 @@ final class CodableResourceMacroTests: XCTestCase {
 			  var birthday: Date?
 			  var tags: [String]
 
-			  static let type = "people"
+			  let type = Self.resourceType
+			}
+
+			extension Person: JSONAPI.ResourceType {
+			  static let resourceType = "people"
 			}
 
 			extension Person: JSONAPI.CodableResource {
 			  private enum ResourceAttributeCodingKeys: String, CodingKey {
-			      case firstName
-			      case lastName = "last_name"
-			      case birthday
-			      case tags
+			    case firstName
+			    case lastName = "last_name"
+			    case birthday
+			    case tags
 			  }
 
 			  init(from decoder: any Decoder) throws {
-			      let container = try decoder.container(keyedBy: ResourceCodingKeys.self)
-			      _ = try container.decode(ResourceType<Self>.self, forKey: .type)
-			      self.id = try container.decode(String.self, forKey: .id)
-			      let attributesContainer = try container.nestedContainer(keyedBy: ResourceAttributeCodingKeys.self, forKey: .attributes)
-			      self.firstName = try attributesContainer.decode(String.self, forKey: .firstName)
-			      self.lastName = try attributesContainer.decode(String.self, forKey: .lastName)
-			      self.birthday = try attributesContainer.decodeIfPresent(Date.self, forKey: .birthday)
-			      self.tags = try attributesContainer.decodeIfPresent([String].self, forKey: .tags) ?? []
+			    let container = try decoder.container(keyedBy: ResourceCodingKeys.self)
+			    try container.checkResourceType(Self.self)
+			    self.id = try container.decode(String.self, forKey: .id)
+			    let attributesContainer = try container.nestedContainer(keyedBy: ResourceAttributeCodingKeys.self, forKey: .attributes)
+			    self.firstName = try attributesContainer.decode(String.self, forKey: .firstName)
+			    self.lastName = try attributesContainer.decode(String.self, forKey: .lastName)
+			    self.birthday = try attributesContainer.decodeIfPresent(Date.self, forKey: .birthday)
+			    self.tags = try attributesContainer.decodeIfPresent([String].self, forKey: .tags) ?? []
 			  }
 			  func encode(to encoder: any Encoder) throws {
-			      var container = encoder.container(keyedBy: ResourceCodingKeys.self)
-			      try container.encode(Self.type, forKey: .type)
-			      try container.encode(self.id, forKey: .id)
-			      var attributesContainer = container.nestedContainer(keyedBy: ResourceAttributeCodingKeys.self, forKey: .attributes)
-			      try attributesContainer.encode(self.firstName, forKey: .firstName)
-			      try attributesContainer.encode(self.lastName, forKey: .lastName)
-			      try attributesContainer.encodeIfPresent(self.birthday, forKey: .birthday)
-			      try attributesContainer.encode(self.tags, forKey: .tags)
+			    var container = encoder.container(keyedBy: ResourceCodingKeys.self)
+			    try container.encode(self.type, forKey: .type)
+			    try container.encode(self.id, forKey: .id)
+			    var attributesContainer = container.nestedContainer(keyedBy: ResourceAttributeCodingKeys.self, forKey: .attributes)
+			    try attributesContainer.encode(self.firstName, forKey: .firstName)
+			    try attributesContainer.encode(self.lastName, forKey: .lastName)
+			    try attributesContainer.encodeIfPresent(self.birthday, forKey: .birthday)
+			    try attributesContainer.encode(self.tags, forKey: .tags)
 			  }
 			}
 			"""
@@ -109,52 +113,55 @@ final class CodableResourceMacroTests: XCTestCase {
 			  var comments: [Comment]
 			  var related: [Article]?
 
-			  var id: String
+			  let type = Self.resourceType
 
-			  static let type = "articles"
+			  var id: String
+			}
+
+			extension Article: JSONAPI.ResourceType {
+			  static let resourceType = "articles"
 			}
 
 			extension Article: JSONAPI.CodableResource {
-
 			  private enum ResourceRelationshipCodingKeys: String, CodingKey {
-			      case author
-			      case coauthor
-			      case comments
-			      case related = "related_articles"
+			    case author
+			    case coauthor
+			    case comments
+			    case related = "related_articles"
 			  }
 			  init(from decoder: any Decoder) throws {
-			      let container = try decoder.container(keyedBy: ResourceCodingKeys.self)
-			      _ = try container.decode(ResourceType<Self>.self, forKey: .type)
-			      self.id = try container.decode(String.self, forKey: .id)
-			      guard let includedResourceDecoder = decoder.includedResourceDecoder else {
-			        throw DocumentDecodingError.includedResourceDecodingNotEnabled
-			      }
-			      let relationshipsContainer = try container.nestedContainer(keyedBy: ResourceRelationshipCodingKeys.self, forKey: .relationships)
-			      let authorRelationship = try relationshipsContainer.decode(RelationshipToOne.self, forKey: .author)
-			      self.author = try includedResourceDecoder.decode(Person.self, forRelationship: authorRelationship)
-			      let coauthorRelationship = try relationshipsContainer.decodeIfPresent(OptionalRelationshipToOne.self, forKey: .coauthor)
-			      self.coauthor = try includedResourceDecoder.decodeIfPresent(Person.self, forRelationship: coauthorRelationship)
-			      let commentsRelationship = try relationshipsContainer.decode(RelationshipToMany.self, forKey: .comments)
-			      self.comments = try includedResourceDecoder.decode([Comment].self, forRelationship: commentsRelationship)
-			      let relatedRelationship = try relationshipsContainer.decodeIfPresent(RelationshipToMany.self, forKey: .related)
-			      self.related = try includedResourceDecoder.decodeIfPresent([Article].self, forRelationship: relatedRelationship)
+			    let container = try decoder.container(keyedBy: ResourceCodingKeys.self)
+			    try container.checkResourceType(Self.self)
+			    self.id = try container.decode(String.self, forKey: .id)
+			    guard let includedResourceDecoder = decoder.includedResourceDecoder else {
+			      throw DocumentDecodingError.includedResourceDecodingNotEnabled
+			    }
+			    let relationshipsContainer = try container.nestedContainer(keyedBy: ResourceRelationshipCodingKeys.self, forKey: .relationships)
+			    let authorRelationship = try relationshipsContainer.decode(RelationshipToOne.self, forKey: .author)
+			    self.author = try includedResourceDecoder.decode(Person.self, forRelationship: authorRelationship)
+			    let coauthorRelationship = try relationshipsContainer.decodeIfPresent(OptionalRelationshipToOne.self, forKey: .coauthor)
+			    self.coauthor = try includedResourceDecoder.decodeIfPresent(Person.self, forRelationship: coauthorRelationship)
+			    let commentsRelationship = try relationshipsContainer.decode(RelationshipToMany.self, forKey: .comments)
+			    self.comments = try includedResourceDecoder.decode([Comment].self, forRelationship: commentsRelationship)
+			    let relatedRelationship = try relationshipsContainer.decodeIfPresent(RelationshipToMany.self, forKey: .related)
+			    self.related = try includedResourceDecoder.decodeIfPresent([Article].self, forRelationship: relatedRelationship)
 			  }
 			  func encode(to encoder: any Encoder) throws {
-			      var container = encoder.container(keyedBy: ResourceCodingKeys.self)
-			      try container.encode(Self.type, forKey: .type)
-			      try container.encode(self.id, forKey: .id)
-			      guard let includedResourceEncoder = encoder.includedResourceEncoder else {
-			        throw DocumentEncodingError.includedResourceEncodingNotEnabled
-			      }
-			      var relationshipsContainer = container.nestedContainer(keyedBy: ResourceRelationshipCodingKeys.self, forKey: .relationships)
-			      try relationshipsContainer.encode(RelationshipToOne(resource: self.author), forKey: .author)
-			      includedResourceEncoder.encode(self.author)
-			      try relationshipsContainer.encodeIfPresent(RelationshipToOne(resource: self.coauthor), forKey: .coauthor)
-			      includedResourceEncoder.encodeIfPresent(self.coauthor)
-			      try relationshipsContainer.encode(RelationshipToMany(resources: self.comments), forKey: .comments)
-			      includedResourceEncoder.encode(self.comments)
-			      try relationshipsContainer.encodeIfPresent(RelationshipToMany(resources: self.related), forKey: .related)
-			      includedResourceEncoder.encodeIfPresent(self.related)
+			    var container = encoder.container(keyedBy: ResourceCodingKeys.self)
+			    try container.encode(self.type, forKey: .type)
+			    try container.encode(self.id, forKey: .id)
+			    guard let includedResourceEncoder = encoder.includedResourceEncoder else {
+			      throw DocumentEncodingError.includedResourceEncodingNotEnabled
+			    }
+			    var relationshipsContainer = container.nestedContainer(keyedBy: ResourceRelationshipCodingKeys.self, forKey: .relationships)
+			    try relationshipsContainer.encode(RelationshipToOne(resource: self.author), forKey: .author)
+			    includedResourceEncoder.encode(self.author)
+			    try relationshipsContainer.encodeIfPresent(RelationshipToOne(resource: self.coauthor), forKey: .coauthor)
+			    includedResourceEncoder.encodeIfPresent(self.coauthor)
+			    try relationshipsContainer.encode(RelationshipToMany(resources: self.comments), forKey: .comments)
+			    includedResourceEncoder.encode(self.comments)
+			    try relationshipsContainer.encodeIfPresent(RelationshipToMany(resources: self.related), forKey: .related)
+			    includedResourceEncoder.encodeIfPresent(self.related)
 			  }
 			}
 			"""
@@ -172,26 +179,29 @@ final class CodableResourceMacroTests: XCTestCase {
 			"""
 			public struct Person {
 
-			    public var id: String
+			    public let type = Self.resourceType
 
-			    public static let type = "people"
+			    public var id: String
+			}
+
+			extension Person: JSONAPI.ResourceType {
+			    public  static let resourceType = "people"
 			}
 
 			extension Person: JSONAPI.CodableResource {
 
 
+			    public init(from decoder: any Decoder) throws {
+			        let container = try decoder.container(keyedBy: ResourceCodingKeys.self)
+			        try container.checkResourceType(Self.self)
+			        self.id = try container.decode(String.self, forKey: .id)
+			    }
 
-			  public init(from decoder: any Decoder) throws {
-			      let container = try decoder.container(keyedBy: ResourceCodingKeys.self)
-			      _ = try container.decode(ResourceType<Self>.self, forKey: .type)
-			      self.id = try container.decode(String.self, forKey: .id)
-			  }
-
-			  public func encode(to encoder: any Encoder) throws {
-			      var container = encoder.container(keyedBy: ResourceCodingKeys.self)
-			      try container.encode(Self.type, forKey: .type)
-			      try container.encode(self.id, forKey: .id)
-			  }
+			    public func encode(to encoder: any Encoder) throws {
+			        var container = encoder.container(keyedBy: ResourceCodingKeys.self)
+			        try container.encode(self.type, forKey: .type)
+			        try container.encode(self.id, forKey: .id)
+			    }
 			}
 			"""
 		}
@@ -214,21 +224,24 @@ final class CodableResourceMacroTests: XCTestCase {
 
 			  var id: Id
 
-			  static let type = "people"
+			  let type = Self.resourceType
+			}
+
+			extension Person: JSONAPI.ResourceType {
+			  static let resourceType = "people"
 			}
 
 			extension Person: JSONAPI.CodableResource {
 
-
 			  init(from decoder: any Decoder) throws {
-			      let container = try decoder.container(keyedBy: ResourceCodingKeys.self)
-			      _ = try container.decode(ResourceType<Self>.self, forKey: .type)
-			      self.id = try container.decode(Id.self, forKey: .id)
+			    let container = try decoder.container(keyedBy: ResourceCodingKeys.self)
+			    try container.checkResourceType(Self.self)
+			    self.id = try container.decode(Id.self, forKey: .id)
 			  }
 			  func encode(to encoder: any Encoder) throws {
-			      var container = encoder.container(keyedBy: ResourceCodingKeys.self)
-			      try container.encode(Self.type, forKey: .type)
-			      try container.encode(self.id, forKey: .id)
+			    var container = encoder.container(keyedBy: ResourceCodingKeys.self)
+			    try container.encode(self.type, forKey: .type)
+			    try container.encode(self.id, forKey: .id)
 			  }
 			}
 			"""
@@ -248,25 +261,29 @@ final class CodableResourceMacroTests: XCTestCase {
 			@available(macOS, unavailable)
 			struct Person {
 
-			    var id: String
+			    let type = Self.resourceType
 
-			    static let type = "people"
+			    var id: String
+			}
+
+			@available(macOS, unavailable)
+			extension Person: JSONAPI.ResourceType {
+			    static let resourceType = "people"
 			}
 
 			@available(macOS, unavailable)
 			extension Person: JSONAPI.CodableResource {
 
-
-			  init(from decoder: any Decoder) throws {
-			      let container = try decoder.container(keyedBy: ResourceCodingKeys.self)
-			      _ = try container.decode(ResourceType<Self>.self, forKey: .type)
-			      self.id = try container.decode(String.self, forKey: .id)
-			  }
-			  func encode(to encoder: any Encoder) throws {
-			      var container = encoder.container(keyedBy: ResourceCodingKeys.self)
-			      try container.encode(Self.type, forKey: .type)
-			      try container.encode(self.id, forKey: .id)
-			  }
+			    init(from decoder: any Decoder) throws {
+			        let container = try decoder.container(keyedBy: ResourceCodingKeys.self)
+			        try container.checkResourceType(Self.self)
+			        self.id = try container.decode(String.self, forKey: .id)
+			    }
+			    func encode(to encoder: any Encoder) throws {
+			        var container = encoder.container(keyedBy: ResourceCodingKeys.self)
+			        try container.encode(self.type, forKey: .type)
+			        try container.encode(self.id, forKey: .id)
+			    }
 			}
 			"""
 		}

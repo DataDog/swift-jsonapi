@@ -266,6 +266,36 @@ final class CodableResourceTests: XCTestCase {
 		)
 	}
 
+	func testDecodeTypeMismatch() throws {
+		// given
+		let json = """
+			{
+			  "data": {
+			    "type": "people",
+			    "id": "9",
+			    "attributes": {
+			  	"firstName": "Dan",
+			  	"lastName": "Gebhardt",
+			  	"twitter": "dgeb"
+			    }
+			  }
+			}
+			""".data(using: .utf8)!
+
+		do {
+			// when
+			_ = try JSONDecoder().decode(Comment.self, from: json)
+			XCTFail("Should throw DecodingError.typeMismatch.")
+		} catch let DecodingError.typeMismatch(type, context) {
+			// then
+			XCTAssertEqual(String(describing: type), String(describing: Comment.self))
+			XCTAssertEqual(
+				context.debugDescription, "Resource type 'people' does not match expected type 'comments'")
+		} catch {
+			XCTFail("Expected DecodingError.typeMismatch but got \(error).")
+		}
+	}
+
 	func testEncodingRoundtrip() throws {
 		// given
 		let articles: [Article] = [
@@ -326,5 +356,89 @@ final class CodableResourceTests: XCTestCase {
 
 		// then
 		XCTAssertEqual(decodedArticles, articles)
+	}
+
+	func testPolymorphicRelationships() throws {
+		// given
+		let json = """
+			{
+				"data": {
+					"type": "messages",
+					"id": "1",
+					"attributes": {
+						"text": "Look what I just found!"
+					},
+					"relationships": {
+						"attachments": {
+							"data": [
+								{
+									"type": "images",
+									"id": "42"
+								},
+								{
+									"type": "audios",
+									"id": "66"
+								}
+							]
+						}
+					}
+				},
+				"included": [
+					{
+						"type": "images",
+						"id": "42",
+						"attributes": {
+							"url": "https://via.placeholder.com/640x480",
+							"width": 640,
+							"height": 480
+						}
+					},
+					{
+						"type": "audios",
+						"id": "66",
+						"attributes": {
+							"url": "https://audio.com/NeverGonnaGiveYouUp.mp3",
+							"title": "Never Gonna Give You Up"
+						}
+					}
+				]
+			}
+			""".data(using: .utf8)!
+
+		// when
+		let message = try JSONDecoder().decode(Message.self, from: json)
+
+		// then
+		XCTAssertEqual(
+			Message(
+				id: "1",
+				text: "Look what I just found!",
+				attachments: [
+					.image(
+						Image(
+							id: "42",
+							url: URL(string: "https://via.placeholder.com/640x480")!,
+							width: 640,
+							height: 480
+						)
+					),
+					.audio(
+						Audio(
+							id: "66",
+							url: URL(string: "https://audio.com/NeverGonnaGiveYouUp.mp3")!,
+							title: "Never Gonna Give You Up"
+						)
+					),
+				]
+			),
+			message
+		)
+
+		// when
+		let data = try JSONEncoder().encode(message)
+		let decodedMessage = try JSONDecoder().decode(Message.self, from: data)
+
+		// then
+		XCTAssertEqual(decodedMessage, message)
 	}
 }

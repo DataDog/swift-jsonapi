@@ -61,11 +61,11 @@ extension CodableResourceMacro: MemberMacro {
 
 		// Add required properties
 		declaration.addIfNeeded(
-			self.id(modifier: declaration.publicModifier),
+			self.type(modifier: declaration.publicModifier),
 			to: &declarations
 		)
 		declaration.addIfNeeded(
-			self.type(modifier: declaration.publicModifier, value: resourceType),
+			self.id(modifier: declaration.publicModifier),
 			to: &declarations
 		)
 
@@ -81,6 +81,16 @@ extension CodableResourceMacro: ExtensionMacro {
 		conformingTo protocols: [TypeSyntax],
 		in context: some MacroExpansionContext
 	) throws -> [ExtensionDeclSyntax] {
+		let resourceTypeExtension = DeclSyntax(
+			"""
+			\(declaration.attributes.availability)
+			extension \(raw: type.trimmedDescription): \(raw: "\(moduleName).ResourceType") {\
+			\(resourceType(modifier: declaration.publicModifier, value: node.firstArgumentStringLiteralSegment))\
+			}
+			"""
+		)
+		.cast(ExtensionDeclSyntax.self)
+
 		// The user may have already defined an 'id' variable with a tagged type instead of 'String'.
 		let idType =
 			declaration.definedVariables.first { variable in
@@ -95,21 +105,21 @@ extension CodableResourceMacro: ExtensionMacro {
 			variable.hasMacroApplication(resourceRelationshipMacroName)
 		}
 
-		let extensionMembers = extensionMembers(
+		let codableResourceMembers = codableResourceMembers(
 			modifier: declaration.publicModifier,
 			idType: idType,
 			attributes: attributes,
 			relationships: relationships
 		)
 
-		let extensionDecl = DeclSyntax(
+		let codableResourceExtension = DeclSyntax(
 			"""
 			\(declaration.attributes.availability)
-			extension \(raw: type.trimmedDescription): \(raw: qualifiedConformanceName) {\(extensionMembers)}
+			extension \(raw: type.trimmedDescription): \(raw: qualifiedConformanceName) {\(codableResourceMembers)}
 			"""
 		)
 		.cast(ExtensionDeclSyntax.self)
 
-		return [extensionDecl]
+		return [resourceTypeExtension, codableResourceExtension]
 	}
 }

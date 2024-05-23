@@ -6,6 +6,7 @@ struct JSONAPIDiagnostic: DiagnosticMessage {
 		case invalidApplication = "invalid type"
 		case missingResourceType = "missing resource type"
 		case missingKey = "missing key"
+		case invalidCase = "invalid case"
 	}
 
 	var message: String

@@ -17,6 +17,12 @@ extension DeclGroupSyntax {
 			}
 		}
 	}
+
+	var enumCaseElements: [EnumCaseElementSyntax] {
+		memberBlock.members.compactMap { member in
+			member.decl.as(EnumCaseDeclSyntax.self)
+		}.flatMap(\.elements)
+	}
 }
 
 extension VariableDeclSyntax {
@@ -115,5 +121,19 @@ extension AttributeSyntax {
 
 	var firstArgumentStringLiteralSegment: StringSegmentSyntax? {
 		self.firstArgumentStringLiteral?.segments.first?.as(StringSegmentSyntax.self)
+	}
+}
+
+extension EnumCaseElementSyntax {
+	var parameterCount: Int {
+		self.parameterClause?.parameters.count ?? 0
+	}
+
+	var firstParameterName: TokenSyntax? {
+		self.parameterClause?.parameters.first?.firstName
+	}
+
+	var firstParameterType: TypeSyntax? {
+		self.parameterClause?.parameters.first?.type
 	}
 }

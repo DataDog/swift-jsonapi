@@ -17,7 +17,7 @@ extension CodableResourceMacro {
 	) -> DeclSyntax {
 		return """
 			var container = encoder.container(keyedBy: ResourceCodingKeys.self)
-			try container.encode(Self.\(raw: typeVariableIdentifier), forKey: .\(raw: typeVariableIdentifier))
+			try container.encode(self.\(raw: typeVariableIdentifier), forKey: .\(raw: typeVariableIdentifier))
 			try container.encode(self.\(raw: idVariableIdentifier), forKey: .\(raw: idVariableIdentifier))
 			\(attributesEncodingContainer(attributes))\
 			\(encodeAttributes(attributes))\
