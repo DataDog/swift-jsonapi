@@ -17,14 +17,23 @@ public class JSONAPIDecoder: JSONDecoder {
 	}
 
 	public func decode<T>(_ type: T.Type, from data: Data) throws -> T where T: DecodableResource {
-		try self.decode(Document<T>.self, from: data).data
+		try self.decode(Document<T, Unit>.self, from: data).data
 	}
 
 	public func decode<T>(
 		_ type: T.Type,
 		from data: Data
 	) throws -> T where T: RangeReplaceableCollection, T: Decodable, T.Element: DecodableResource {
-		try self.decode(Document<T?>.self, from: data).data ?? T()
+		try self.decode(Document<T?, Unit>.self, from: data).data ?? T()
+	}
+
+	public func decode<T, Meta>(
+		_ type: Document<T, Meta>.Type,
+		from data: Data
+	) throws -> Document<T, Meta>
+	where T: RangeReplaceableCollection, T: Decodable, T.Element: DecodableResource, Meta: Decodable {
+		let document = try self.decode(Document<T?, Meta>.self, from: data)
+		return Document(data: document.data ?? T(), meta: document.meta)
 	}
 }
 
