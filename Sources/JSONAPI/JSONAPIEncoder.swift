@@ -3,6 +3,8 @@ import Foundation
 public class JSONAPIEncoder: JSONEncoder {
 	public override init() {
 		super.init()
+		self.userInfo.linkedResourceObjectEncoder = LinkedResourceObjectEncoder()
+		// TODO: delete this
 		self.userInfo.includedResourceEncoder = IncludedResourceEncoder()
 	}
 
@@ -18,12 +20,27 @@ public class JSONAPIEncoder: JSONEncoder {
 }
 
 extension Encoder {
+	var linkedResourceObjectEncoder: LinkedResourceObjectEncoder? {
+		self.userInfo.linkedResourceObjectEncoder
+	}
+
+	// TODO: delete this
 	public var includedResourceEncoder: IncludedResourceEncoder? {
 		userInfo.includedResourceEncoder
 	}
 }
 
 extension Dictionary where Key == CodingUserInfoKey, Value == Any {
+	fileprivate var linkedResourceObjectEncoder: LinkedResourceObjectEncoder? {
+		get {
+			self[.linkedResourceObjectEncoder] as? LinkedResourceObjectEncoder
+		}
+		set {
+			self[.linkedResourceObjectEncoder] = newValue
+		}
+	}
+
+	// TODO: delete this
 	fileprivate var includedResourceEncoder: IncludedResourceEncoder? {
 		get {
 			self[IncludedResourceEncoder.key] as? IncludedResourceEncoder
@@ -32,4 +49,8 @@ extension Dictionary where Key == CodingUserInfoKey, Value == Any {
 			self[IncludedResourceEncoder.key] = newValue
 		}
 	}
+}
+
+extension CodingUserInfoKey {
+	fileprivate static let linkedResourceObjectEncoder = Self(rawValue: "JSONAPI.linkedResourceObjectEncoder")!
 }

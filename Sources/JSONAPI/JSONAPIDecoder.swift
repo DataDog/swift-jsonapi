@@ -13,6 +13,9 @@ public class JSONAPIDecoder: JSONDecoder {
 
 	public override init() {
 		super.init()
+
+		self.userInfo.linkedResourceObjectDecoderStorage = LinkResourceObjectDecoderStorage()
+		// TODO: delete this
 		self.userInfo.includedResourceDecoderStorage = IncludedResourceDecoderStorage()
 	}
 
@@ -38,6 +41,11 @@ public class JSONAPIDecoder: JSONDecoder {
 }
 
 extension Decoder {
+	var linkedResourceObjectDecoder: LinkedResourceObjectDecoder? {
+		self.userInfo.linkedResourceObjectDecoderStorage?.linkedResourceObjectDecoder
+	}
+
+	// TODO: delete this
 	public var includedResourceDecoder: IncludedResourceDecoder? {
 		userInfo.includedResourceDecoderStorage?.includedResourceDecoder
 	}
@@ -62,6 +70,16 @@ extension Dictionary where Key == CodingUserInfoKey, Value == Any {
 		}
 	}
 
+	fileprivate(set) var linkedResourceObjectDecoderStorage: LinkResourceObjectDecoderStorage? {
+		get {
+			self[.linkedResourceObjectDecoderStorage] as? LinkResourceObjectDecoderStorage
+		}
+		set {
+			self[.linkedResourceObjectDecoderStorage] = newValue
+		}
+	}
+
+	// TODO: delete this
 	fileprivate(set) var includedResourceDecoderStorage: IncludedResourceDecoderStorage? {
 		get {
 			self[.includedResourceDecoderStorage] as? IncludedResourceDecoderStorage
@@ -72,6 +90,11 @@ extension Dictionary where Key == CodingUserInfoKey, Value == Any {
 	}
 }
 
+final class LinkResourceObjectDecoderStorage {
+	var linkedResourceObjectDecoder: LinkedResourceObjectDecoder?
+}
+
+// TODO: delete this
 final class IncludedResourceDecoderStorage {
 	var includedResourceDecoder: IncludedResourceDecoder?
 }
@@ -79,5 +102,9 @@ final class IncludedResourceDecoderStorage {
 extension CodingUserInfoKey {
 	fileprivate static let ignoresMissingResources = Self(rawValue: "JSONAPI.ignoresMissingResources")!
 	fileprivate static let ignoresUnhandledResourceTypes = Self(rawValue: "JSONAPI.ignoresUnhandledResourceTypes")!
+	fileprivate static let linkedResourceObjectDecoderStorage = Self(
+		rawValue: "JSONAPI.linkResourceObjectDecoderStorage"
+	)!
+	// TODO: delete this
 	fileprivate static let includedResourceDecoderStorage = Self(rawValue: "JSONAPI.IncludedResourceDecoderStorage")!
 }
