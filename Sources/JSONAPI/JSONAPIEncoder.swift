@@ -3,15 +3,27 @@ import Foundation
 public class JSONAPIEncoder: JSONEncoder {
 	public override init() {
 		super.init()
-		self.userInfo.linkedResourceObjectEncoder = LinkedResourceObjectEncoder()
+		self.userInfo.resourceObjectEncoder = ResourceObjectEncoder()
 		// TODO: delete this
 		self.userInfo.includedResourceEncoder = IncludedResourceEncoder()
 	}
 
+	public func encode<R>(_ value: R) throws -> Data where R: ResourceObjectIdentifiable & Encodable {
+		try self.encode(CompoundDocument(data: value))
+	}
+
+	public func encode<C>(
+		_ value: C
+	) throws -> Data where C: Collection & Encodable, C.Element: ResourceObjectIdentifiable & Encodable {
+		try self.encode(CompoundDocument(data: value))
+	}
+
+	// TODO: delete this
 	public func encode<T>(_ value: T) throws -> Data where T: EncodableResource {
 		try self.encode(Document(data: value))
 	}
 
+	// TODO: delete this
 	public func encode<T>(
 		_ value: T
 	) throws -> Data where T: Collection, T: Encodable, T.Element: EncodableResource {
@@ -20,8 +32,8 @@ public class JSONAPIEncoder: JSONEncoder {
 }
 
 extension Encoder {
-	var linkedResourceObjectEncoder: LinkedResourceObjectEncoder? {
-		self.userInfo.linkedResourceObjectEncoder
+	var resourceObjectEncoder: ResourceObjectEncoder? {
+		self.userInfo.resourceObjectEncoder
 	}
 
 	// TODO: delete this
@@ -31,12 +43,12 @@ extension Encoder {
 }
 
 extension Dictionary where Key == CodingUserInfoKey, Value == Any {
-	fileprivate var linkedResourceObjectEncoder: LinkedResourceObjectEncoder? {
+	fileprivate var resourceObjectEncoder: ResourceObjectEncoder? {
 		get {
-			self[.linkedResourceObjectEncoder] as? LinkedResourceObjectEncoder
+			self[.resourceObjectEncoder] as? ResourceObjectEncoder
 		}
 		set {
-			self[.linkedResourceObjectEncoder] = newValue
+			self[.resourceObjectEncoder] = newValue
 		}
 	}
 
@@ -52,5 +64,5 @@ extension Dictionary where Key == CodingUserInfoKey, Value == Any {
 }
 
 extension CodingUserInfoKey {
-	fileprivate static let linkedResourceObjectEncoder = Self(rawValue: "JSONAPI.linkedResourceObjectEncoder")!
+	fileprivate static let resourceObjectEncoder = Self(rawValue: "JSONAPI.resourceObjectEncoder")!
 }

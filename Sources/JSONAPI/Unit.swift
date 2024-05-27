@@ -1,3 +1,4 @@
 import Foundation
 
-public struct Unit: Equatable, Codable {}
+public struct Unit: Equatable, Codable {
+}

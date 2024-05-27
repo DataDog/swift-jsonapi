@@ -1,0 +1,11 @@
+{
+	"data": {
+		"type": "people",
+		"id": "9",
+		"attributes": {
+			"firstName": "Dan",
+			"lastName": "Gebhardt",
+			"twitter": "dgeb"
+		}
+	}
+}

@@ -14,15 +14,39 @@ public class JSONAPIDecoder: JSONDecoder {
 	public override init() {
 		super.init()
 
-		self.userInfo.linkedResourceObjectDecoderStorage = LinkResourceObjectDecoderStorage()
+		self.userInfo.resourceObjectDecoderStorage = ResourceObjectDecoderStorage()
 		// TODO: delete this
 		self.userInfo.includedResourceDecoderStorage = IncludedResourceDecoderStorage()
 	}
 
+	public func decode<R>(_: R.Type, from data: Data) throws -> R where R: ResourceObjectIdentifiable & Decodable {
+		try self.decode(CompoundDocument<R, Unit>.self, from: data).data
+	}
+
+	public func decode<C>(
+		_: C.Type,
+		from data: Data
+	) throws -> C where C: RangeReplaceableCollection, C: Decodable, C.Element: ResourceObjectIdentifiable & Decodable {
+		try self.decode(CompoundDocument<C?, Unit>.self, from: data).data ?? C()
+	}
+
+	public func decode<C, M>(
+		_: CompoundDocument<C, M>.Type,
+		from data: Data
+	) throws -> CompoundDocument<C, M>
+	where
+		C: RangeReplaceableCollection, C: Decodable, C.Element: ResourceObjectIdentifiable & Decodable, M: Decodable
+	{
+		let document = try self.decode(CompoundDocument<C?, M>.self, from: data)
+		return CompoundDocument(data: document.data ?? C(), meta: document.meta)
+	}
+
+	// TODO: delete this
 	public func decode<T>(_ type: T.Type, from data: Data) throws -> T where T: DecodableResource {
 		try self.decode(Document<T, Unit>.self, from: data).data
 	}
 
+	// TODO: delete this
 	public func decode<T>(
 		_ type: T.Type,
 		from data: Data
@@ -30,6 +54,7 @@ public class JSONAPIDecoder: JSONDecoder {
 		try self.decode(Document<T?, Unit>.self, from: data).data ?? T()
 	}
 
+	// TODO: delete this
 	public func decode<T, Meta>(
 		_ type: Document<T, Meta>.Type,
 		from data: Data
@@ -41,8 +66,8 @@ public class JSONAPIDecoder: JSONDecoder {
 }
 
 extension Decoder {
-	var linkedResourceObjectDecoder: LinkedResourceObjectDecoder? {
-		self.userInfo.linkedResourceObjectDecoderStorage?.linkedResourceObjectDecoder
+	var resourceObjectDecoder: ResourceObjectDecoder? {
+		self.userInfo.resourceObjectDecoderStorage?.resourceObjectDecoder
 	}
 
 	// TODO: delete this
@@ -70,12 +95,12 @@ extension Dictionary where Key == CodingUserInfoKey, Value == Any {
 		}
 	}
 
-	fileprivate(set) var linkedResourceObjectDecoderStorage: LinkResourceObjectDecoderStorage? {
+	fileprivate(set) var resourceObjectDecoderStorage: ResourceObjectDecoderStorage? {
 		get {
-			self[.linkedResourceObjectDecoderStorage] as? LinkResourceObjectDecoderStorage
+			self[.resourceObjectDecoderStorage] as? ResourceObjectDecoderStorage
 		}
 		set {
-			self[.linkedResourceObjectDecoderStorage] = newValue
+			self[.resourceObjectDecoderStorage] = newValue
 		}
 	}
 
@@ -90,8 +115,8 @@ extension Dictionary where Key == CodingUserInfoKey, Value == Any {
 	}
 }
 
-final class LinkResourceObjectDecoderStorage {
-	var linkedResourceObjectDecoder: LinkedResourceObjectDecoder?
+final class ResourceObjectDecoderStorage {
+	var resourceObjectDecoder: ResourceObjectDecoder?
 }
 
 // TODO: delete this
@@ -102,9 +127,7 @@ final class IncludedResourceDecoderStorage {
 extension CodingUserInfoKey {
 	fileprivate static let ignoresMissingResources = Self(rawValue: "JSONAPI.ignoresMissingResources")!
 	fileprivate static let ignoresUnhandledResourceTypes = Self(rawValue: "JSONAPI.ignoresUnhandledResourceTypes")!
-	fileprivate static let linkedResourceObjectDecoderStorage = Self(
-		rawValue: "JSONAPI.linkResourceObjectDecoderStorage"
-	)!
+	fileprivate static let resourceObjectDecoderStorage = Self(rawValue: "JSONAPI.resourceObjectDecoderStorage")!
 	// TODO: delete this
 	fileprivate static let includedResourceDecoderStorage = Self(rawValue: "JSONAPI.IncludedResourceDecoderStorage")!
 }
