@@ -43,7 +43,7 @@ final class ResourceObjectTests: XCTestCase {
 	}
 
 	private typealias Article = ResourceObject<String, ArticleFieldSet>
-	
+
 	private struct CopyrightInfo: Equatable, Codable {
 		var copyright: String
 		var authors: [String]
@@ -204,7 +204,7 @@ final class ResourceObjectTests: XCTestCase {
 			XCTFail("Expected DecodingError.valueNotFound but got \(error).")
 		}
 	}
-	
+
 	func testDecodeIgnoresMissingResourceObject() throws {
 		// given
 		let json = try XCTUnwrap(
@@ -212,17 +212,17 @@ final class ResourceObjectTests: XCTestCase {
 				try Data(contentsOf: $0)
 			}
 		)
-		
+
 		let decoder = JSONAPIDecoder()
 		decoder.ignoresMissingResources = true
-		
+
 		// when
 		let article = try decoder.decode(Article.self, from: json)
-		
+
 		// then
 		XCTAssertTrue(article.comments.destination.isEmpty)
 	}
-	
+
 	func testDecodeMeta() throws {
 		// given
 		let json = try XCTUnwrap(
@@ -230,23 +230,23 @@ final class ResourceObjectTests: XCTestCase {
 				try Data(contentsOf: $0)
 			}
 		)
-		
+
 		// when
 		let document = try JSONAPIDecoder().decode(CompoundDocument<Article, CopyrightInfo>.self, from: json)
-		
+
 		// then
 		XCTAssertEqual(document, CompoundDocument(data: Fixtures.article, meta: Fixtures.copyrightInfo))
 	}
 
-	func testEncodeSingle() throws {
+	func testEncodeSingle() {
 		assertSnapshot(of: Fixtures.article, as: .jsonAPI())
 	}
 
-	func testEncodeArray() throws {
+	func testEncodeArray() {
 		assertSnapshot(of: Fixtures.articles, as: .jsonAPI())
 	}
-	
-	func testEncodeMeta() throws {
+
+	func testEncodeMeta() {
 		assertSnapshot(of: CompoundDocument(data: Fixtures.article, meta: Fixtures.copyrightInfo), as: .jsonAPI())
 	}
 }

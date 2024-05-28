@@ -1,19 +1,19 @@
 import Foundation
 
 @dynamicMemberLookup
-public struct ResourceObject<ID, Fieldset>: ResourceObjectIdentifiable
+public struct ResourceObject<ID, FieldSet>: ResourceObjectIdentifiable
 where
 	ID: Hashable & CustomStringConvertible,
-	Fieldset: ResourceObjectFieldSet
+	FieldSet: ResourceObjectFieldSet
 {
-	public typealias Attributes = Fieldset.Attributes
-	public typealias Relationships = Fieldset.Relationships
+	public typealias Attributes = FieldSet.Attributes
+	public typealias Relationships = FieldSet.Relationships
 
 	private enum CodingKeys: String, CodingKey {
 		case type, id, attributes, relationships
 	}
 
-	public let type: String = Fieldset.resourceObjectType
+	public let type: String = FieldSet.resourceObjectType
 
 	public var id: ID
 	public var attributes: Attributes
@@ -57,13 +57,13 @@ extension ResourceObject: Decodable where ID: Decodable, Attributes: Decodable, 
 
 		let type = try container.decode(String.self, forKey: .type)
 
-		if type != Fieldset.resourceObjectType {
+		if type != FieldSet.resourceObjectType {
 			throw DecodingError.typeMismatch(
-				Fieldset.self,
+				FieldSet.self,
 				DecodingError.Context(
 					codingPath: [CodingKeys.type],
 					debugDescription:
-						"Resource type '\(type)' does not match expected type '\(Fieldset.resourceObjectType)'"
+						"Resource type '\(type)' does not match expected type '\(FieldSet.resourceObjectType)'"
 				)
 			)
 		}

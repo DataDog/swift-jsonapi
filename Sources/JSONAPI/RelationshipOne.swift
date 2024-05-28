@@ -1,13 +1,5 @@
 import Foundation
 
-public struct PrimitiveRelationshipOne: Equatable, Codable {
-	public var data: ResourceObjectIdentifier
-
-	public init(data: ResourceObjectIdentifier) {
-		self.data = data
-	}
-}
-
 public struct RelationshipOne<R> {
 	public var destination: R
 
@@ -41,5 +33,13 @@ extension RelationshipOne: Encodable where R: Encodable & ResourceObjectIdentifi
 		}
 
 		resourceObjectEncoder.encode(self.destination)
+	}
+}
+
+struct PrimitiveRelationshipOne: Equatable, Codable {
+	var data: ResourceObjectIdentifier
+
+	init(data: ResourceObjectIdentifier) {
+		self.data = data
 	}
 }

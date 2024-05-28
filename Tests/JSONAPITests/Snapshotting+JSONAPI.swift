@@ -28,7 +28,7 @@ extension Snapshotting where Format == String {
 		snapshotting.pathExtension = "json"
 		return snapshotting
 	}
-	
+
 	static func jsonAPI<PrimaryData, Meta>() -> Snapshotting
 	where
 		PrimaryData: Encodable, Meta: Encodable,
