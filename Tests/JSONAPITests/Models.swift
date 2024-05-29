@@ -3,10 +3,11 @@ import JSONAPI
 
 // MARK: - Person
 
+//@ResourceWrapper(type: "people")
 struct Person: Equatable {
 	var id: String
 
-	var firstName: String
+	@ResourceAttribute var firstName: String
 	var lastName: String
 	var twitter: String?
 }
@@ -14,6 +15,7 @@ struct Person: Equatable {
 extension Person {
 	struct FieldSet: ResourceFieldSet {
 		struct Attributes: Equatable, Codable {
+			// coding keys when needed!
 			var firstName: String
 			var lastName: String
 			var twitter: String?
@@ -24,6 +26,7 @@ extension Person {
 
 	struct BodyFieldSet: ResourceFieldSet {
 		struct Attributes: Equatable, Encodable {
+			// coding keys when needed!
 			var firstName: String?
 			var lastName: String?
 			var twitter: String?

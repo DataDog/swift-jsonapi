@@ -1,31 +1,35 @@
 // TODO: Fix macros
 
-//@attached(member, names: named(type), named(id))
-//@attached(
-//	extension,
-//	conformances: ResourceType, CodableResource,
-//	names:
-//		named(resourceType),
-//	named(ResourceAttributeCodingKeys),
-//	named(ResourceRelationshipCodingKeys),
-//	named(init(from:)),
-//	named(encode(to:))
-//)
-//public macro CodableResource(type: String) = #externalMacro(module: "JSONAPIMacros", type: "CodableResourceMacro")
-//
-//@attached(accessor, names: named(willSet))
-//public macro ResourceAttribute(key: String? = nil) =
-//	#externalMacro(
-//		module: "JSONAPIMacros",
-//		type: "ResourceAttributeMacro"
-//	)
-//
-//@attached(accessor, names: named(willSet))
-//public macro ResourceRelationship(key: String? = nil) =
-//	#externalMacro(
-//		module: "JSONAPIMacros",
-//		type: "ResourceRelationshipMacro"
-//	)
+@attached(
+	extension,
+	conformances: ResourceIdentifiable, Codable,
+	names: named(FieldSet), named(BodyFieldSet), named(Primitive), named(Body), named(type), named(init(from:)),
+	named(encode(to:))
+)
+public macro ResourceWrapper(type: String) = #externalMacro(module: "JSONAPIMacros", type: "ResourceWrapperMacro")
+
+@available(*, deprecated, renamed: "ResourceWrapper")
+@attached(
+	extension,
+	conformances: ResourceIdentifiable, Codable,
+	names: named(FieldSet), named(BodyFieldSet), named(Primitive), named(Body), named(type), named(init(from:)),
+	named(encode(to:))
+)
+public macro CodableResource(type: String) = #externalMacro(module: "JSONAPIMacros", type: "ResourceWrapperMacro")
+
+@attached(accessor, names: named(willSet))
+public macro ResourceAttribute(key: String? = nil) =
+	#externalMacro(
+		module: "JSONAPIMacros",
+		type: "ResourceAttributeMacro"
+	)
+
+@attached(accessor, names: named(willSet))
+public macro ResourceRelationship(key: String? = nil) =
+	#externalMacro(
+		module: "JSONAPIMacros",
+		type: "ResourceRelationshipMacro"
+	)
 //
 //@attached(
 //	extension,

@@ -4,7 +4,7 @@ import SwiftSyntaxMacros
 @main
 struct JSONAPIPlugin: CompilerPlugin {
 	let providingMacros: [Macro.Type] = [
-		CodableResourceMacro.self,
+		ResourceWrapperMacro.self,
 		ResourceAttributeMacro.self,
 		ResourceRelationshipMacro.self,
 		CodableResourceUnionMacro.self,
