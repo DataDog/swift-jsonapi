@@ -1,9 +1,11 @@
 import Foundation
 
 public struct ResourceLinkageMany: Equatable, Codable {
+	public static let empty = ResourceLinkageMany()
+
 	public var data: [ResourceObjectIdentifier]
 
-	public init(data: [ResourceObjectIdentifier]) {
+	public init(data: [ResourceObjectIdentifier] = []) {
 		self.data = data
 	}
 

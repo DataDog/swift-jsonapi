@@ -21,7 +21,7 @@ final class ResourceObjectBodyTests: XCTestCase {
 		}
 
 		struct Relationships: Encodable {
-			var author: RelationshipOneRef<String, PersonFieldSet>?
+			var author: ResourceLinkageOne?
 		}
 
 		static let resourceObjectType = "comments"
@@ -29,11 +29,30 @@ final class ResourceObjectBodyTests: XCTestCase {
 
 	private typealias CommentBody = ResourceObjectBody<String, CommentFieldSet>
 
-	func testEncodeAttributes() {
+	func testEncodeOnlyAttributes() {
 		// given
-		let person = PersonBody(attributes: .init(firstName: "Guille", lastName: "González"))
+		let comment = CommentBody(attributes: .init(body: "I like XML better"))
 
 		// then
-		assertSnapshot(of: person, as: .json)
+		assertSnapshot(of: comment, as: .json)
+	}
+
+	func testEncodeEmptyRelationshipOne() {
+		// given
+		let comment = CommentBody(attributes: .init(body: "I like XML better"), relationships: .init(author: .empty))
+
+		// then
+		assertSnapshot(of: comment, as: .json)
+	}
+
+	func testEncodeRelationshipOne() {
+		// given
+		let comment = CommentBody(
+			attributes: .init(body: "I like XML better"),
+			relationships: .init(author: ResourceLinkageOne(data: .init(type: "people", id: "9")))
+		)
+
+		// then
+		assertSnapshot(of: comment, as: .json)
 	}
 }

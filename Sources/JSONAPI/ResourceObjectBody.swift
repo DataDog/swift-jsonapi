@@ -1,6 +1,5 @@
 import Foundation
 
-@dynamicMemberLookup
 public struct ResourceObjectBody<ID, FieldSet>: Encodable
 where
 	ID: Hashable & Encodable,
@@ -14,23 +13,13 @@ where
 	public let type: String = FieldSet.resourceObjectType
 
 	public var id: ID?
-	public var attributes: Attributes
-	public var relationships: Relationships
+	public var attributes: Attributes?
+	public var relationships: Relationships?
 
-	public init(id: ID? = nil, attributes: Attributes, relationships: Relationships) {
+	public init(id: ID? = nil, attributes: Attributes? = nil, relationships: Relationships? = nil) {
 		self.id = id
 		self.attributes = attributes
 		self.relationships = relationships
-	}
-
-	public subscript<V>(dynamicMember keyPath: WritableKeyPath<Attributes, V>) -> V {
-		get { self.attributes[keyPath: keyPath] }
-		set { self.attributes[keyPath: keyPath] = newValue }
-	}
-
-	public subscript<V>(dynamicMember keyPath: WritableKeyPath<Relationships, V>) -> V {
-		get { self.relationships[keyPath: keyPath] }
-		set { self.relationships[keyPath: keyPath] = newValue }
 	}
 
 	enum CodingKeys: String, CodingKey {
@@ -49,11 +38,11 @@ where
 		try nestedContainer.encodeIfPresent(self.id, forKey: .id)
 
 		if Attributes.self != Unit.self {
-			try nestedContainer.encode(self.attributes, forKey: .attributes)
+			try nestedContainer.encodeIfPresent(self.attributes, forKey: .attributes)
 		}
 
 		if Relationships.self != Unit.self {
-			try nestedContainer.encode(self.relationships, forKey: .relationships)
+			try nestedContainer.encodeIfPresent(self.relationships, forKey: .relationships)
 		}
 	}
 }
