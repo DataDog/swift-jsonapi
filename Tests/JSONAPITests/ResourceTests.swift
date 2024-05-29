@@ -144,7 +144,7 @@ final class ResourceTests: XCTestCase {
 		let comment = try JSONAPIDecoder().decode(Comment.self, from: json)
 
 		// then
-		XCTAssertNil(comment.author.destination)
+		XCTAssertNil(comment.author.resource)
 	}
 
 	func testDecodeNullRelationshipMany() throws {

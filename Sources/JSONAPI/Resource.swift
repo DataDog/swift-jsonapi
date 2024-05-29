@@ -15,9 +15,9 @@ where
 
 	public let type: String = FieldSet.resourceType
 
-	public var id: ID
-	public var attributes: Attributes
-	public var relationships: Relationships
+	public let id: ID
+	public let attributes: Attributes
+	public let relationships: Relationships
 
 	public init(id: ID, attributes: Attributes, relationships: Relationships) {
 		self.id = id
@@ -25,14 +25,12 @@ where
 		self.relationships = relationships
 	}
 
-	public subscript<V>(dynamicMember keyPath: WritableKeyPath<Attributes, V>) -> V {
-		get { self.attributes[keyPath: keyPath] }
-		set { self.attributes[keyPath: keyPath] = newValue }
+	public subscript<V>(dynamicMember keyPath: KeyPath<Attributes, V>) -> V {
+		self.attributes[keyPath: keyPath]
 	}
 
-	public subscript<V>(dynamicMember keyPath: WritableKeyPath<Relationships, V>) -> V {
-		get { self.relationships[keyPath: keyPath] }
-		set { self.relationships[keyPath: keyPath] = newValue }
+	public subscript<V>(dynamicMember keyPath: KeyPath<Relationships, V>) -> V {
+		self.relationships[keyPath: keyPath]
 	}
 }
 
