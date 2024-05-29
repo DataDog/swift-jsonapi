@@ -159,7 +159,7 @@ final class ResourceObjectTests: XCTestCase {
 		let articles = try JSONAPIDecoder().decode([Article].self, from: json)
 
 		// then
-		XCTAssertTrue(articles.first!.comments.destination.isEmpty)
+		XCTAssertTrue(articles.first!.comments.isEmpty)
 	}
 
 	func testDecodeTypeMismatch() throws {
@@ -220,7 +220,7 @@ final class ResourceObjectTests: XCTestCase {
 		let article = try decoder.decode(Article.self, from: json)
 
 		// then
-		XCTAssertTrue(article.comments.destination.isEmpty)
+		XCTAssertTrue(article.comments.isEmpty)
 	}
 
 	func testDecodeMeta() throws {

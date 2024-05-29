@@ -5,20 +5,21 @@ where
 	ID: CustomStringConvertible,
 	FieldSet: ResourceObjectFieldSet
 {
-	public let id: ID
-	
-	public init(id: ID) {
+	public let id: ID?
+
+	public init(id: ID?) {
 		self.id = id
 	}
-	
+
 	public func encode(to encoder: any Encoder) throws {
-		let primitive = PrimitiveRelationshipOne(
-			data: ResourceObjectIdentifier(
-				type: FieldSet.resourceObjectType,
-				id: self.id.description
-			)
-		)
-		try primitive.encode(to: encoder)
+		try ResourceLinkageOne(
+			data: self.id.map {
+				ResourceObjectIdentifier(
+					type: FieldSet.resourceObjectType,
+					id: $0.description
+				)
+			}
+		).encode(to: encoder)
 	}
 }
 

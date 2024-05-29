@@ -32,22 +32,22 @@ where
 		get { self.relationships[keyPath: keyPath] }
 		set { self.relationships[keyPath: keyPath] = newValue }
 	}
-	
+
 	enum CodingKeys: String, CodingKey {
 		case data
 	}
-	
+
 	enum DataCodingKeys: String, CodingKey {
 		case type, id, attributes, relationships
 	}
-	
+
 	public func encode(to encoder: any Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		var nestedContainer = container.nestedContainer(keyedBy: DataCodingKeys.self, forKey: .data)
-		
+
 		try nestedContainer.encode(self.type, forKey: .type)
 		try nestedContainer.encodeIfPresent(self.id, forKey: .id)
-		
+
 		if Attributes.self != Unit.self {
 			try nestedContainer.encode(self.attributes, forKey: .attributes)
 		}
