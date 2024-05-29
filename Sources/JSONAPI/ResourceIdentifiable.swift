@@ -1,6 +1,6 @@
 import Foundation
 
-public protocol ResourceObjectIdentifiable {
+public protocol ResourceIdentifiable {
 	associatedtype ID: Hashable & CustomStringConvertible
 
 	var type: String { get }

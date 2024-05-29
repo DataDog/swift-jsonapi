@@ -25,13 +25,12 @@ extension CompoundDocument: Decodable where PrimaryData: Decodable, Meta: Decoda
 	public init(from decoder: any Decoder) throws {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 
-		// Setup the resource object decoder
-		let identifiers = try container.decodeIfPresent([ResourceObjectIdentifier].self, forKey: .included) ?? []
-		let resourceObjectDecoder = ResourceObjectDecoder(
-			userInfo: decoder.userInfo,
-			identifiers: identifiers
-		) { try container.nestedUnkeyedContainer(forKey: .included) }
-		decoder.userInfo.resourceObjectDecoderStorage?.resourceObjectDecoder = resourceObjectDecoder
+		// Setup the resource decoder
+		let identifiers = try container.decodeIfPresent([ResourceIdentifier].self, forKey: .included) ?? []
+		let resourceDecoder = ResourceDecoder(userInfo: decoder.userInfo, identifiers: identifiers) {
+			try container.nestedUnkeyedContainer(forKey: .included)
+		}
+		decoder.userInfo.resourceDecoderStorage?.resourceDecoder = resourceDecoder
 
 		self.data = try container.decode(PrimaryData.self, forKey: .data)
 
@@ -54,6 +53,6 @@ extension CompoundDocument: Encodable where PrimaryData: Encodable, Meta: Encoda
 		}
 
 		var includedContainer = container.nestedUnkeyedContainer(forKey: .included)
-		try encoder.resourceObjectEncoder?.encodeResourceObjects(into: &includedContainer)
+		try encoder.resourceEncoder?.encodeResources(into: &includedContainer)
 	}
 }

@@ -1,8 +1,8 @@
 import Foundation
 
-public protocol ResourceObjectFieldSet {
+public protocol ResourceFieldSet {
 	associatedtype Attributes = Unit
 	associatedtype Relationships = Unit
 
-	static var resourceObjectType: String { get }
+	static var resourceType: String { get }
 }

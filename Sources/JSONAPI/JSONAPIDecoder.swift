@@ -14,17 +14,17 @@ public class JSONAPIDecoder: JSONDecoder {
 	public override init() {
 		super.init()
 
-		self.userInfo.resourceObjectDecoderStorage = ResourceObjectDecoderStorage()
+		self.userInfo.resourceDecoderStorage = ResourceDecoderStorage()
 	}
 
-	public func decode<R>(_: R.Type, from data: Data) throws -> R where R: ResourceObjectIdentifiable & Decodable {
+	public func decode<R>(_: R.Type, from data: Data) throws -> R where R: ResourceIdentifiable & Decodable {
 		try self.decode(CompoundDocument<R, Unit>.self, from: data).data
 	}
 
 	public func decode<C>(
 		_: C.Type,
 		from data: Data
-	) throws -> C where C: RangeReplaceableCollection, C: Decodable, C.Element: ResourceObjectIdentifiable & Decodable {
+	) throws -> C where C: RangeReplaceableCollection, C: Decodable, C.Element: ResourceIdentifiable & Decodable {
 		try self.decode(CompoundDocument<C?, Unit>.self, from: data).data ?? C()
 	}
 
@@ -33,7 +33,7 @@ public class JSONAPIDecoder: JSONDecoder {
 		from data: Data
 	) throws -> CompoundDocument<C, M>
 	where
-		C: RangeReplaceableCollection, C: Decodable, C.Element: ResourceObjectIdentifiable & Decodable, M: Decodable
+		C: RangeReplaceableCollection, C: Decodable, C.Element: ResourceIdentifiable & Decodable, M: Decodable
 	{
 		let document = try self.decode(CompoundDocument<C?, M>.self, from: data)
 		return CompoundDocument(data: document.data ?? C(), meta: document.meta)
@@ -41,8 +41,8 @@ public class JSONAPIDecoder: JSONDecoder {
 }
 
 extension Decoder {
-	var resourceObjectDecoder: ResourceObjectDecoder? {
-		self.userInfo.resourceObjectDecoderStorage?.resourceObjectDecoder
+	var resourceDecoder: ResourceDecoder? {
+		self.userInfo.resourceDecoderStorage?.resourceDecoder
 	}
 }
 
@@ -65,22 +65,22 @@ extension Dictionary where Key == CodingUserInfoKey, Value == Any {
 		}
 	}
 
-	fileprivate(set) var resourceObjectDecoderStorage: ResourceObjectDecoderStorage? {
+	fileprivate(set) var resourceDecoderStorage: ResourceDecoderStorage? {
 		get {
-			self[.resourceObjectDecoderStorage] as? ResourceObjectDecoderStorage
+			self[.resourceDecoderStorage] as? ResourceDecoderStorage
 		}
 		set {
-			self[.resourceObjectDecoderStorage] = newValue
+			self[.resourceDecoderStorage] = newValue
 		}
 	}
 }
 
-final class ResourceObjectDecoderStorage {
-	var resourceObjectDecoder: ResourceObjectDecoder?
+final class ResourceDecoderStorage {
+	var resourceDecoder: ResourceDecoder?
 }
 
 extension CodingUserInfoKey {
 	fileprivate static let ignoresMissingResources = Self(rawValue: "JSONAPI.ignoresMissingResources")!
 	fileprivate static let ignoresUnhandledResourceTypes = Self(rawValue: "JSONAPI.ignoresUnhandledResourceTypes")!
-	fileprivate static let resourceObjectDecoderStorage = Self(rawValue: "JSONAPI.resourceObjectDecoderStorage")!
+	fileprivate static let resourceDecoderStorage = Self(rawValue: "JSONAPI.resourceDecoderStorage")!
 }

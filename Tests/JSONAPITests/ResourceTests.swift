@@ -2,20 +2,20 @@ import JSONAPI
 import SnapshotTesting
 import XCTest
 
-final class ResourceObjectTests: XCTestCase {
-	private struct PersonFieldSet: ResourceObjectFieldSet {
+final class ResourceTests: XCTestCase {
+	private struct PersonFieldSet: ResourceFieldSet {
 		struct Attributes: Equatable, Codable {
 			var firstName: String
 			var lastName: String
 			var twitter: String?
 		}
 
-		static let resourceObjectType = "people"
+		static let resourceType = "people"
 	}
 
-	private typealias Person = ResourceObject<String, PersonFieldSet>
+	private typealias Person = Resource<String, PersonFieldSet>
 
-	private struct CommentFieldSet: ResourceObjectFieldSet {
+	private struct CommentFieldSet: ResourceFieldSet {
 		struct Attributes: Equatable, Codable {
 			var body: String
 		}
@@ -24,12 +24,12 @@ final class ResourceObjectTests: XCTestCase {
 			var author: RelationshipOptional<Person>
 		}
 
-		static let resourceObjectType = "comments"
+		static let resourceType = "comments"
 	}
 
-	private typealias Comment = ResourceObject<String, CommentFieldSet>
+	private typealias Comment = Resource<String, CommentFieldSet>
 
-	private struct ArticleFieldSet: ResourceObjectFieldSet {
+	private struct ArticleFieldSet: ResourceFieldSet {
 		struct Attributes: Equatable, Codable {
 			var title: String
 		}
@@ -39,10 +39,10 @@ final class ResourceObjectTests: XCTestCase {
 			var comments: RelationshipMany<Comment>
 		}
 
-		static let resourceObjectType = "articles"
+		static let resourceType = "articles"
 	}
 
-	private typealias Article = ResourceObject<String, ArticleFieldSet>
+	private typealias Article = Resource<String, ArticleFieldSet>
 
 	private struct CopyrightInfo: Equatable, Codable {
 		var copyright: String
@@ -184,7 +184,7 @@ final class ResourceObjectTests: XCTestCase {
 		}
 	}
 
-	func testDecodeMissingResourceObject() throws {
+	func testDecodeMissingResource() throws {
 		// given
 		let json = try XCTUnwrap(
 			Bundle.module.url(forResource: "Fixtures/ArticleMissingResource", withExtension: "json").map {
@@ -199,13 +199,13 @@ final class ResourceObjectTests: XCTestCase {
 		} catch let DecodingError.valueNotFound(type, context) {
 			// then
 			XCTAssertEqual(String(describing: type), String(describing: Comment.self))
-			XCTAssertEqual(context.debugDescription, "Could not find resource object of type 'comments' with id '5'.")
+			XCTAssertEqual(context.debugDescription, "Could not find resource of type 'comments' with id '5'.")
 		} catch {
 			XCTFail("Expected DecodingError.valueNotFound but got \(error).")
 		}
 	}
 
-	func testDecodeIgnoresMissingResourceObject() throws {
+	func testDecodeIgnoresMissingResource() throws {
 		// given
 		let json = try XCTUnwrap(
 			Bundle.module.url(forResource: "Fixtures/ArticleMissingResource", withExtension: "json").map {

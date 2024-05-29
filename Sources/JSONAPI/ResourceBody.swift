@@ -1,16 +1,16 @@
 import Foundation
 
-public struct ResourceObjectBody<ID, FieldSet>: Encodable
+public struct ResourceBody<ID, FieldSet>: Encodable
 where
 	ID: Hashable & Encodable,
-	FieldSet: ResourceObjectFieldSet,
+	FieldSet: ResourceFieldSet,
 	FieldSet.Attributes: Encodable,
 	FieldSet.Relationships: Encodable
 {
 	public typealias Attributes = FieldSet.Attributes
 	public typealias Relationships = FieldSet.Relationships
 
-	public let type: String = FieldSet.resourceObjectType
+	public let type: String = FieldSet.resourceType
 
 	public var id: ID?
 	public var attributes: Attributes?
@@ -47,17 +47,17 @@ where
 	}
 }
 
-extension ResourceObjectBody where Attributes == Unit {
+extension ResourceBody where Attributes == Unit {
 	public init(id: ID? = nil, relationships: Relationships) {
 		self.init(id: id, attributes: Unit(), relationships: relationships)
 	}
 }
 
-extension ResourceObjectBody where Relationships == Unit {
+extension ResourceBody where Relationships == Unit {
 	public init(id: ID? = nil, attributes: Attributes) {
 		self.init(id: id, attributes: attributes, relationships: Unit())
 	}
 }
 
-extension ResourceObjectBody: Equatable where ID: Equatable, Attributes: Equatable, Relationships: Equatable {
+extension ResourceBody: Equatable where ID: Equatable, Attributes: Equatable, Relationships: Equatable {
 }

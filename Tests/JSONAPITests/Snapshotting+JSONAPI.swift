@@ -3,7 +3,7 @@ import JSONAPI
 import SnapshotTesting
 
 extension Snapshotting where Format == String {
-	static func jsonAPI() -> Snapshotting where Value: ResourceObjectIdentifiable & Encodable {
+	static func jsonAPI() -> Snapshotting where Value: ResourceIdentifiable & Encodable {
 		let encoder = JSONAPIEncoder()
 		encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
 
@@ -17,7 +17,7 @@ extension Snapshotting where Format == String {
 	static func jsonAPI() -> Snapshotting
 	where
 		Value: Collection & Encodable,
-		Value.Element: ResourceObjectIdentifiable & Encodable
+		Value.Element: ResourceIdentifiable & Encodable
 	{
 		let encoder = JSONAPIEncoder()
 		encoder.outputFormatting = [.prettyPrinted, .sortedKeys]

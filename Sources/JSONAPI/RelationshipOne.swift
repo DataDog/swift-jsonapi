@@ -30,22 +30,22 @@ extension RelationshipOne: Decodable where R: Decodable {
 			)
 		}
 
-		guard let resourceObjectDecoder = decoder.resourceObjectDecoder else {
+		guard let resourceDecoder = decoder.resourceDecoder else {
 			fatalError("You must use a 'JSONAPIDecoder' instance to decode a JSON:API response.")
 		}
 
-		self.destination = try resourceObjectDecoder.decode(R.self, identifier: data)
+		self.destination = try resourceDecoder.decode(R.self, identifier: data)
 	}
 }
 
-extension RelationshipOne: Encodable where R: Encodable & ResourceObjectIdentifiable {
+extension RelationshipOne: Encodable where R: Encodable & ResourceIdentifiable {
 	public func encode(to encoder: any Encoder) throws {
 		try ResourceLinkageOne(self.destination).encode(to: encoder)
 
-		guard let resourceObjectEncoder = encoder.resourceObjectEncoder else {
+		guard let resourceEncoder = encoder.resourceEncoder else {
 			fatalError("You must use a 'JSONAPIEncoder' instance to encode a JSON:API resource.")
 		}
 
-		resourceObjectEncoder.encode(self.destination)
+		resourceEncoder.encode(self.destination)
 	}
 }

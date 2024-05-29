@@ -2,20 +2,20 @@ import JSONAPI
 import SnapshotTesting
 import XCTest
 
-final class ResourceObjectBodyTests: XCTestCase {
-	private struct PersonFieldSet: ResourceObjectFieldSet {
+final class ResourceBodyTests: XCTestCase {
+	private struct PersonFieldSet: ResourceFieldSet {
 		struct Attributes: Encodable {
 			var firstName: String?
 			var lastName: String?
 			var twitter: String?
 		}
 
-		static let resourceObjectType = "people"
+		static let resourceType = "people"
 	}
 
-	private typealias PersonBody = ResourceObjectBody<String, PersonFieldSet>
+	private typealias PersonBody = ResourceBody<String, PersonFieldSet>
 
-	private struct CommentFieldSet: ResourceObjectFieldSet {
+	private struct CommentFieldSet: ResourceFieldSet {
 		struct Attributes: Encodable {
 			var body: String?
 		}
@@ -24,10 +24,10 @@ final class ResourceObjectBodyTests: XCTestCase {
 			var author: ResourceLinkageOne?
 		}
 
-		static let resourceObjectType = "comments"
+		static let resourceType = "comments"
 	}
 
-	private typealias CommentBody = ResourceObjectBody<String, CommentFieldSet>
+	private typealias CommentBody = ResourceBody<String, CommentFieldSet>
 
 	func testEncodeOnlyAttributes() {
 		// given

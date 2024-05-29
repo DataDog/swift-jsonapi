@@ -3,18 +3,18 @@ import Foundation
 public struct ResourceLinkageOne: Equatable, Codable {
 	public static let empty = ResourceLinkageOne()
 
-	public var data: ResourceObjectIdentifier?
+	public var data: ResourceIdentifier?
 
-	public init(data: ResourceObjectIdentifier? = nil) {
+	public init(data: ResourceIdentifier? = nil) {
 		self.data = data
 	}
 
-	public init<R>(_ resource: R) where R: ResourceObjectIdentifiable {
-		self.init(data: ResourceObjectIdentifier(resource))
+	public init<R>(_ resource: R) where R: ResourceIdentifiable {
+		self.init(data: ResourceIdentifier(resource))
 	}
 
-	public init<R>(_ optionalResource: R?) where R: ResourceObjectIdentifiable {
-		self.init(data: optionalResource.map(ResourceObjectIdentifier.init))
+	public init<R>(_ optionalResource: R?) where R: ResourceIdentifiable {
+		self.init(data: optionalResource.map(ResourceIdentifier.init))
 	}
 
 	public func encode(to encoder: any Encoder) throws {

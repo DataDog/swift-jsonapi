@@ -1,13 +1,13 @@
 import Foundation
 
-final class ResourceObjectDecoder {
+final class ResourceDecoder {
 	private let userInfo: [CodingUserInfoKey: Any]
-	private let indexByIdentifier: [ResourceObjectIdentifier: Int]
+	private let indexByIdentifier: [ResourceIdentifier: Int]
 	private let container: () throws -> any UnkeyedDecodingContainer
 
 	init(
 		userInfo: [CodingUserInfoKey: Any],
-		identifiers: [ResourceObjectIdentifier],
+		identifiers: [ResourceIdentifier],
 		container: @escaping () throws -> any UnkeyedDecodingContainer
 	) {
 		self.userInfo = userInfo
@@ -18,14 +18,14 @@ final class ResourceObjectDecoder {
 		self.container = container
 	}
 
-	func decode<R>(_ type: R.Type, identifier: ResourceObjectIdentifier) throws -> R where R: Decodable {
+	func decode<R>(_ type: R.Type, identifier: ResourceIdentifier) throws -> R where R: Decodable {
 		guard let resource = try self.decodeIfPresent(type, identifier: identifier) else {
 			throw DecodingError.valueNotFound(
 				type,
 				.init(
 					codingPath: (try? self.container())?.codingPath ?? [],
 					debugDescription: """
-						Could not find resource object of type '\(identifier.type)' with id '\(identifier.id)'.
+						Could not find resource of type '\(identifier.type)' with id '\(identifier.id)'.
 						"""
 				)
 			)
@@ -36,7 +36,7 @@ final class ResourceObjectDecoder {
 
 	func decodeIfPresent<R>(
 		_ type: R.Type,
-		identifier: ResourceObjectIdentifier?
+		identifier: ResourceIdentifier?
 	) throws -> R? where R: Decodable {
 		guard let identifier, let index = self.indexByIdentifier[identifier] else {
 			return nil
@@ -51,7 +51,7 @@ final class ResourceObjectDecoder {
 
 	func decode<R>(
 		_ type: [R].Type,
-		identifiers: [ResourceObjectIdentifier]
+		identifiers: [ResourceIdentifier]
 	) throws -> [R] where R: Decodable {
 		try identifiers.compactMap { identifier in
 			do {
@@ -73,7 +73,7 @@ final class ResourceObjectDecoder {
 		precondition(index < container.count!)
 
 		while container.currentIndex < index {
-			_ = try container.decode(ResourceObjectIdentifier.self)
+			_ = try container.decode(ResourceIdentifier.self)
 		}
 
 		return try container.decode(R.self)

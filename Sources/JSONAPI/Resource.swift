@@ -1,10 +1,10 @@
 import Foundation
 
 @dynamicMemberLookup
-public struct ResourceObject<ID, FieldSet>: ResourceObjectIdentifiable
+public struct Resource<ID, FieldSet>: ResourceIdentifiable
 where
 	ID: Hashable & CustomStringConvertible,
-	FieldSet: ResourceObjectFieldSet
+	FieldSet: ResourceFieldSet
 {
 	public typealias Attributes = FieldSet.Attributes
 	public typealias Relationships = FieldSet.Relationships
@@ -13,7 +13,7 @@ where
 		case type, id, attributes, relationships
 	}
 
-	public let type: String = FieldSet.resourceObjectType
+	public let type: String = FieldSet.resourceType
 
 	public var id: ID
 	public var attributes: Attributes
@@ -36,34 +36,34 @@ where
 	}
 }
 
-extension ResourceObject where Attributes == Unit {
+extension Resource where Attributes == Unit {
 	public init(id: ID, relationships: Relationships) {
 		self.init(id: id, attributes: Unit(), relationships: relationships)
 	}
 }
 
-extension ResourceObject where Relationships == Unit {
+extension Resource where Relationships == Unit {
 	public init(id: ID, attributes: Attributes) {
 		self.init(id: id, attributes: attributes, relationships: Unit())
 	}
 }
 
-extension ResourceObject: Equatable where ID: Equatable, Attributes: Equatable, Relationships: Equatable {
+extension Resource: Equatable where ID: Equatable, Attributes: Equatable, Relationships: Equatable {
 }
 
-extension ResourceObject: Decodable where ID: Decodable, Attributes: Decodable, Relationships: Decodable {
+extension Resource: Decodable where ID: Decodable, Attributes: Decodable, Relationships: Decodable {
 	public init(from decoder: any Decoder) throws {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 
 		let type = try container.decode(String.self, forKey: .type)
 
-		if type != FieldSet.resourceObjectType {
+		if type != FieldSet.resourceType {
 			throw DecodingError.typeMismatch(
 				FieldSet.self,
 				DecodingError.Context(
 					codingPath: [CodingKeys.type],
 					debugDescription:
-						"Resource type '\(type)' does not match expected type '\(FieldSet.resourceObjectType)'"
+						"Resource type '\(type)' does not match expected type '\(FieldSet.resourceType)'"
 				)
 			)
 		}
@@ -84,7 +84,7 @@ extension ResourceObject: Decodable where ID: Decodable, Attributes: Decodable, 
 	}
 }
 
-extension ResourceObject: Encodable where ID: Encodable, Attributes: Encodable, Relationships: Encodable {
+extension Resource: Encodable where ID: Encodable, Attributes: Encodable, Relationships: Encodable {
 	public func encode(to encoder: any Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 
