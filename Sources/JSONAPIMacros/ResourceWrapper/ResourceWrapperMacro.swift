@@ -39,7 +39,7 @@ public struct ResourceWrapperMacro: ExtensionMacro {
 				resourceType: resourceType.content.text
 			),
 			try .makeResourceIdentifiableExtension(attachedTo: declaration, providingExtensionsOf: type),
-			// TODO: Codable
+			try .makeCodableExtension(attachedTo: declaration, providingExtensionsOf: type),
 		]
 	}
 }
@@ -61,6 +61,14 @@ extension ExtensionDeclSyntax {
 		let resourceAttributes = declaration.definedVariables.filter(\.hasResourceAttributeMacro)
 		let resourceRelationships = declaration.definedVariables.filter(\.hasResourceRelationshipMacro)
 
+		guard let identifier = declaration.definedVariables.first(where: \.isIdentifier) else {
+			throw DiagnosticsError(
+				syntax: declaration,
+				message: "'@ResourceWrapper' requires a valid 'id' member.",
+				id: .missingResourceType
+			)
+		}
+
 		let members = try MemberBlockItemListSyntax {
 			try StructDeclSyntax.makeFieldSet(
 				modifiers: modifiers,
@@ -75,8 +83,8 @@ extension ExtensionDeclSyntax {
 				resourceAttributes: resourceAttributes,
 				resourceRelationships: resourceRelationships
 			)
-			DeclSyntax("\(modifiers)typealias Primitive = JSONAPI.Resource<String, FieldSet>")
-			DeclSyntax("\(modifiers)typealias Update = JSONAPI.ResourceUpdate<String, UpdateFieldSet>")
+			DeclSyntax("\(modifiers)typealias Primitive = JSONAPI.Resource<\(identifier.type), FieldSet>")
+			DeclSyntax("\(modifiers)typealias Update = JSONAPI.ResourceUpdate<\(identifier.type), UpdateFieldSet>")
 		}
 
 		return try ExtensionDeclSyntax(
@@ -97,16 +105,69 @@ extension ExtensionDeclSyntax {
 			}
 		}
 		let members = MemberBlockItemListSyntax {
-			DeclSyntax("\(modifiers) var type: String { FieldSet.resourceType }")
-			//			var type: String {
-			//				FieldSet.resourceType
-			//			}
+			DeclSyntax("\(modifiers)var type: String { FieldSet.resourceType }")
 		}
 
 		return try ExtensionDeclSyntax(
 			"""
 			\(declaration.attributes.availability)
 			extension \(type): JSONAPI.ResourceIdentifiable\(MemberBlockSyntax(members: members))
+			"""
+		)
+	}
+
+	fileprivate static func makeCodableExtension(
+		attachedTo declaration: some DeclGroupSyntax,
+		providingExtensionsOf type: some TypeSyntaxProtocol
+	) throws -> ExtensionDeclSyntax {
+		let modifiers = DeclModifierListSyntax {
+			if let publicModifier = declaration.publicModifier {
+				publicModifier
+			}
+		}
+		let resourceAttributes = declaration.definedVariables.filter(\.hasResourceAttributeMacro)
+		let resourceRelationships = declaration.definedVariables.filter(\.hasResourceRelationshipMacro)
+		let members = try MemberBlockItemListSyntax {
+			try InitializerDeclSyntax("\(modifiers)init(from decoder: any Decoder) throws") {
+				StmtSyntax("let primitive = try Primitive(from: decoder)")
+				StmtSyntax("self.id = primitive.id")
+					.with(\.trailingTrivia, .newline)
+				for resourceAttribute in resourceAttributes {
+					StmtSyntax("self.\(resourceAttribute.identifier) = primitive.\(resourceAttribute.identifier)")
+						.with(\.trailingTrivia, .newline)
+				}
+				for resourceRelationship in resourceRelationships {
+					StmtSyntax(
+						"""
+						self.\(resourceRelationship.identifier) = \
+						primitive.\(resourceRelationship.identifier).\(resourceRelationship.relationshipResource)
+						"""
+					).with(\.trailingTrivia, .newline)
+				}
+			}
+
+			try FunctionDeclSyntax("\(modifiers)func encode(to encoder: any Encoder) throws") {
+				if !resourceAttributes.isEmpty {
+					StmtSyntax(
+						"let attributes = \(FunctionCallExprSyntax.makePrimitiveAttributes(resourceAttributes))"
+					)
+				}
+				if !resourceRelationships.isEmpty {
+					StmtSyntax(
+						"let relationships = \(FunctionCallExprSyntax.makePrimitiveRelationships(resourceRelationships))"
+					)
+				}
+				StmtSyntax(
+					"let primitive = \(FunctionCallExprSyntax.makePrimitive(resourceAttributes, resourceRelationships))"
+				)
+				StmtSyntax("try primitive.encode(to: encoder)")
+			}
+		}
+
+		return try ExtensionDeclSyntax(
+			"""
+			\(declaration.attributes.availability)
+			extension \(type): Codable\(MemberBlockSyntax(members: members))
 			"""
 		)
 	}
@@ -231,6 +292,53 @@ extension StructDeclSyntax {
 	}
 }
 
+extension FunctionCallExprSyntax {
+	fileprivate static func makePrimitiveAttributes(
+		_ resourceAttributes: [VariableDeclSyntax]
+	) -> FunctionCallExprSyntax {
+		FunctionCallExprSyntax(callee: ExprSyntax("Primitive.Attributes")) {
+			for resourceAttribute in resourceAttributes {
+				LabeledExprSyntax(
+					label: resourceAttribute.identifier,
+					colon: .colonToken(trailingTrivia: .space),
+					expression: ExprSyntax("self.\(resourceAttribute.identifier)")
+				)
+			}
+		}
+	}
+
+	fileprivate static func makePrimitiveRelationships(
+		_ resourceRelationships: [VariableDeclSyntax]
+	) -> FunctionCallExprSyntax {
+		FunctionCallExprSyntax(callee: ExprSyntax("Primitive.Relationships")) {
+			for resourceRelationship in resourceRelationships {
+				LabeledExprSyntax(
+					label: resourceRelationship.identifier,
+					colon: .colonToken(trailingTrivia: .space),
+					expression: ExprSyntax(
+						".init(self.\(resourceRelationship.identifier))"
+					)
+				)
+			}
+		}
+	}
+
+	fileprivate static func makePrimitive(
+		_ resourceAttributes: [VariableDeclSyntax],
+		_ resourceRelationships: [VariableDeclSyntax]
+	) -> FunctionCallExprSyntax {
+		FunctionCallExprSyntax(callee: ExprSyntax("Primitive")) {
+			LabeledExprSyntax(label: "id", expression: ExprSyntax("self.id"))
+			if !resourceAttributes.isEmpty {
+				LabeledExprSyntax(label: "attributes", expression: ExprSyntax("attributes"))
+			}
+			if !resourceRelationships.isEmpty {
+				LabeledExprSyntax(label: "relationships", expression: ExprSyntax("relationships"))
+			}
+		}
+	}
+}
+
 extension DeclSyntax {
 	fileprivate static func makeCodingKeys(
 		for variables: [VariableDeclSyntax],
@@ -299,6 +407,10 @@ extension VariableDeclSyntax {
 		self.hasMacroApplication("ResourceRelationship")
 	}
 
+	fileprivate var isIdentifier: Bool {
+		self.identifier?.text == "id"
+	}
+
 	fileprivate var resourceAttributeKey: StringSegmentSyntax? {
 		self.attribute(named: "ResourceAttribute")?.firstArgumentStringLiteralSegment
 	}
@@ -318,6 +430,13 @@ extension VariableDeclSyntax {
 		} else {
 			return TypeSyntax("JSONAPI.RelationshipOne<\(resourceType)>")
 		}
+	}
+
+	fileprivate var relationshipResource: TokenSyntax? {
+		guard let resourceType = self.isOptional ? self.optionalWrappedType : self.type else {
+			return nil
+		}
+		return resourceType.isArray ? "resources" : "resource"
 	}
 
 	fileprivate var resourceLinkageType: TypeSyntax? {
