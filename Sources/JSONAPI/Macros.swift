@@ -3,7 +3,7 @@
 @attached(
 	extension,
 	conformances: ResourceIdentifiable, Codable,
-	names: named(FieldSet), named(BodyFieldSet), named(Primitive), named(Body), named(type), named(init(from:)),
+	names: named(FieldSet), named(UpdateFieldSet), named(Primitive), named(Update), named(type), named(init(from:)),
 	named(encode(to:))
 )
 public macro ResourceWrapper(type: String) = #externalMacro(module: "JSONAPIMacros", type: "ResourceWrapperMacro")
@@ -12,7 +12,7 @@ public macro ResourceWrapper(type: String) = #externalMacro(module: "JSONAPIMacr
 @attached(
 	extension,
 	conformances: ResourceIdentifiable, Codable,
-	names: named(FieldSet), named(BodyFieldSet), named(Primitive), named(Body), named(type), named(init(from:)),
+	names: named(FieldSet), named(UpdateFieldSet), named(Primitive), named(Update), named(type), named(init(from:)),
 	named(encode(to:))
 )
 public macro CodableResource(type: String) = #externalMacro(module: "JSONAPIMacros", type: "ResourceWrapperMacro")

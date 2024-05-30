@@ -24,7 +24,7 @@ extension Person {
 		static let resourceType = "people"
 	}
 
-	struct BodyFieldSet: ResourceFieldSet {
+	struct UpdateFieldSet: ResourceFieldSet {
 		struct Attributes: Equatable, Encodable {
 			// coding keys when needed!
 			var firstName: String?
@@ -36,7 +36,7 @@ extension Person {
 	}
 
 	typealias Primitive = Resource<String, FieldSet>
-	typealias Body = ResourceBody<String, BodyFieldSet>
+	typealias Update = ResourceUpdate<String, UpdateFieldSet>
 }
 
 extension Person: ResourceIdentifiable {
@@ -82,7 +82,7 @@ extension Comment {
 		static let resourceType = "comments"
 	}
 
-	struct BodyFieldSet: ResourceFieldSet {
+	struct UpdateFieldSet: ResourceFieldSet {
 		struct Attributes: Equatable, Encodable {
 			var body: String?
 		}
@@ -93,7 +93,7 @@ extension Comment {
 	}
 
 	typealias Primitive = Resource<String, FieldSet>
-	typealias Body = ResourceBody<String, BodyFieldSet>
+	typealias Update = ResourceUpdate<String, UpdateFieldSet>
 }
 
 extension Comment: ResourceIdentifiable {
@@ -141,7 +141,7 @@ extension Article {
 		static let resourceType = "articles"
 	}
 
-	struct BodyFieldSet: ResourceFieldSet {
+	struct UpdateFieldSet: ResourceFieldSet {
 		struct Attributes: Equatable, Encodable {
 			var title: String?
 		}
@@ -153,7 +153,7 @@ extension Article {
 	}
 
 	typealias Primitive = Resource<String, FieldSet>
-	typealias Body = ResourceBody<String, BodyFieldSet>
+	typealias Update = ResourceUpdate<String, UpdateFieldSet>
 }
 
 extension Article: ResourceIdentifiable {

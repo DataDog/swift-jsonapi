@@ -1,6 +1,6 @@
 import Foundation
 
-public struct ResourceBody<ID, FieldSet>: Encodable
+public struct ResourceUpdate<ID, FieldSet>: Encodable
 where
 	ID: Hashable & Encodable,
 	FieldSet: ResourceFieldSet,
@@ -47,17 +47,17 @@ where
 	}
 }
 
-extension ResourceBody where Attributes == Unit {
+extension ResourceUpdate where Attributes == Unit {
 	public init(id: ID? = nil, relationships: Relationships) {
 		self.init(id: id, attributes: Unit(), relationships: relationships)
 	}
 }
 
-extension ResourceBody where Relationships == Unit {
+extension ResourceUpdate where Relationships == Unit {
 	public init(id: ID? = nil, attributes: Attributes) {
 		self.init(id: id, attributes: attributes, relationships: Unit())
 	}
 }
 
-extension ResourceBody: Equatable where ID: Equatable, Attributes: Equatable, Relationships: Equatable {
+extension ResourceUpdate: Equatable where ID: Equatable, Attributes: Equatable, Relationships: Equatable {
 }

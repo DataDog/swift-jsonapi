@@ -2,9 +2,8 @@ import SwiftDiagnostics
 import SwiftSyntax
 import SwiftSyntaxBuilder
 import SwiftSyntaxMacros
-import SwiftBasicFormat
 
-public struct ResourceWrapperMacro: ExtensionMacro {	
+public struct ResourceWrapperMacro: ExtensionMacro {
 	public static func expansion(
 		of node: AttributeSyntax,
 		attachedTo declaration: some DeclGroupSyntax,
@@ -39,7 +38,7 @@ public struct ResourceWrapperMacro: ExtensionMacro {
 			// TODO: Codable
 		]
 	}
-	
+
 	private static func fieldSetExtension(
 		attachedTo declaration: some DeclGroupSyntax,
 		providingExtensionsOf type: some TypeSyntaxProtocol
@@ -49,10 +48,10 @@ public struct ResourceWrapperMacro: ExtensionMacro {
 		let inheritedTypeList = InheritedTypeListSyntax(
 			[
 				declaration.inheritanceClause?.inheritedTypes.first(where: { $0.type == "Equatable" }),
-				InheritedTypeSyntax(type: TypeSyntax("Codable"))
+				InheritedTypeSyntax(type: TypeSyntax("Codable")),
 			].compactMap { $0 }
 		)
-		
+
 		let members = try MemberBlockItemListSyntax {
 			try StructDeclSyntax("\(declaration.publicModifier)struct FieldSet: ResourceFieldSet") {
 				if !resourceAttributes.isEmpty {
@@ -64,11 +63,11 @@ public struct ResourceWrapperMacro: ExtensionMacro {
 					}
 				}
 			}
-			try StructDeclSyntax("\(declaration.publicModifier)struct BodyFieldSet: ResourceFieldSet") {
-				
+			try StructDeclSyntax("\(declaration.publicModifier)struct UpdateFieldSet: ResourceFieldSet") {
+
 			}
 		}
-		
+
 		return try ExtensionDeclSyntax(
 			"""
 			\(declaration.attributes.availability ?? [])
@@ -82,7 +81,7 @@ extension VariableDeclSyntax {
 	fileprivate var hasResourceAttributeMacro: Bool {
 		hasMacroApplication("ResourceAttribute")
 	}
-	
+
 	fileprivate var hasResourceRelationshipMacro: Bool {
 		hasMacroApplication("ResourceRelationship")
 	}
