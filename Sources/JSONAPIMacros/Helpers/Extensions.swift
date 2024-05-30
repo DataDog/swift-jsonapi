@@ -105,6 +105,13 @@ extension TypeSyntax {
 
 		return nil
 	}
+
+	var optional: TypeSyntax {
+		guard !self.isOptional else {
+			return self
+		}
+		return TypeSyntax(OptionalTypeSyntax(wrappedType: self))
+	}
 }
 
 extension AttributeSyntax {

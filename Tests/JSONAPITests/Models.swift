@@ -3,13 +3,12 @@ import JSONAPI
 
 // MARK: - Person
 
-//@ResourceWrapper(type: "people")
 struct Person: Equatable {
 	var id: String
 
-	@ResourceAttribute var firstName: String
-	var lastName: String
-	var twitter: String?
+	@ResourceAttribute public var firstName: String
+	@ResourceAttribute var lastName: String
+	@ResourceAttribute var twitter: String?
 }
 
 extension Person {
@@ -64,36 +63,12 @@ extension Person: Codable {
 
 // MARK: - Comment
 
+@ResourceWrapper(type: "comments")
 struct Comment: Equatable {
 	var id: String
 
-	var body: String
-	var author: Person?
-}
-
-extension Comment {
-	struct FieldSet: ResourceFieldSet {
-		struct Attributes: Equatable, Codable {
-			var body: String
-		}
-		struct Relationships: Equatable, Codable {
-			var author: RelationshipOptional<Person>
-		}
-		static let resourceType = "comments"
-	}
-
-	struct UpdateFieldSet: ResourceFieldSet {
-		struct Attributes: Equatable, Encodable {
-			var body: String?
-		}
-		struct Relationships: Equatable, Encodable {
-			var author: ResourceLinkageOne?
-		}
-		static let resourceType = FieldSet.resourceType
-	}
-
-	typealias Primitive = Resource<String, FieldSet>
-	typealias Update = ResourceUpdate<String, UpdateFieldSet>
+	@ResourceAttribute var body: String
+	@ResourceRelationship var author: Person?
 }
 
 extension Comment: ResourceIdentifiable {
