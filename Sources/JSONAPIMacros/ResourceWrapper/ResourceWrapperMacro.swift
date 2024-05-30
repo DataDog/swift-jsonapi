@@ -37,8 +37,8 @@ public struct ResourceWrapperMacro: ExtensionMacro {
 				attachedTo: declaration,
 				providingExtensionsOf: type,
 				resourceType: resourceType.content.text
-			)
-			// TODO: ResourceIdentifiable extension
+			),
+			try .makeResourceIdentifiableExtension(attachedTo: declaration, providingExtensionsOf: type),
 			// TODO: Codable
 		]
 	}
@@ -75,14 +75,38 @@ extension ExtensionDeclSyntax {
 				resourceAttributes: resourceAttributes,
 				resourceRelationships: resourceRelationships
 			)
-			DeclSyntax("\(modifiers)typealias Primitive = Resource<String, FieldSet>")
-			DeclSyntax("\(modifiers)typealias Update = ResourceUpdate<String, UpdateFieldSet>")
+			DeclSyntax("\(modifiers)typealias Primitive = JSONAPI.Resource<String, FieldSet>")
+			DeclSyntax("\(modifiers)typealias Update = JSONAPI.ResourceUpdate<String, UpdateFieldSet>")
 		}
 
 		return try ExtensionDeclSyntax(
 			"""
-			\(declaration.attributes.availability ?? [])
+			\(declaration.attributes.availability)
 			extension \(type)\(MemberBlockSyntax(members: members))
+			"""
+		)
+	}
+
+	fileprivate static func makeResourceIdentifiableExtension(
+		attachedTo declaration: some DeclGroupSyntax,
+		providingExtensionsOf type: some TypeSyntaxProtocol
+	) throws -> ExtensionDeclSyntax {
+		let modifiers = DeclModifierListSyntax {
+			if let publicModifier = declaration.publicModifier {
+				publicModifier
+			}
+		}
+		let members = MemberBlockItemListSyntax {
+			DeclSyntax("\(modifiers) var type: String { FieldSet.resourceType }")
+			//			var type: String {
+			//				FieldSet.resourceType
+			//			}
+		}
+
+		return try ExtensionDeclSyntax(
+			"""
+			\(declaration.attributes.availability)
+			extension \(type): JSONAPI.ResourceIdentifiable\(MemberBlockSyntax(members: members))
 			"""
 		)
 	}
@@ -96,9 +120,12 @@ extension StructDeclSyntax {
 		resourceRelationships: [VariableDeclSyntax],
 		resourceType: String
 	) throws -> StructDeclSyntax {
-		try StructDeclSyntax("\(modifiers)struct FieldSet: ResourceFieldSet") {
+		try StructDeclSyntax("\(modifiers)struct FieldSet: JSONAPI.ResourceFieldSet") {
 			if !resourceAttributes.isEmpty {
 				try StructDeclSyntax.makeFieldSetAttributes(
+					arrayAttributes: AttributeListSyntax {
+						AttributeSyntax("@DefaultEmpty")
+					}.with(\.trailingTrivia, .space),
 					modifiers: modifiers,
 					inheritedTypeList: inheritedTypeList,
 					resourceAttributes: resourceAttributes
@@ -121,13 +148,13 @@ extension StructDeclSyntax {
 		resourceAttributes: [VariableDeclSyntax],
 		resourceRelationships: [VariableDeclSyntax]
 	) throws -> StructDeclSyntax {
-		try StructDeclSyntax("\(modifiers)struct UpdateFieldSet: ResourceFieldSet") {
+		try StructDeclSyntax("\(modifiers)struct UpdateFieldSet: JSONAPI.ResourceFieldSet") {
 			if !resourceAttributes.isEmpty {
 				try StructDeclSyntax.makeFieldSetAttributes(
 					modifiers: modifiers,
 					inheritedTypeList: inheritedTypeList,
 					resourceAttributes: resourceAttributes,
-					typeKeyPath: \.type?.optional
+					typeKeyPath: \.type?.optionalType
 				)
 			}
 			if !resourceRelationships.isEmpty {
@@ -143,6 +170,7 @@ extension StructDeclSyntax {
 	}
 
 	fileprivate static func makeFieldSetAttributes(
+		arrayAttributes: AttributeListSyntax = [],
 		modifiers: DeclModifierListSyntax,
 		inheritedTypeList: InheritedTypeListSyntax,
 		resourceAttributes: [VariableDeclSyntax],
@@ -155,6 +183,7 @@ extension StructDeclSyntax {
 
 			for resourceAttribute in resourceAttributes {
 				VariableDeclSyntax(
+					attributes: resourceAttribute.type?.isArray == true ? arrayAttributes : [],
 					modifiers: resourceAttribute.modifiers,
 					bindingSpecifier: resourceAttribute.bindingSpecifier
 				) {
@@ -167,6 +196,7 @@ extension StructDeclSyntax {
 						)
 					}
 				}
+				.with(\.trailingTrivia, .newline)
 			}
 		}
 	}
@@ -282,11 +312,11 @@ extension VariableDeclSyntax {
 			return nil
 		}
 		if self.isOptional, !resourceType.isArray {
-			return TypeSyntax("RelationshipOptional<\(resourceType)>")
+			return TypeSyntax("JSONAPI.RelationshipOptional<\(resourceType)>")
 		} else if resourceType.isArray {
-			return TypeSyntax("RelationshipMany<\(resourceType)>")
+			return TypeSyntax("JSONAPI.RelationshipMany<\(resourceType.arrayElementType)>")
 		} else {
-			return TypeSyntax("RelationshipOne<\(resourceType)>")
+			return TypeSyntax("JSONAPI.RelationshipOne<\(resourceType)>")
 		}
 	}
 
@@ -295,9 +325,9 @@ extension VariableDeclSyntax {
 			return nil
 		}
 		if resourceType.isArray {
-			return TypeSyntax("ResourceLinkageMany").optional
+			return TypeSyntax("JSONAPI.ResourceLinkageMany").optionalType
 		} else {
-			return TypeSyntax("ResourceLinkageOne").optional
+			return TypeSyntax("JSONAPI.ResourceLinkageOne").optionalType
 		}
 	}
 }

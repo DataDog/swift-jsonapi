@@ -3,45 +3,13 @@ import JSONAPI
 
 // MARK: - Person
 
+@ResourceWrapper(type: "people")
 struct Person: Equatable {
 	var id: String
 
-	@ResourceAttribute public var firstName: String
+	@ResourceAttribute var firstName: String
 	@ResourceAttribute var lastName: String
 	@ResourceAttribute var twitter: String?
-}
-
-extension Person {
-	struct FieldSet: ResourceFieldSet {
-		struct Attributes: Equatable, Codable {
-			// coding keys when needed!
-			var firstName: String
-			var lastName: String
-			var twitter: String?
-		}
-
-		static let resourceType = "people"
-	}
-
-	struct UpdateFieldSet: ResourceFieldSet {
-		struct Attributes: Equatable, Encodable {
-			// coding keys when needed!
-			var firstName: String?
-			var lastName: String?
-			var twitter: String?
-		}
-
-		static let resourceType = FieldSet.resourceType
-	}
-
-	typealias Primitive = Resource<String, FieldSet>
-	typealias Update = ResourceUpdate<String, UpdateFieldSet>
-}
-
-extension Person: ResourceIdentifiable {
-	var type: String {
-		FieldSet.resourceType
-	}
 }
 
 extension Person: Codable {
@@ -71,12 +39,6 @@ struct Comment: Equatable {
 	@ResourceRelationship var author: Person?
 }
 
-extension Comment: ResourceIdentifiable {
-	var type: String {
-		FieldSet.resourceType
-	}
-}
-
 extension Comment: Codable {
 	init(from decoder: any Decoder) throws {
 		let primitive = try Primitive(from: decoder)
@@ -96,45 +58,13 @@ extension Comment: Codable {
 
 // MARK: - Article
 
+@ResourceWrapper(type: "articles")
 struct Article: Equatable {
 	var id: String
 
-	var title: String
-	var author: Person
-	var comments: [Comment]
-}
-
-extension Article {
-	struct FieldSet: ResourceFieldSet {
-		struct Attributes: Equatable, Codable {
-			var title: String
-		}
-		struct Relationships: Equatable, Codable {
-			var author: RelationshipOne<Person>
-			var comments: RelationshipMany<Comment>
-		}
-		static let resourceType = "articles"
-	}
-
-	struct UpdateFieldSet: ResourceFieldSet {
-		struct Attributes: Equatable, Encodable {
-			var title: String?
-		}
-		struct Relationships: Equatable, Encodable {
-			var author: ResourceLinkageOne?
-			var comments: ResourceLinkageMany?
-		}
-		static let resourceType = FieldSet.resourceType
-	}
-
-	typealias Primitive = Resource<String, FieldSet>
-	typealias Update = ResourceUpdate<String, UpdateFieldSet>
-}
-
-extension Article: ResourceIdentifiable {
-	var type: String {
-		FieldSet.resourceType
-	}
+	@ResourceAttribute var title: String
+	@ResourceRelationship var author: Person
+	@ResourceRelationship var comments: [Comment]
 }
 
 extension Article: Codable {
