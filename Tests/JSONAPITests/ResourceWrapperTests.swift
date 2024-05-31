@@ -2,33 +2,33 @@ import JSONAPI
 import SnapshotTesting
 import XCTest
 
-@ResourceWrapper(type: "people")
-private struct Person: Equatable {
-	var id: String
-
-	@ResourceAttribute var firstName: String
-	@ResourceAttribute var lastName: String
-	@ResourceAttribute var twitter: String?
-}
-
-@ResourceWrapper(type: "comments")
-private struct Comment: Equatable {
-	var id: String
-
-	@ResourceAttribute var body: String
-	@ResourceRelationship var author: Person?
-}
-
-@ResourceWrapper(type: "articles")
-private struct Article: Equatable {
-	var id: String
-
-	@ResourceAttribute var title: String
-	@ResourceRelationship var author: Person
-	@ResourceRelationship var comments: [Comment]
-}
-
 final class ResourceWrapperTests: XCTestCase {
+	@ResourceWrapper(type: "people")
+	fileprivate struct Person: Equatable {
+		var id: String
+
+		@ResourceAttribute var firstName: String
+		@ResourceAttribute var lastName: String
+		@ResourceAttribute var twitter: String?
+	}
+
+	@ResourceWrapper(type: "comments")
+	fileprivate struct Comment: Equatable {
+		var id: String
+
+		@ResourceAttribute var body: String
+		@ResourceRelationship var author: ResourceWrapperTests.Person?
+	}
+
+	@ResourceWrapper(type: "articles")
+	fileprivate struct Article: Equatable {
+		var id: String
+
+		@ResourceAttribute var title: String
+		@ResourceRelationship var author: ResourceWrapperTests.Person
+		@ResourceRelationship var comments: [ResourceWrapperTests.Comment]
+	}
+
 	private enum Fixtures {
 		static let article = Article(
 			id: "1",
