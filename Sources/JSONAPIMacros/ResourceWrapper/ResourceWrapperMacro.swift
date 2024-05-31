@@ -83,7 +83,7 @@ extension ExtensionDeclSyntax {
 				resourceAttributes: resourceAttributes,
 				resourceRelationships: resourceRelationships
 			)
-			DeclSyntax("\(modifiers)typealias Primitive = JSONAPI.Resource<\(identifier.type), FieldSet>")
+			DeclSyntax("\(modifiers)typealias Wrapped = JSONAPI.Resource<\(identifier.type), FieldSet>")
 			DeclSyntax("\(modifiers)typealias Update = JSONAPI.ResourceUpdate<\(identifier.type), UpdateFieldSet>")
 		}
 
@@ -129,18 +129,18 @@ extension ExtensionDeclSyntax {
 		let resourceRelationships = declaration.definedVariables.filter(\.hasResourceRelationshipMacro)
 		let members = try MemberBlockItemListSyntax {
 			try InitializerDeclSyntax("\(modifiers)init(from decoder: any Decoder) throws") {
-				StmtSyntax("let primitive = try Primitive(from: decoder)")
-				StmtSyntax("self.id = primitive.id")
+				StmtSyntax("let wrapped = try Wrapped(from: decoder)")
+				StmtSyntax("self.id = wrapped.id")
 					.with(\.trailingTrivia, .newline)
 				for resourceAttribute in resourceAttributes {
-					StmtSyntax("self.\(resourceAttribute.identifier) = primitive.\(resourceAttribute.identifier)")
+					StmtSyntax("self.\(resourceAttribute.identifier) = wrapped.\(resourceAttribute.identifier)")
 						.with(\.trailingTrivia, .newline)
 				}
 				for resourceRelationship in resourceRelationships {
 					StmtSyntax(
 						"""
 						self.\(resourceRelationship.identifier) = \
-						primitive.\(resourceRelationship.identifier).\(resourceRelationship.relationshipResource)
+						wrapped.\(resourceRelationship.identifier).\(resourceRelationship.relationshipResource)
 						"""
 					).with(\.trailingTrivia, .newline)
 				}
@@ -149,18 +149,18 @@ extension ExtensionDeclSyntax {
 			try FunctionDeclSyntax("\(modifiers)func encode(to encoder: any Encoder) throws") {
 				if !resourceAttributes.isEmpty {
 					StmtSyntax(
-						"let attributes = \(FunctionCallExprSyntax.makePrimitiveAttributes(resourceAttributes))"
+						"let attributes = \(FunctionCallExprSyntax.makeWrappedAttributes(resourceAttributes))"
 					)
 				}
 				if !resourceRelationships.isEmpty {
 					StmtSyntax(
-						"let relationships = \(FunctionCallExprSyntax.makePrimitiveRelationships(resourceRelationships))"
+						"let relationships = \(FunctionCallExprSyntax.makeWrappedRelationships(resourceRelationships))"
 					)
 				}
 				StmtSyntax(
-					"let primitive = \(FunctionCallExprSyntax.makePrimitive(resourceAttributes, resourceRelationships))"
+					"let wrapped = \(FunctionCallExprSyntax.makeWrapped(resourceAttributes, resourceRelationships))"
 				)
-				StmtSyntax("try primitive.encode(to: encoder)")
+				StmtSyntax("try wrapped.encode(to: encoder)")
 			}
 		}
 
@@ -293,10 +293,10 @@ extension StructDeclSyntax {
 }
 
 extension FunctionCallExprSyntax {
-	fileprivate static func makePrimitiveAttributes(
+	fileprivate static func makeWrappedAttributes(
 		_ resourceAttributes: [VariableDeclSyntax]
 	) -> FunctionCallExprSyntax {
-		FunctionCallExprSyntax(callee: ExprSyntax("Primitive.Attributes")) {
+		FunctionCallExprSyntax(callee: ExprSyntax("Wrapped.Attributes")) {
 			for resourceAttribute in resourceAttributes {
 				LabeledExprSyntax(
 					label: resourceAttribute.identifier,
@@ -307,10 +307,10 @@ extension FunctionCallExprSyntax {
 		}
 	}
 
-	fileprivate static func makePrimitiveRelationships(
+	fileprivate static func makeWrappedRelationships(
 		_ resourceRelationships: [VariableDeclSyntax]
 	) -> FunctionCallExprSyntax {
-		FunctionCallExprSyntax(callee: ExprSyntax("Primitive.Relationships")) {
+		FunctionCallExprSyntax(callee: ExprSyntax("Wrapped.Relationships")) {
 			for resourceRelationship in resourceRelationships {
 				LabeledExprSyntax(
 					label: resourceRelationship.identifier,
@@ -323,11 +323,11 @@ extension FunctionCallExprSyntax {
 		}
 	}
 
-	fileprivate static func makePrimitive(
+	fileprivate static func makeWrapped(
 		_ resourceAttributes: [VariableDeclSyntax],
 		_ resourceRelationships: [VariableDeclSyntax]
 	) -> FunctionCallExprSyntax {
-		FunctionCallExprSyntax(callee: ExprSyntax("Primitive")) {
+		FunctionCallExprSyntax(callee: ExprSyntax("Wrapped")) {
 			LabeledExprSyntax(label: "id", expression: ExprSyntax("self.id"))
 			if !resourceAttributes.isEmpty {
 				LabeledExprSyntax(label: "attributes", expression: ExprSyntax("attributes"))
