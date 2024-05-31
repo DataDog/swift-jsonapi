@@ -46,6 +46,12 @@ extension Resource where Relationships == Unit {
 	}
 }
 
+extension Resource where Attributes == Unit, Relationships == Unit {
+	public init(id: ID) {
+		self.init(id: id, attributes: Unit(), relationships: Unit())
+	}
+}
+
 extension Resource: Equatable where ID: Equatable, Attributes: Equatable, Relationships: Equatable {
 }
 
