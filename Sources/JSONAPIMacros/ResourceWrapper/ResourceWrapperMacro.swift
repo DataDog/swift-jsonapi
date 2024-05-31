@@ -64,7 +64,7 @@ extension ExtensionDeclSyntax {
 		guard let identifier = declaration.definedVariables.first(where: \.isIdentifier) else {
 			throw DiagnosticsError(
 				syntax: declaration,
-				message: "'@ResourceWrapper' requires a valid 'id' member.",
+				message: "'@ResourceWrapper' requires a valid 'id' property.",
 				id: .missingResourceType
 			)
 		}

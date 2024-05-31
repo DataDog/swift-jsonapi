@@ -43,7 +43,7 @@ public struct CodableResourceUnionMacro: ExtensionMacro {
 			modifier: declaration.publicModifier,
 			enumCaseElements: enumCaseElements
 		)
-		let qualifiedConformanceName = CodableResourceMacro.qualifiedConformanceName
+		let qualifiedConformanceName = "JSONAPI.CodableResource"
 
 		let extensionDecl = DeclSyntax(
 			"""
