@@ -1,0 +1,26 @@
+{
+	"data": {
+		"type": "single_attachment_messages",
+		"id": "1",
+		"attributes": {
+			"text": "Look what I just found!"
+		},
+		"relationships": {
+			"attachment": {
+				"data": {
+					"type": "videos",
+					"id": "42"
+				}
+			}
+		}
+	},
+	"included": [
+		{
+			"type": "videos",
+			"id": "42",
+			"attributes": {
+				"url": "https://example.com/video.mp4"
+			}
+		}
+	]
+}

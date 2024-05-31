@@ -19,10 +19,10 @@ public macro ResourceRelationship(key: String? = nil) =
 		module: "JSONAPIMacros",
 		type: "ResourceRelationshipMacro"
 	)
-//
-//@attached(
-//	extension,
-//	conformances: CodableResource,
-//	names: named(type), named(id), named(init(from:)), named(encode(to:))
-//)
-//public macro CodableResourceUnion() = #externalMacro(module: "JSONAPIMacros", type: "CodableResourceUnionMacro")
+
+@attached(
+	extension,
+	conformances: ResourceIdentifiable, Codable,
+	names: named(type), named(id), named(init(from:)), named(encode(to:))
+)
+public macro ResourceUnion() = #externalMacro(module: "JSONAPIMacros", type: "ResourceUnionMacro")

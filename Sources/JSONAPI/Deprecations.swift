@@ -1,5 +1,8 @@
 import Foundation
 
+@available(*, deprecated, renamed: "CompoundDocument")
+public typealias Document = CompoundDocument
+
 @available(*, deprecated, renamed: "ResourceWrapper")
 @attached(
 	extension,
@@ -8,3 +11,11 @@ import Foundation
 	named(encode(to:))
 )
 public macro CodableResource(type: String) = #externalMacro(module: "JSONAPIMacros", type: "ResourceWrapperMacro")
+
+@available(*, deprecated, renamed: "ResourceUnion")
+@attached(
+	extension,
+	conformances: ResourceIdentifiable, Codable,
+	names: named(type), named(id), named(init(from:)), named(encode(to:))
+)
+public macro CodableResourceUnion() = #externalMacro(module: "JSONAPIMacros", type: "ResourceUnionMacro")

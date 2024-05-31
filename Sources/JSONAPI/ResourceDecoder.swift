@@ -19,7 +19,7 @@ final class ResourceDecoder {
 	}
 
 	func decode<R>(_ type: R.Type, identifier: ResourceIdentifier) throws -> R where R: Decodable {
-		guard let resource = try self.decodeIfPresent(type, identifier: identifier) else {
+		guard let index = self.indexByIdentifier[identifier] else {
 			throw DecodingError.valueNotFound(
 				type,
 				.init(
@@ -31,7 +31,7 @@ final class ResourceDecoder {
 			)
 		}
 
-		return resource
+		return try self.decode(R.self, at: index)
 	}
 
 	func decodeIfPresent<R>(

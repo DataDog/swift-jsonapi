@@ -1,0 +1,28 @@
+{
+  "data" : {
+    "attributes" : {
+      "text" : "Look what I just found!"
+    },
+    "id" : "1",
+    "relationships" : {
+      "attachment" : {
+        "data" : {
+          "id" : "42",
+          "type" : "images"
+        }
+      }
+    },
+    "type" : "single_attachment_messages"
+  },
+  "included" : [
+    {
+      "attributes" : {
+        "height" : 480,
+        "url" : "https:\/\/via.placeholder.com\/640x480",
+        "width" : 640
+      },
+      "id" : "42",
+      "type" : "images"
+    }
+  ]
+}
