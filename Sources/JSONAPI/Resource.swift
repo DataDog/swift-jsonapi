@@ -1,5 +1,9 @@
 import Foundation
 
+public enum ResourceCodingKeys: String, CodingKey {
+	case type, id, attributes, relationships
+}
+
 @dynamicMemberLookup
 public struct Resource<ID, FieldSet>: ResourceIdentifiable
 where
@@ -8,10 +12,6 @@ where
 {
 	public typealias Attributes = FieldSet.Attributes
 	public typealias Relationships = FieldSet.Relationships
-
-	private enum CodingKeys: String, CodingKey {
-		case type, id, attributes, relationships
-	}
 
 	public let type: String = FieldSet.resourceType
 
@@ -51,7 +51,7 @@ extension Resource: Equatable where ID: Equatable, Attributes: Equatable, Relati
 
 extension Resource: Decodable where ID: Decodable, Attributes: Decodable, Relationships: Decodable {
 	public init(from decoder: any Decoder) throws {
-		let container = try decoder.container(keyedBy: CodingKeys.self)
+		let container = try decoder.container(keyedBy: ResourceCodingKeys.self)
 
 		let type = try container.decode(String.self, forKey: .type)
 
@@ -59,7 +59,7 @@ extension Resource: Decodable where ID: Decodable, Attributes: Decodable, Relati
 			throw DecodingError.typeMismatch(
 				FieldSet.self,
 				DecodingError.Context(
-					codingPath: [CodingKeys.type],
+					codingPath: [ResourceCodingKeys.type],
 					debugDescription:
 						"Resource type '\(type)' does not match expected type '\(FieldSet.resourceType)'"
 				)
@@ -84,7 +84,7 @@ extension Resource: Decodable where ID: Decodable, Attributes: Decodable, Relati
 
 extension Resource: Encodable where ID: Encodable, Attributes: Encodable, Relationships: Encodable {
 	public func encode(to encoder: any Encoder) throws {
-		var container = encoder.container(keyedBy: CodingKeys.self)
+		var container = encoder.container(keyedBy: ResourceCodingKeys.self)
 
 		try container.encode(self.type, forKey: .type)
 		try container.encode(self.id, forKey: .id)

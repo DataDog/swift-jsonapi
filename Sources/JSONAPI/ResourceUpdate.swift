@@ -22,17 +22,13 @@ where
 		self.relationships = relationships
 	}
 
-	enum CodingKeys: String, CodingKey {
+	private enum CodingKeys: String, CodingKey {
 		case data
-	}
-
-	enum DataCodingKeys: String, CodingKey {
-		case type, id, attributes, relationships
 	}
 
 	public func encode(to encoder: any Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
-		var nestedContainer = container.nestedContainer(keyedBy: DataCodingKeys.self, forKey: .data)
+		var nestedContainer = container.nestedContainer(keyedBy: ResourceCodingKeys.self, forKey: .data)
 
 		try nestedContainer.encode(self.type, forKey: .type)
 		try nestedContainer.encodeIfPresent(self.id, forKey: .id)
