@@ -16,7 +16,7 @@ final class ResourceWrapperMacroTests: XCTestCase {
 			super.invokeTest()
 		}
 	}
-	
+
 	func testResourceWrapperRequiresStruct() {
 		assertMacro {
 			"""
@@ -36,7 +36,7 @@ final class ResourceWrapperMacroTests: XCTestCase {
 			"""
 		}
 	}
-	
+
 	func testResourceWrapperRequiresType() {
 		assertMacro {
 			"""
@@ -56,7 +56,7 @@ final class ResourceWrapperMacroTests: XCTestCase {
 			"""
 		}
 	}
-	
+
 	func testResourceWrapperRequiresIdProperty() {
 		assertMacro {
 			"""
@@ -73,7 +73,7 @@ final class ResourceWrapperMacroTests: XCTestCase {
 			"""
 		}
 	}
-	
+
 	func testResourceWrapper() {
 		assertMacro {
 			"""
@@ -145,7 +145,7 @@ final class ResourceWrapperMacroTests: XCTestCase {
 			"""
 		}
 	}
-	
+
 	func testResourceWrapperCodingKeys() {
 		assertMacro {
 			"""
@@ -231,7 +231,7 @@ final class ResourceWrapperMacroTests: XCTestCase {
 			"""
 		}
 	}
-	
+
 	func testResourceWrapperAccessControl() {
 		assertMacro {
 			"""
@@ -303,7 +303,7 @@ final class ResourceWrapperMacroTests: XCTestCase {
 			"""
 		}
 	}
-	
+
 	func testAvailability() {
 		assertMacro {
 			"""
@@ -347,6 +347,72 @@ final class ResourceWrapperMacroTests: XCTestCase {
 				}
 				public func encode(to encoder: any Encoder) throws {
 					let wrapped = Wrapped(id: self.id)
+					try wrapped.encode(to: encoder)
+				}
+			}
+			"""
+		}
+	}
+
+	func testResourceWrapperArrayAttribute() {
+		assertMacro {
+			"""
+			@ResourceWrapper(type: "schedules")
+			struct Schedule: Equatable {
+				var id: UUID
+
+				@ResourceAttribute
+				var name: String
+
+				@ResourceAttribute
+				var tags: [String]
+			}
+			"""
+		} expansion: {
+			"""
+			struct Schedule: Equatable {
+				var id: UUID
+				var name: String
+				var tags: [String]
+			}
+
+			extension Schedule {
+				struct FieldSet: JSONAPI.ResourceFieldSet {
+					struct Attributes: Equatable, Codable {
+						var name: String
+						@DefaultEmpty
+							var tags: [String]
+					}
+					static let resourceType = "schedules"
+				}
+				struct UpdateFieldSet: JSONAPI.ResourceFieldSet {
+					struct Attributes: Equatable, Codable {
+						var name: String?
+
+						var tags: [String]?
+					}
+					static let resourceType = FieldSet.resourceType
+				}
+				typealias Wrapped = JSONAPI.Resource<UUID, FieldSet>
+				typealias Update = JSONAPI.ResourceUpdate<UUID, UpdateFieldSet>
+			}
+
+			extension Schedule: JSONAPI.ResourceIdentifiable {
+				var type: String {
+					FieldSet.resourceType
+				}
+			}
+
+			extension Schedule: Codable {
+				init(from decoder: any Decoder) throws {
+					let wrapped = try Wrapped(from: decoder)
+					self.id = wrapped.id
+					self.name = wrapped.name
+					self.tags = wrapped.tags
+				}
+				func encode(to encoder: any Encoder) throws {
+					let attributes = Wrapped.Attributes(name: self.name, tags: self.tags)
+					let wrapped = Wrapped(id: self.id, attributes: attributes)
 					try wrapped.encode(to: encoder)
 				}
 			}

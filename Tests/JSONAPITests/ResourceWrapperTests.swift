@@ -29,6 +29,17 @@ final class ResourceWrapperTests: XCTestCase {
 		@ResourceRelationship var comments: [ResourceWrapperTests.Comment]
 	}
 
+	@ResourceWrapper(type: "schedules")
+	fileprivate struct Schedule: Equatable {
+		var id: String
+
+		@ResourceAttribute
+		var name: String
+
+		@ResourceAttribute
+		var tags: [String]
+	}
+
 	private enum Fixtures {
 		static let article = Article(
 			id: "1",
@@ -74,6 +85,27 @@ final class ResourceWrapperTests: XCTestCase {
 
 		// then
 		XCTAssertEqual(articles, Fixtures.articles)
+	}
+
+	func testDecodeNullArrayAttribute() throws {
+		// given
+		let json = try XCTUnwrap(
+			Bundle.module.url(forResource: "Fixtures/NullArrayAttribute", withExtension: "json").map {
+				try Data(contentsOf: $0)
+			}
+		)
+
+		// when
+		let schedules = try JSONAPIDecoder().decode([Schedule].self, from: json)
+
+		// then
+		XCTAssertEqual(
+			[
+				Schedule(id: "1", name: "Some schedule", tags: ["some tag"]),
+				Schedule(id: "2", name: "Some other schedule", tags: []),
+			],
+			schedules
+		)
 	}
 
 	func testEncodeSingle() {

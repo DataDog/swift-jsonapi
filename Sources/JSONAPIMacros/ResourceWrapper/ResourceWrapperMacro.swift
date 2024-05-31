@@ -186,7 +186,7 @@ extension StructDeclSyntax {
 				try StructDeclSyntax.makeFieldSetAttributes(
 					arrayAttributes: AttributeListSyntax {
 						AttributeSyntax("@DefaultEmpty")
-					}.with(\.trailingTrivia, .space),
+					},
 					modifiers: modifiers,
 					inheritedTypeList: inheritedTypeList,
 					resourceAttributes: resourceAttributes
