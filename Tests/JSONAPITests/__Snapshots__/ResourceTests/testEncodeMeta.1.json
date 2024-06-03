@@ -1,0 +1,76 @@
+{
+  "data" : {
+    "attributes" : {
+      "title" : "JSON:API paints my bikeshed!"
+    },
+    "id" : "1",
+    "relationships" : {
+      "author" : {
+        "data" : {
+          "id" : "9",
+          "type" : "people"
+        }
+      },
+      "comments" : {
+        "data" : [
+          {
+            "id" : "5",
+            "type" : "comments"
+          },
+          {
+            "id" : "12",
+            "type" : "comments"
+          }
+        ]
+      }
+    },
+    "type" : "articles"
+  },
+  "included" : [
+    {
+      "attributes" : {
+        "firstName" : "Dan",
+        "lastName" : "Gebhardt",
+        "twitter" : "dgeb"
+      },
+      "id" : "9",
+      "type" : "people"
+    },
+    {
+      "attributes" : {
+        "body" : "First!"
+      },
+      "id" : "5",
+      "relationships" : {
+        "author" : {
+          "data" : null
+        }
+      },
+      "type" : "comments"
+    },
+    {
+      "attributes" : {
+        "body" : "I like XML better"
+      },
+      "id" : "12",
+      "relationships" : {
+        "author" : {
+          "data" : {
+            "id" : "9",
+            "type" : "people"
+          }
+        }
+      },
+      "type" : "comments"
+    }
+  ],
+  "meta" : {
+    "authors" : [
+      "Yassir Ramdani",
+      "Nicolas Mulet",
+      "Alan Fineberg",
+      "Guille González"
+    ],
+    "copyright" : "Copyright 2024 Datadog Inc."
+  }
+}

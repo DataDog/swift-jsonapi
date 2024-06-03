@@ -1,0 +1,22 @@
+{
+	"data": [
+		{
+			"type": "schedules",
+			"id": "1",
+			"attributes": {
+				"name": "Some schedule",
+				"tags": [
+					"some tag"
+				]
+			}
+		},
+		{
+			"type": "schedules",
+			"id": "2",
+			"attributes": {
+				"name": "Some other schedule",
+				"tags": null
+			}
+		}
+	]
+}

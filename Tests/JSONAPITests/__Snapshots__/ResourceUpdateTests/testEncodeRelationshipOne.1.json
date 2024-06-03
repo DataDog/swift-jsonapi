@@ -1,0 +1,16 @@
+{
+  "data" : {
+    "attributes" : {
+      "body" : "I like XML better"
+    },
+    "relationships" : {
+      "author" : {
+        "data" : {
+          "id" : "9",
+          "type" : "people"
+        }
+      }
+    },
+    "type" : "comments"
+  }
+}

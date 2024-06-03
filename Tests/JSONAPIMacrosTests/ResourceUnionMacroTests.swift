@@ -3,20 +3,85 @@ import MacroTesting
 import SwiftSyntaxMacros
 import XCTest
 
-final class CodableResourceUnionMacroTests: XCTestCase {
+final class ResourceUnionMacroTests: XCTestCase {
 	override func invokeTest() {
 		withMacroTesting(
-			// isRecording: true,
-			macros: [CodableResourceUnionMacro.self]
+			macros: [ResourceUnionMacro.self]
 		) {
 			super.invokeTest()
 		}
 	}
 
-	func testCodableResourceConformance() {
+	func testResourceUnionRequiresEnum() {
 		assertMacro {
 			"""
-			@CodableResourceUnion
+			@ResourceUnion
+			struct Attachment: Equatable {
+				var image: Image
+				var audio: Audio
+			}
+			"""
+		} diagnostics: {
+			"""
+			@ResourceUnion
+			┬─────────────
+			╰─ 🛑 '@ResourceUnion' can only be applied to enum types
+			struct Attachment: Equatable {
+				var image: Image
+				var audio: Audio
+			}
+			"""
+		}
+	}
+
+	func testResourceUnionCaseRequiresAssociatedType() {
+		assertMacro {
+			"""
+			@ResourceUnion
+			enum Attachment: Equatable {
+				case image(Image)
+				case audio
+			}
+			"""
+		} diagnostics: {
+			"""
+			@ResourceUnion
+			enum Attachment: Equatable {
+				case image(Image)
+				case audio
+			      ┬────
+			      ╰─ 🛑 '@ResourceUnion' enum cases are expected to have 1 associated 'ResourceIdentifiable' type
+			}
+			"""
+		}
+	}
+
+	func testResourceUnionCaseRequiresNoParameterName() {
+		assertMacro {
+			"""
+			@ResourceUnion
+			enum Attachment: Equatable {
+				case image(Image)
+				case audio(test: Audio)
+			}
+			"""
+		} diagnostics: {
+			"""
+			@ResourceUnion
+			enum Attachment: Equatable {
+				case image(Image)
+				case audio(test: Audio)
+			      ┬─────────────────
+			      ╰─ 🛑 '@ResourceUnion' enum cases are expected to have no parameter name
+			}
+			"""
+		}
+	}
+
+	func testResourceUnion() {
+		assertMacro {
+			"""
+			@ResourceUnion
 			enum Attachment: Equatable {
 				case image(Image)
 				case audio(Audio)
@@ -29,7 +94,7 @@ final class CodableResourceUnionMacroTests: XCTestCase {
 				case audio(Audio)
 			}
 
-			extension Attachment: JSONAPI.CodableResource {
+			extension Attachment: JSONAPI.ResourceIdentifiable {
 				var type: String {
 					switch self {
 					case .image(let value):
@@ -46,13 +111,16 @@ final class CodableResourceUnionMacroTests: XCTestCase {
 						return String(describing: value.id)
 					}
 				}
+			}
+
+			extension Attachment: Codable {
 				init(from decoder: any Decoder) throws {
 					let container = try decoder.container(keyedBy: ResourceCodingKeys.self)
 					let type = try container.decode(String.self, forKey: .type)
 					switch type {
-					case Image.resourceType:
+					case Image.FieldSet.resourceType:
 					    self = try .image(Image(from: decoder))
-					case Audio.resourceType:
+					case Audio.FieldSet.resourceType:
 					    self = try .audio(Audio(from: decoder))
 					default:
 						throw JSONAPIDecodingError.unhandledResourceType(Self.self, type)
@@ -71,10 +139,10 @@ final class CodableResourceUnionMacroTests: XCTestCase {
 		}
 	}
 
-	func testAccessControl() {
+	func testResourceUnionAccessControl() {
 		assertMacro {
 			"""
-			@CodableResourceUnion
+			@ResourceUnion
 			public enum Attachment: Equatable {
 				case image(Image), audio(Audio)
 			}
@@ -85,7 +153,7 @@ final class CodableResourceUnionMacroTests: XCTestCase {
 				case image(Image), audio(Audio)
 			}
 
-			extension Attachment: JSONAPI.CodableResource {
+			extension Attachment: JSONAPI.ResourceIdentifiable {
 				public var type: String {
 					switch self {
 					case .image(let value):
@@ -102,13 +170,16 @@ final class CodableResourceUnionMacroTests: XCTestCase {
 						return String(describing: value.id)
 					}
 				}
+			}
+
+			extension Attachment: Codable {
 				public init(from decoder: any Decoder) throws {
 					let container = try decoder.container(keyedBy: ResourceCodingKeys.self)
 					let type = try container.decode(String.self, forKey: .type)
 					switch type {
-					case Image.resourceType:
+					case Image.FieldSet.resourceType:
 					    self = try .image(Image(from: decoder))
-					case Audio.resourceType:
+					case Audio.FieldSet.resourceType:
 					    self = try .audio(Audio(from: decoder))
 					default:
 						throw JSONAPIDecodingError.unhandledResourceType(Self.self, type)
@@ -127,11 +198,11 @@ final class CodableResourceUnionMacroTests: XCTestCase {
 		}
 	}
 
-	func testAvailability() {
+	func testResourceUnionAvailability() {
 		assertMacro {
 			"""
 			@available(macOS, unavailable)
-			@CodableResourceUnion
+			@ResourceUnion
 			public enum Attachment: Equatable {
 				case image(Image), audio(Audio)
 			}
@@ -144,7 +215,7 @@ final class CodableResourceUnionMacroTests: XCTestCase {
 			}
 
 			@available(macOS, unavailable)
-			extension Attachment: JSONAPI.CodableResource {
+			extension Attachment: JSONAPI.ResourceIdentifiable {
 				public var type: String {
 					switch self {
 					case .image(let value):
@@ -161,13 +232,17 @@ final class CodableResourceUnionMacroTests: XCTestCase {
 						return String(describing: value.id)
 					}
 				}
+			}
+
+			@available(macOS, unavailable)
+			extension Attachment: Codable {
 				public init(from decoder: any Decoder) throws {
 					let container = try decoder.container(keyedBy: ResourceCodingKeys.self)
 					let type = try container.decode(String.self, forKey: .type)
 					switch type {
-					case Image.resourceType:
+					case Image.FieldSet.resourceType:
 					    self = try .image(Image(from: decoder))
-					case Audio.resourceType:
+					case Audio.FieldSet.resourceType:
 					    self = try .audio(Audio(from: decoder))
 					default:
 						throw JSONAPIDecodingError.unhandledResourceType(Self.self, type)

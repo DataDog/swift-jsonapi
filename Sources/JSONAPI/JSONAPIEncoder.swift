@@ -3,33 +3,37 @@ import Foundation
 public class JSONAPIEncoder: JSONEncoder {
 	public override init() {
 		super.init()
-		self.userInfo.includedResourceEncoder = IncludedResourceEncoder()
+		self.userInfo.resourceEncoder = ResourceEncoder()
 	}
 
-	public func encode<T>(_ value: T) throws -> Data where T: EncodableResource {
-		try self.encode(Document(data: value))
+	public func encode<R>(_ value: R) throws -> Data where R: ResourceIdentifiable & Encodable {
+		try self.encode(CompoundDocument(data: value))
 	}
 
-	public func encode<T>(
-		_ value: T
-	) throws -> Data where T: Collection, T: Encodable, T.Element: EncodableResource {
-		try self.encode(Document(data: value))
+	public func encode<C>(
+		_ value: C
+	) throws -> Data where C: Collection & Encodable, C.Element: ResourceIdentifiable & Encodable {
+		try self.encode(CompoundDocument(data: value))
 	}
 }
 
 extension Encoder {
-	public var includedResourceEncoder: IncludedResourceEncoder? {
-		userInfo.includedResourceEncoder
+	var resourceEncoder: ResourceEncoder? {
+		self.userInfo.resourceEncoder
 	}
 }
 
 extension Dictionary where Key == CodingUserInfoKey, Value == Any {
-	fileprivate var includedResourceEncoder: IncludedResourceEncoder? {
+	fileprivate var resourceEncoder: ResourceEncoder? {
 		get {
-			self[IncludedResourceEncoder.key] as? IncludedResourceEncoder
+			self[.resourceEncoder] as? ResourceEncoder
 		}
 		set {
-			self[IncludedResourceEncoder.key] = newValue
+			self[.resourceEncoder] = newValue
 		}
 	}
+}
+
+extension CodingUserInfoKey {
+	fileprivate static let resourceEncoder = Self(rawValue: "JSONAPI.resourceEncoder")!
 }

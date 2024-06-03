@@ -13,33 +13,36 @@ public class JSONAPIDecoder: JSONDecoder {
 
 	public override init() {
 		super.init()
-		self.userInfo.includedResourceDecoderStorage = IncludedResourceDecoderStorage()
+
+		self.userInfo.resourceDecoderStorage = ResourceDecoderStorage()
 	}
 
-	public func decode<T>(_ type: T.Type, from data: Data) throws -> T where T: DecodableResource {
-		try self.decode(Document<T, Unit>.self, from: data).data
+	public func decode<R>(_: R.Type, from data: Data) throws -> R where R: ResourceIdentifiable & Decodable {
+		try self.decode(CompoundDocument<R, Unit>.self, from: data).data
 	}
 
-	public func decode<T>(
-		_ type: T.Type,
+	public func decode<C>(
+		_: C.Type,
 		from data: Data
-	) throws -> T where T: RangeReplaceableCollection, T: Decodable, T.Element: DecodableResource {
-		try self.decode(Document<T?, Unit>.self, from: data).data ?? T()
+	) throws -> C where C: RangeReplaceableCollection, C: Decodable, C.Element: ResourceIdentifiable & Decodable {
+		try self.decode(CompoundDocument<C?, Unit>.self, from: data).data ?? C()
 	}
 
-	public func decode<T, Meta>(
-		_ type: Document<T, Meta>.Type,
+	public func decode<C, M>(
+		_: CompoundDocument<C, M>.Type,
 		from data: Data
-	) throws -> Document<T, Meta>
-	where T: RangeReplaceableCollection, T: Decodable, T.Element: DecodableResource, Meta: Decodable {
-		let document = try self.decode(Document<T?, Meta>.self, from: data)
-		return Document(data: document.data ?? T(), meta: document.meta)
+	) throws -> CompoundDocument<C, M>
+	where
+		C: RangeReplaceableCollection, C: Decodable, C.Element: ResourceIdentifiable & Decodable, M: Decodable
+	{
+		let document = try self.decode(CompoundDocument<C?, M>.self, from: data)
+		return CompoundDocument(data: document.data ?? C(), meta: document.meta)
 	}
 }
 
 extension Decoder {
-	public var includedResourceDecoder: IncludedResourceDecoder? {
-		userInfo.includedResourceDecoderStorage?.includedResourceDecoder
+	var resourceDecoder: ResourceDecoder? {
+		self.userInfo.resourceDecoderStorage?.resourceDecoder
 	}
 }
 
@@ -62,22 +65,22 @@ extension Dictionary where Key == CodingUserInfoKey, Value == Any {
 		}
 	}
 
-	fileprivate(set) var includedResourceDecoderStorage: IncludedResourceDecoderStorage? {
+	fileprivate(set) var resourceDecoderStorage: ResourceDecoderStorage? {
 		get {
-			self[.includedResourceDecoderStorage] as? IncludedResourceDecoderStorage
+			self[.resourceDecoderStorage] as? ResourceDecoderStorage
 		}
 		set {
-			self[.includedResourceDecoderStorage] = newValue
+			self[.resourceDecoderStorage] = newValue
 		}
 	}
 }
 
-final class IncludedResourceDecoderStorage {
-	var includedResourceDecoder: IncludedResourceDecoder?
+final class ResourceDecoderStorage {
+	var resourceDecoder: ResourceDecoder?
 }
 
 extension CodingUserInfoKey {
 	fileprivate static let ignoresMissingResources = Self(rawValue: "JSONAPI.ignoresMissingResources")!
 	fileprivate static let ignoresUnhandledResourceTypes = Self(rawValue: "JSONAPI.ignoresUnhandledResourceTypes")!
-	fileprivate static let includedResourceDecoderStorage = Self(rawValue: "JSONAPI.IncludedResourceDecoderStorage")!
+	fileprivate static let resourceDecoderStorage = Self(rawValue: "JSONAPI.resourceDecoderStorage")!
 }

@@ -1,15 +1,10 @@
-@attached(member, names: named(type), named(id))
 @attached(
 	extension,
-	conformances: ResourceType, CodableResource,
-	names:
-		named(resourceType),
-	named(ResourceAttributeCodingKeys),
-	named(ResourceRelationshipCodingKeys),
-	named(init(from:)),
+	conformances: ResourceIdentifiable, Codable,
+	names: named(FieldSet), named(UpdateFieldSet), named(Wrapped), named(Update), named(type), named(init(from:)),
 	named(encode(to:))
 )
-public macro CodableResource(type: String) = #externalMacro(module: "JSONAPIMacros", type: "CodableResourceMacro")
+public macro ResourceWrapper(type: String) = #externalMacro(module: "JSONAPIMacros", type: "ResourceWrapperMacro")
 
 @attached(accessor, names: named(willSet))
 public macro ResourceAttribute(key: String? = nil) =
@@ -27,7 +22,7 @@ public macro ResourceRelationship(key: String? = nil) =
 
 @attached(
 	extension,
-	conformances: CodableResource,
+	conformances: ResourceIdentifiable, Codable,
 	names: named(type), named(id), named(init(from:)), named(encode(to:))
 )
-public macro CodableResourceUnion() = #externalMacro(module: "JSONAPIMacros", type: "CodableResourceUnionMacro")
+public macro ResourceUnion() = #externalMacro(module: "JSONAPIMacros", type: "ResourceUnionMacro")

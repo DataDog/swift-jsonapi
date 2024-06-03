@@ -72,6 +72,22 @@ extension TypeSyntax {
 		return false
 	}
 
+	var arrayElementType: TypeSyntax? {
+		if let arrayType = self.as(ArrayTypeSyntax.self) {
+			return arrayType.element
+		}
+
+		if let identifierType = self.as(IdentifierTypeSyntax.self),
+			identifierType.name.text == "Array",
+			let genericArgumentClause = identifierType.genericArgumentClause,
+			let firstArgument = genericArgumentClause.arguments.first
+		{
+			return firstArgument.argument
+		}
+
+		return nil
+	}
+
 	var isOptional: Bool {
 		// Check for shorthand optional syntax (Type?)
 		if self.is(OptionalTypeSyntax.self) {
@@ -104,6 +120,13 @@ extension TypeSyntax {
 		}
 
 		return nil
+	}
+
+	var optionalType: TypeSyntax {
+		guard !self.isOptional else {
+			return self
+		}
+		return TypeSyntax(OptionalTypeSyntax(wrappedType: self))
 	}
 }
 

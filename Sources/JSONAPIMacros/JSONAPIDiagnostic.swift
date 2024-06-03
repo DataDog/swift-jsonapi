@@ -5,6 +5,7 @@ struct JSONAPIDiagnostic: DiagnosticMessage {
 	enum ID: String {
 		case invalidApplication = "invalid type"
 		case missingResourceType = "missing resource type"
+		case missingIdProperty = "missing id property"
 		case missingKey = "missing key"
 		case invalidCase = "invalid case"
 	}
