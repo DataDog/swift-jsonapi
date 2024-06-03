@@ -6,7 +6,6 @@ import XCTest
 final class ResourceWrapperMacroTests: XCTestCase {
 	override func invokeTest() {
 		withMacroTesting(
-			// isRecording: true,
 			macros: [
 				ResourceWrapperMacro.self,
 				ResourceAttributeMacro.self,

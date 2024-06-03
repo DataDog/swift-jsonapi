@@ -6,7 +6,6 @@ import XCTest
 final class ResourceUnionMacroTests: XCTestCase {
 	override func invokeTest() {
 		withMacroTesting(
-			// isRecording: true,
 			macros: [ResourceUnionMacro.self]
 		) {
 			super.invokeTest()
