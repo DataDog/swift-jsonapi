@@ -33,7 +33,7 @@ public struct ResourceWrapperMacro: ExtensionMacro {
 		}
 
 		return [
-			try .makeFieldSetExtension(
+			try .makeDefinitionExtension(
 				attachedTo: declaration,
 				providingExtensionsOf: type,
 				resourceType: resourceType.content.text
@@ -45,7 +45,7 @@ public struct ResourceWrapperMacro: ExtensionMacro {
 }
 
 extension ExtensionDeclSyntax {
-	fileprivate static func makeFieldSetExtension(
+	fileprivate static func makeDefinitionExtension(
 		attachedTo declaration: some DeclGroupSyntax,
 		providingExtensionsOf type: some TypeSyntaxProtocol,
 		resourceType: String
@@ -55,7 +55,7 @@ extension ExtensionDeclSyntax {
 				publicModifier
 			}
 		}
-		let inheritedTypeList = InheritedTypeListSyntax.makeFieldSetAssociatedTypesInheritedTypeList(
+		let inheritedTypeList = InheritedTypeListSyntax.makeDefinitionAssociatedTypesInheritedTypeList(
 			attachedTo: declaration
 		)
 		let resourceAttributes = declaration.definedVariables.filter(\.hasResourceAttributeMacro)
@@ -70,21 +70,21 @@ extension ExtensionDeclSyntax {
 		}
 
 		let members = try MemberBlockItemListSyntax {
-			try StructDeclSyntax.makeFieldSet(
+			try StructDeclSyntax.makeDefinition(
 				modifiers: modifiers,
 				inheritedTypeList: inheritedTypeList,
 				resourceAttributes: resourceAttributes,
 				resourceRelationships: resourceRelationships,
 				resourceType: resourceType
 			)
-			try StructDeclSyntax.makeUpdateFieldSet(
+			try StructDeclSyntax.makeUpdateDefinition(
 				modifiers: modifiers,
 				inheritedTypeList: inheritedTypeList,
 				resourceAttributes: resourceAttributes,
 				resourceRelationships: resourceRelationships
 			)
-			DeclSyntax("\(modifiers)typealias Wrapped = JSONAPI.Resource<\(identifier.type), FieldSet>")
-			DeclSyntax("\(modifiers)typealias Update = JSONAPI.ResourceUpdate<\(identifier.type), UpdateFieldSet>")
+			DeclSyntax("\(modifiers)typealias Wrapped = JSONAPI.Resource<\(identifier.type), Definition>")
+			DeclSyntax("\(modifiers)typealias Update = JSONAPI.ResourceUpdate<\(identifier.type), UpdateDefinition>")
 		}
 
 		return try ExtensionDeclSyntax(
@@ -105,7 +105,7 @@ extension ExtensionDeclSyntax {
 			}
 		}
 		let members = MemberBlockItemListSyntax {
-			DeclSyntax("\(modifiers)var type: String { FieldSet.resourceType }")
+			DeclSyntax("\(modifiers)var type: String { Definition.resourceType }")
 		}
 
 		return try ExtensionDeclSyntax(
@@ -174,16 +174,16 @@ extension ExtensionDeclSyntax {
 }
 
 extension StructDeclSyntax {
-	fileprivate static func makeFieldSet(
+	fileprivate static func makeDefinition(
 		modifiers: DeclModifierListSyntax,
 		inheritedTypeList: InheritedTypeListSyntax,
 		resourceAttributes: [VariableDeclSyntax],
 		resourceRelationships: [VariableDeclSyntax],
 		resourceType: String
 	) throws -> StructDeclSyntax {
-		try StructDeclSyntax("\(modifiers)struct FieldSet: JSONAPI.ResourceFieldSet") {
+		try StructDeclSyntax("\(modifiers)struct Definition: JSONAPI.ResourceDefinition") {
 			if !resourceAttributes.isEmpty {
-				try StructDeclSyntax.makeFieldSetAttributes(
+				try StructDeclSyntax.makeDefinitionAttributes(
 					arrayAttributes: AttributeListSyntax {
 						AttributeSyntax("@DefaultEmpty")
 					},
@@ -193,7 +193,7 @@ extension StructDeclSyntax {
 				)
 			}
 			if !resourceRelationships.isEmpty {
-				try StructDeclSyntax.makeFieldSetRelationships(
+				try StructDeclSyntax.makeDefinitionRelationships(
 					modifiers: modifiers,
 					inheritedTypeList: inheritedTypeList,
 					resourceRelationships: resourceRelationships
@@ -203,15 +203,15 @@ extension StructDeclSyntax {
 		}
 	}
 
-	fileprivate static func makeUpdateFieldSet(
+	fileprivate static func makeUpdateDefinition(
 		modifiers: DeclModifierListSyntax,
 		inheritedTypeList: InheritedTypeListSyntax,
 		resourceAttributes: [VariableDeclSyntax],
 		resourceRelationships: [VariableDeclSyntax]
 	) throws -> StructDeclSyntax {
-		try StructDeclSyntax("\(modifiers)struct UpdateFieldSet: JSONAPI.ResourceFieldSet") {
+		try StructDeclSyntax("\(modifiers)struct UpdateDefinition: JSONAPI.ResourceDefinition") {
 			if !resourceAttributes.isEmpty {
-				try StructDeclSyntax.makeFieldSetAttributes(
+				try StructDeclSyntax.makeDefinitionAttributes(
 					modifiers: modifiers,
 					inheritedTypeList: inheritedTypeList,
 					resourceAttributes: resourceAttributes,
@@ -219,18 +219,18 @@ extension StructDeclSyntax {
 				)
 			}
 			if !resourceRelationships.isEmpty {
-				try StructDeclSyntax.makeFieldSetRelationships(
+				try StructDeclSyntax.makeDefinitionRelationships(
 					modifiers: modifiers,
 					inheritedTypeList: inheritedTypeList,
 					resourceRelationships: resourceRelationships,
 					typeKeyPath: \.rawRelationshipType
 				)
 			}
-			DeclSyntax("\(modifiers)static let resourceType = FieldSet.resourceType")
+			DeclSyntax("\(modifiers)static let resourceType = Definition.resourceType")
 		}
 	}
 
-	fileprivate static func makeFieldSetAttributes(
+	fileprivate static func makeDefinitionAttributes(
 		arrayAttributes: AttributeListSyntax = [],
 		modifiers: DeclModifierListSyntax,
 		inheritedTypeList: InheritedTypeListSyntax,
@@ -262,7 +262,7 @@ extension StructDeclSyntax {
 		}
 	}
 
-	fileprivate static func makeFieldSetRelationships(
+	fileprivate static func makeDefinitionRelationships(
 		modifiers: DeclModifierListSyntax,
 		inheritedTypeList: InheritedTypeListSyntax,
 		resourceRelationships: [VariableDeclSyntax],
@@ -373,7 +373,7 @@ extension DeclSyntax {
 }
 
 extension InheritedTypeListSyntax {
-	fileprivate static func makeFieldSetAssociatedTypesInheritedTypeList(
+	fileprivate static func makeDefinitionAssociatedTypesInheritedTypeList(
 		attachedTo declaration: some DeclGroupSyntax
 	) -> InheritedTypeListSyntax {
 		let inheritedTypes = [

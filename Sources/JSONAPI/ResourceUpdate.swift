@@ -1,16 +1,16 @@
 import Foundation
 
-public struct ResourceUpdate<ID, FieldSet>: Encodable
+public struct ResourceUpdate<ID, Definition>: Encodable
 where
 	ID: Hashable & Encodable,
-	FieldSet: ResourceFieldSet,
-	FieldSet.Attributes: Encodable,
-	FieldSet.Relationships: Encodable
+	Definition: ResourceDefinition,
+	Definition.Attributes: Encodable,
+	Definition.Relationships: Encodable
 {
-	public typealias Attributes = FieldSet.Attributes
-	public typealias Relationships = FieldSet.Relationships
+	public typealias Attributes = Definition.Attributes
+	public typealias Relationships = Definition.Relationships
 
-	public let type: String = FieldSet.resourceType
+	public let type: String = Definition.resourceType
 
 	public var id: ID?
 	public var attributes: Attributes?

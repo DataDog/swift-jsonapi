@@ -96,7 +96,7 @@ final class ResourceWrapperMacroTests: XCTestCase {
 			}
 
 			extension Article {
-				struct FieldSet: JSONAPI.ResourceFieldSet {
+				struct Definition: JSONAPI.ResourceDefinition {
 					struct Attributes: Codable {
 						var title: String
 					}
@@ -106,7 +106,7 @@ final class ResourceWrapperMacroTests: XCTestCase {
 					}
 					static let resourceType = "articles"
 				}
-				struct UpdateFieldSet: JSONAPI.ResourceFieldSet {
+				struct UpdateDefinition: JSONAPI.ResourceDefinition {
 					struct Attributes: Codable {
 						var title: String?
 					}
@@ -114,15 +114,15 @@ final class ResourceWrapperMacroTests: XCTestCase {
 						var author: JSONAPI.RawRelationshipOne?
 						var comments: JSONAPI.RawRelationshipMany?
 					}
-					static let resourceType = FieldSet.resourceType
+					static let resourceType = Definition.resourceType
 				}
-				typealias Wrapped = JSONAPI.Resource<UUID, FieldSet>
-				typealias Update = JSONAPI.ResourceUpdate<UUID, UpdateFieldSet>
+				typealias Wrapped = JSONAPI.Resource<UUID, Definition>
+				typealias Update = JSONAPI.ResourceUpdate<UUID, UpdateDefinition>
 			}
 
 			extension Article: JSONAPI.ResourceIdentifiable {
 				var type: String {
-					FieldSet.resourceType
+					Definition.resourceType
 				}
 			}
 
@@ -168,7 +168,7 @@ final class ResourceWrapperMacroTests: XCTestCase {
 			}
 
 			extension Person {
-				struct FieldSet: JSONAPI.ResourceFieldSet {
+				struct Definition: JSONAPI.ResourceDefinition {
 					struct Attributes: Equatable, Codable {
 						private enum CodingKeys: String, CodingKey {
 						    case firstName = "first_name"
@@ -185,7 +185,7 @@ final class ResourceWrapperMacroTests: XCTestCase {
 					}
 					static let resourceType = "people"
 				}
-				struct UpdateFieldSet: JSONAPI.ResourceFieldSet {
+				struct UpdateDefinition: JSONAPI.ResourceDefinition {
 					struct Attributes: Equatable, Codable {
 						private enum CodingKeys: String, CodingKey {
 						    case firstName = "first_name"
@@ -200,15 +200,15 @@ final class ResourceWrapperMacroTests: XCTestCase {
 						}
 						var related: JSONAPI.RawRelationshipOne?
 					}
-					static let resourceType = FieldSet.resourceType
+					static let resourceType = Definition.resourceType
 				}
-				typealias Wrapped = JSONAPI.Resource<String, FieldSet>
-				typealias Update = JSONAPI.ResourceUpdate<String, UpdateFieldSet>
+				typealias Wrapped = JSONAPI.Resource<String, Definition>
+				typealias Update = JSONAPI.ResourceUpdate<String, UpdateDefinition>
 			}
 
 			extension Person: JSONAPI.ResourceIdentifiable {
 				var type: String {
-					FieldSet.resourceType
+					Definition.resourceType
 				}
 			}
 
@@ -254,7 +254,7 @@ final class ResourceWrapperMacroTests: XCTestCase {
 			}
 
 			extension Person {
-				public struct FieldSet: JSONAPI.ResourceFieldSet {
+				public struct Definition: JSONAPI.ResourceDefinition {
 					public struct Attributes: Equatable, Codable {
 						public var firstName: String
 						var lastName: String
@@ -264,7 +264,7 @@ final class ResourceWrapperMacroTests: XCTestCase {
 					}
 					public static let resourceType = "people"
 				}
-				public struct UpdateFieldSet: JSONAPI.ResourceFieldSet {
+				public struct UpdateDefinition: JSONAPI.ResourceDefinition {
 					public struct Attributes: Equatable, Codable {
 						public var firstName: String?
 						var lastName: String?
@@ -272,15 +272,15 @@ final class ResourceWrapperMacroTests: XCTestCase {
 					public struct Relationships: Equatable, Codable {
 						public var related: JSONAPI.RawRelationshipOne?
 					}
-					public static let resourceType = FieldSet.resourceType
+					public static let resourceType = Definition.resourceType
 				}
-				public typealias Wrapped = JSONAPI.Resource<String, FieldSet>
-				public typealias Update = JSONAPI.ResourceUpdate<String, UpdateFieldSet>
+				public typealias Wrapped = JSONAPI.Resource<String, Definition>
+				public typealias Update = JSONAPI.ResourceUpdate<String, UpdateDefinition>
 			}
 
 			extension Person: JSONAPI.ResourceIdentifiable {
 				public var type: String {
-					FieldSet.resourceType
+					Definition.resourceType
 				}
 			}
 
@@ -321,20 +321,20 @@ final class ResourceWrapperMacroTests: XCTestCase {
 
 			@available(iOS, unavailable)
 			extension Person {
-				public struct FieldSet: JSONAPI.ResourceFieldSet {
+				public struct Definition: JSONAPI.ResourceDefinition {
 					public static let resourceType = "people"
 				}
-				public struct UpdateFieldSet: JSONAPI.ResourceFieldSet {
-					public static let resourceType = FieldSet.resourceType
+				public struct UpdateDefinition: JSONAPI.ResourceDefinition {
+					public static let resourceType = Definition.resourceType
 				}
-				public typealias Wrapped = JSONAPI.Resource<String, FieldSet>
-				public typealias Update = JSONAPI.ResourceUpdate<String, UpdateFieldSet>
+				public typealias Wrapped = JSONAPI.Resource<String, Definition>
+				public typealias Update = JSONAPI.ResourceUpdate<String, UpdateDefinition>
 			}
 
 			@available(iOS, unavailable)
 			extension Person: JSONAPI.ResourceIdentifiable {
 				public var type: String {
-					FieldSet.resourceType
+					Definition.resourceType
 				}
 			}
 
@@ -376,7 +376,7 @@ final class ResourceWrapperMacroTests: XCTestCase {
 			}
 
 			extension Schedule {
-				struct FieldSet: JSONAPI.ResourceFieldSet {
+				struct Definition: JSONAPI.ResourceDefinition {
 					struct Attributes: Equatable, Codable {
 						var name: String
 						@DefaultEmpty
@@ -384,21 +384,21 @@ final class ResourceWrapperMacroTests: XCTestCase {
 					}
 					static let resourceType = "schedules"
 				}
-				struct UpdateFieldSet: JSONAPI.ResourceFieldSet {
+				struct UpdateDefinition: JSONAPI.ResourceDefinition {
 					struct Attributes: Equatable, Codable {
 						var name: String?
 
 						var tags: [String]?
 					}
-					static let resourceType = FieldSet.resourceType
+					static let resourceType = Definition.resourceType
 				}
-				typealias Wrapped = JSONAPI.Resource<UUID, FieldSet>
-				typealias Update = JSONAPI.ResourceUpdate<UUID, UpdateFieldSet>
+				typealias Wrapped = JSONAPI.Resource<UUID, Definition>
+				typealias Update = JSONAPI.ResourceUpdate<UUID, UpdateDefinition>
 			}
 
 			extension Schedule: JSONAPI.ResourceIdentifiable {
 				var type: String {
-					FieldSet.resourceType
+					Definition.resourceType
 				}
 			}
 

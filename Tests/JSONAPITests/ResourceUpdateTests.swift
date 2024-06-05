@@ -3,7 +3,7 @@ import SnapshotTesting
 import XCTest
 
 final class ResourceUpdateTests: XCTestCase {
-	private struct CommentFieldSet: ResourceFieldSet {
+	private struct CommentDefinition: ResourceDefinition {
 		struct Attributes: Encodable {
 			var body: String?
 		}
@@ -15,7 +15,7 @@ final class ResourceUpdateTests: XCTestCase {
 		static let resourceType = "comments"
 	}
 
-	private typealias CommentUpdate = ResourceUpdate<String, CommentFieldSet>
+	private typealias CommentUpdate = ResourceUpdate<String, CommentDefinition>
 
 	func testEncodeOnlyAttributes() {
 		// given

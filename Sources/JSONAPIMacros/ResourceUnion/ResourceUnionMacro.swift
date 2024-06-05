@@ -82,7 +82,7 @@ extension ExtensionDeclSyntax {
 	) throws -> ExtensionDeclSyntax {
 		let decodeValue = SwitchExprSyntax(subject: ExprSyntax("type")) {
 			for element in declaration.enumCaseElements {
-				SwitchCaseSyntax("case \(element.firstParameterType).FieldSet.resourceType:") {
+				SwitchCaseSyntax("case \(element.firstParameterType).Definition.resourceType:") {
 					ExprSyntax("self = try .\(element.name)(\(element.firstParameterType)(from: decoder))")
 				}
 			}

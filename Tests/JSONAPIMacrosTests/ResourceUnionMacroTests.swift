@@ -118,9 +118,9 @@ final class ResourceUnionMacroTests: XCTestCase {
 					let container = try decoder.container(keyedBy: ResourceCodingKeys.self)
 					let type = try container.decode(String.self, forKey: .type)
 					switch type {
-					case Image.FieldSet.resourceType:
+					case Image.Definition.resourceType:
 					    self = try .image(Image(from: decoder))
-					case Audio.FieldSet.resourceType:
+					case Audio.Definition.resourceType:
 					    self = try .audio(Audio(from: decoder))
 					default:
 						throw JSONAPIDecodingError.unhandledResourceType(Self.self, type)
@@ -177,9 +177,9 @@ final class ResourceUnionMacroTests: XCTestCase {
 					let container = try decoder.container(keyedBy: ResourceCodingKeys.self)
 					let type = try container.decode(String.self, forKey: .type)
 					switch type {
-					case Image.FieldSet.resourceType:
+					case Image.Definition.resourceType:
 					    self = try .image(Image(from: decoder))
-					case Audio.FieldSet.resourceType:
+					case Audio.Definition.resourceType:
 					    self = try .audio(Audio(from: decoder))
 					default:
 						throw JSONAPIDecodingError.unhandledResourceType(Self.self, type)
@@ -240,9 +240,9 @@ final class ResourceUnionMacroTests: XCTestCase {
 					let container = try decoder.container(keyedBy: ResourceCodingKeys.self)
 					let type = try container.decode(String.self, forKey: .type)
 					switch type {
-					case Image.FieldSet.resourceType:
+					case Image.Definition.resourceType:
 					    self = try .image(Image(from: decoder))
-					case Audio.FieldSet.resourceType:
+					case Audio.Definition.resourceType:
 					    self = try .audio(Audio(from: decoder))
 					default:
 						throw JSONAPIDecodingError.unhandledResourceType(Self.self, type)

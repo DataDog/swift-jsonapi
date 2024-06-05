@@ -1,6 +1,6 @@
 import Foundation
 
-public protocol ResourceFieldSet {
+public protocol ResourceDefinition {
 	associatedtype Attributes = Unit
 	associatedtype Relationships = Unit
 
