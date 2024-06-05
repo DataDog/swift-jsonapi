@@ -1,7 +1,7 @@
 import Foundation
 
-public struct ResourceLinkageOne: Equatable, Codable {
-	public static let empty = ResourceLinkageOne()
+public struct RawRelationshipOne: Equatable, Codable {
+	public static let empty = RawRelationshipOne()
 
 	public var data: ResourceIdentifier?
 

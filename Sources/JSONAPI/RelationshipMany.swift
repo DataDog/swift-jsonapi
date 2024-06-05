@@ -38,19 +38,19 @@ extension RelationshipMany: Equatable where R: Equatable {
 
 extension RelationshipMany: Decodable where R: Decodable {
 	public init(from decoder: any Decoder) throws {
-		let resourceLinkage = try ResourceLinkageMany(from: decoder)
+		let rawRelationship = try RawRelationshipMany(from: decoder)
 
 		guard let resourceDecoder = decoder.resourceDecoder else {
 			fatalError("You must use a 'JSONAPIDecoder' instance to decode a JSON:API response.")
 		}
 
-		self.resources = try resourceDecoder.decode([R].self, identifiers: resourceLinkage.data)
+		self.resources = try resourceDecoder.decode([R].self, identifiers: rawRelationship.data)
 	}
 }
 
 extension RelationshipMany: Encodable where R: Encodable & ResourceIdentifiable {
 	public func encode(to encoder: any Encoder) throws {
-		try ResourceLinkageMany(self.resources).encode(to: encoder)
+		try RawRelationshipMany(self.resources).encode(to: encoder)
 
 		guard let resourceEncoder = encoder.resourceEncoder else {
 			fatalError("You must use a 'JSONAPIEncoder' instance to encode a JSON:API resource.")

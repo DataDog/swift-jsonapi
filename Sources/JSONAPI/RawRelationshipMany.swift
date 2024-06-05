@@ -1,7 +1,7 @@
 import Foundation
 
-public struct ResourceLinkageMany: Equatable, Codable {
-	public static let empty = ResourceLinkageMany()
+public struct RawRelationshipMany: Equatable, Codable {
+	public static let empty = RawRelationshipMany()
 
 	@DefaultEmpty public var data: [ResourceIdentifier]
 

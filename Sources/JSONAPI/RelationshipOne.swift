@@ -18,9 +18,9 @@ extension RelationshipOne: Equatable where R: Equatable {
 
 extension RelationshipOne: Decodable where R: Decodable {
 	public init(from decoder: any Decoder) throws {
-		let resourceLinkage = try ResourceLinkageOne(from: decoder)
+		let rawRelationship = try RawRelationshipOne(from: decoder)
 
-		guard let data = resourceLinkage.data else {
+		guard let data = rawRelationship.data else {
 			throw DecodingError.valueNotFound(
 				Self.self,
 				DecodingError.Context(
@@ -40,7 +40,7 @@ extension RelationshipOne: Decodable where R: Decodable {
 
 extension RelationshipOne: Encodable where R: Encodable & ResourceIdentifiable {
 	public func encode(to encoder: any Encoder) throws {
-		try ResourceLinkageOne(self.resource).encode(to: encoder)
+		try RawRelationshipOne(self.resource).encode(to: encoder)
 
 		guard let resourceEncoder = encoder.resourceEncoder else {
 			fatalError("You must use a 'JSONAPIEncoder' instance to encode a JSON:API resource.")

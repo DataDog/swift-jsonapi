@@ -18,9 +18,9 @@ extension RelationshipOptional: Equatable where R: Equatable {
 
 extension RelationshipOptional: Decodable where R: Decodable {
 	public init(from decoder: any Decoder) throws {
-		let resourceLinkage = try ResourceLinkageOne(from: decoder)
+		let rawRelationship = try RawRelationshipOne(from: decoder)
 
-		if let data = resourceLinkage.data {
+		if let data = rawRelationship.data {
 			guard let resourceDecoder = decoder.resourceDecoder else {
 				fatalError("You must use a 'JSONAPIDecoder' instance to decode a JSON:API response.")
 			}
@@ -34,7 +34,7 @@ extension RelationshipOptional: Decodable where R: Decodable {
 
 extension RelationshipOptional: Encodable where R: Encodable, R: ResourceIdentifiable {
 	public func encode(to encoder: any Encoder) throws {
-		try ResourceLinkageOne(self.resource).encode(to: encoder)
+		try RawRelationshipOne(self.resource).encode(to: encoder)
 
 		guard let resourceEncoder = encoder.resourceEncoder else {
 			fatalError("You must use a 'JSONAPIEncoder' instance to encode a JSON:API resource.")

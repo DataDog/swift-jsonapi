@@ -223,7 +223,7 @@ extension StructDeclSyntax {
 					modifiers: modifiers,
 					inheritedTypeList: inheritedTypeList,
 					resourceRelationships: resourceRelationships,
-					typeKeyPath: \.resourceLinkageType
+					typeKeyPath: \.rawRelationshipType
 				)
 			}
 			DeclSyntax("\(modifiers)static let resourceType = FieldSet.resourceType")
@@ -439,14 +439,14 @@ extension VariableDeclSyntax {
 		return resourceType.isArray ? "resources" : "resource"
 	}
 
-	fileprivate var resourceLinkageType: TypeSyntax? {
+	fileprivate var rawRelationshipType: TypeSyntax? {
 		guard let resourceType = self.isOptional ? self.optionalWrappedType : self.type else {
 			return nil
 		}
 		if resourceType.isArray {
-			return TypeSyntax("JSONAPI.ResourceLinkageMany").optionalType
+			return TypeSyntax("JSONAPI.RawRelationshipMany").optionalType
 		} else {
-			return TypeSyntax("JSONAPI.ResourceLinkageOne").optionalType
+			return TypeSyntax("JSONAPI.RawRelationshipOne").optionalType
 		}
 	}
 }

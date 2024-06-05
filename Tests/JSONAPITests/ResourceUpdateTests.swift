@@ -9,7 +9,7 @@ final class ResourceUpdateTests: XCTestCase {
 		}
 
 		struct Relationships: Encodable {
-			var author: ResourceLinkageOne?
+			var author: RawRelationshipOne?
 		}
 
 		static let resourceType = "comments"
@@ -37,7 +37,7 @@ final class ResourceUpdateTests: XCTestCase {
 		// given
 		let comment = CommentUpdate(
 			attributes: .init(body: "I like XML better"),
-			relationships: .init(author: ResourceLinkageOne(data: .init(type: "people", id: "9")))
+			relationships: .init(author: RawRelationshipOne(data: .init(type: "people", id: "9")))
 		)
 
 		// then
