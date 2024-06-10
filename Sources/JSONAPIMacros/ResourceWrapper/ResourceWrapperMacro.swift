@@ -424,11 +424,11 @@ extension VariableDeclSyntax {
 			return nil
 		}
 		if self.isOptional, !resourceType.isArray {
-			return TypeSyntax("JSONAPI.RelationshipOptional<\(resourceType)>")
+			return TypeSyntax("JSONAPI.InlineRelationshipOptional<\(resourceType)>")
 		} else if resourceType.isArray {
-			return TypeSyntax("JSONAPI.RelationshipMany<\(resourceType.arrayElementType)>")
+			return TypeSyntax("JSONAPI.InlineRelationshipMany<\(resourceType.arrayElementType)>")
 		} else {
-			return TypeSyntax("JSONAPI.RelationshipOne<\(resourceType)>")
+			return TypeSyntax("JSONAPI.InlineRelationshipOne<\(resourceType)>")
 		}
 	}
 

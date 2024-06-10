@@ -1,6 +1,6 @@
 import Foundation
 
-public struct RelationshipMany<R> {
+public struct InlineRelationshipMany<R> {
 	public var resources: [R]
 
 	public init(_ resources: [R]) {
@@ -8,7 +8,7 @@ public struct RelationshipMany<R> {
 	}
 }
 
-extension RelationshipMany: RandomAccessCollection {
+extension InlineRelationshipMany: RandomAccessCollection {
 	public typealias Index = Int
 	public typealias Element = R
 
@@ -33,10 +33,10 @@ extension RelationshipMany: RandomAccessCollection {
 	}
 }
 
-extension RelationshipMany: Equatable where R: Equatable {
+extension InlineRelationshipMany: Equatable where R: Equatable {
 }
 
-extension RelationshipMany: Decodable where R: Decodable {
+extension InlineRelationshipMany: Decodable where R: Decodable {
 	public init(from decoder: any Decoder) throws {
 		let rawRelationship = try RawRelationshipMany(from: decoder)
 
@@ -48,7 +48,7 @@ extension RelationshipMany: Decodable where R: Decodable {
 	}
 }
 
-extension RelationshipMany: Encodable where R: Encodable & ResourceIdentifiable {
+extension InlineRelationshipMany: Encodable where R: Encodable & ResourceIdentifiable {
 	public func encode(to encoder: any Encoder) throws {
 		try RawRelationshipMany(self.resources).encode(to: encoder)
 

@@ -1,7 +1,7 @@
 import Foundation
 
 @dynamicMemberLookup
-public struct RelationshipOptional<R> {
+public struct InlineRelationshipOptional<R> {
 	public var resource: R?
 
 	public init(_ resource: R?) {
@@ -13,10 +13,10 @@ public struct RelationshipOptional<R> {
 	}
 }
 
-extension RelationshipOptional: Equatable where R: Equatable {
+extension InlineRelationshipOptional: Equatable where R: Equatable {
 }
 
-extension RelationshipOptional: Decodable where R: Decodable {
+extension InlineRelationshipOptional: Decodable where R: Decodable {
 	public init(from decoder: any Decoder) throws {
 		let rawRelationship = try RawRelationshipOne(from: decoder)
 
@@ -32,7 +32,7 @@ extension RelationshipOptional: Decodable where R: Decodable {
 	}
 }
 
-extension RelationshipOptional: Encodable where R: Encodable, R: ResourceIdentifiable {
+extension InlineRelationshipOptional: Encodable where R: Encodable, R: ResourceIdentifiable {
 	public func encode(to encoder: any Encoder) throws {
 		try RawRelationshipOne(self.resource).encode(to: encoder)
 

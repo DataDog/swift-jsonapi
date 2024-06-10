@@ -101,8 +101,8 @@ final class ResourceWrapperMacroTests: XCTestCase {
 						var title: String
 					}
 					struct Relationships: Codable {
-						var author: JSONAPI.RelationshipOne<Person>
-						var comments: JSONAPI.RelationshipMany<Comment>
+						var author: JSONAPI.InlineRelationshipOne<Person>
+						var comments: JSONAPI.InlineRelationshipMany<Comment>
 					}
 					static let resourceType = "articles"
 				}
@@ -181,7 +181,7 @@ final class ResourceWrapperMacroTests: XCTestCase {
 						private enum CodingKeys: String, CodingKey {
 						    case related = "related_person"
 						}
-						var related: JSONAPI.RelationshipOptional<Person>
+						var related: JSONAPI.InlineRelationshipOptional<Person>
 					}
 					static let resourceType = "people"
 				}
@@ -260,7 +260,7 @@ final class ResourceWrapperMacroTests: XCTestCase {
 						var lastName: String
 					}
 					public struct Relationships: Equatable, Codable {
-						public var related: JSONAPI.RelationshipOptional<Person>
+						public var related: JSONAPI.InlineRelationshipOptional<Person>
 					}
 					public static let resourceType = "people"
 				}

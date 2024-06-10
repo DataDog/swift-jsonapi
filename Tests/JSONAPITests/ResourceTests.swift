@@ -21,7 +21,7 @@ final class ResourceTests: XCTestCase {
 		}
 
 		struct Relationships: Equatable, Codable {
-			var author: RelationshipOptional<Person>
+			var author: InlineRelationshipOptional<Person>
 		}
 
 		static let resourceType = "comments"
@@ -35,8 +35,8 @@ final class ResourceTests: XCTestCase {
 		}
 
 		struct Relationships: Equatable, Codable {
-			var author: RelationshipOne<Person>
-			var comments: RelationshipMany<Comment>
+			var author: InlineRelationshipOne<Person>
+			var comments: InlineRelationshipMany<Comment>
 		}
 
 		static let resourceType = "articles"
