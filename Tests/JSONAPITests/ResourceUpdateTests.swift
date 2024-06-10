@@ -3,13 +3,25 @@ import SnapshotTesting
 import XCTest
 
 final class ResourceUpdateTests: XCTestCase {
+	private struct PersonDefinition: ResourceDefinition {
+		struct Attributes: Encodable {
+			var firstName: String?
+			var lastName: String?
+			var twitter: String?
+		}
+
+		static let resourceType = "people"
+	}
+
+	private typealias PersonUpdate = ResourceUpdate<String, PersonDefinition>
+
 	private struct CommentDefinition: ResourceDefinition {
 		struct Attributes: Encodable {
 			var body: String?
 		}
 
 		struct Relationships: Encodable {
-			var author: RawRelationshipOne?
+			var author: RelationshipOne<PersonUpdate>?
 		}
 
 		static let resourceType = "comments"
@@ -27,7 +39,7 @@ final class ResourceUpdateTests: XCTestCase {
 
 	func testEncodeEmptyRelationshipOne() {
 		// given
-		let comment = CommentUpdate(attributes: .init(body: "I like XML better"), relationships: .init(author: .empty))
+		let comment = CommentUpdate(attributes: .init(body: "I like XML better"), relationships: .init(author: .null))
 
 		// then
 		assertSnapshot(of: comment, as: .json)
@@ -37,7 +49,7 @@ final class ResourceUpdateTests: XCTestCase {
 		// given
 		let comment = CommentUpdate(
 			attributes: .init(body: "I like XML better"),
-			relationships: .init(author: RawRelationshipOne(data: .init(type: "people", id: "9")))
+			relationships: .init(author: "9")
 		)
 
 		// then

@@ -39,6 +39,7 @@ public struct ResourceWrapperMacro: ExtensionMacro {
 				resourceType: resourceType.content.text
 			),
 			try .makeResourceIdentifiableExtension(attachedTo: declaration, providingExtensionsOf: type),
+			try .makeResourceLinkageProvidingExtension(attachedTo: declaration, providingExtensionsOf: type),
 			try .makeCodableExtension(attachedTo: declaration, providingExtensionsOf: type),
 		]
 	}
@@ -90,7 +91,7 @@ extension ExtensionDeclSyntax {
 		return try ExtensionDeclSyntax(
 			"""
 			\(declaration.attributes.availability)
-			extension \(type)\(MemberBlockSyntax(members: members))
+			extension \(type): JSONAPI.ResourceDefinitionProviding\(MemberBlockSyntax(members: members))
 			"""
 		)
 	}
@@ -99,19 +100,37 @@ extension ExtensionDeclSyntax {
 		attachedTo declaration: some DeclGroupSyntax,
 		providingExtensionsOf type: some TypeSyntaxProtocol
 	) throws -> ExtensionDeclSyntax {
+		try ExtensionDeclSyntax(
+			"\(declaration.attributes.availability)\nextension \(type): JSONAPI.ResourceIdentifiable {}"
+		)
+	}
+
+	fileprivate static func makeResourceLinkageProvidingExtension(
+		attachedTo declaration: some DeclGroupSyntax,
+		providingExtensionsOf type: some TypeSyntaxProtocol
+	) throws -> ExtensionDeclSyntax {
 		let modifiers = DeclModifierListSyntax {
 			if let publicModifier = declaration.publicModifier {
 				publicModifier
 			}
 		}
+
+		guard let identifier = declaration.definedVariables.first(where: \.isIdentifier) else {
+			throw DiagnosticsError(
+				syntax: declaration,
+				message: "'@ResourceWrapper' requires a valid 'id' property.",
+				id: .missingResourceType
+			)
+		}
+
 		let members = MemberBlockItemListSyntax {
-			DeclSyntax("\(modifiers)var type: String { Definition.resourceType }")
+			DeclSyntax("\(modifiers)typealias ID = \(identifier.type)")
 		}
 
 		return try ExtensionDeclSyntax(
 			"""
 			\(declaration.attributes.availability)
-			extension \(type): JSONAPI.ResourceIdentifiable\(MemberBlockSyntax(members: members))
+			extension \(type): JSONAPI.ResourceLinkageProviding\(MemberBlockSyntax(members: members))
 			"""
 		)
 	}
@@ -444,9 +463,9 @@ extension VariableDeclSyntax {
 			return nil
 		}
 		if resourceType.isArray {
-			return TypeSyntax("JSONAPI.RawRelationshipMany").optionalType
+			return TypeSyntax("JSONAPI.RelationshipMany<\(resourceType.arrayElementType)>").optionalType
 		} else {
-			return TypeSyntax("JSONAPI.RawRelationshipOne").optionalType
+			return TypeSyntax("JSONAPI.RelationshipOne<\(resourceType)>").optionalType
 		}
 	}
 }

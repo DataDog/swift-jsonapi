@@ -103,12 +103,35 @@ final class ResourceUnionMacroTests: XCTestCase {
 						return value.type
 					}
 				}
-				var id: String {
+				var id: ID {
 					switch self {
 					case .image(let value):
-						return String(describing: value.id)
+						return .image(value.id)
 					case .audio(let value):
-						return String(describing: value.id)
+						return .audio(value.id)
+					}
+				}
+			}
+
+			extension Attachment: JSONAPI.ResourceLinkageProviding {
+				enum ID: Hashable, CustomStringConvertible {
+				    case image(Image.ID)
+				    case audio(Audio.ID)
+				    var description: String {
+				        switch self {
+				        case .image(let id):
+				            return id.description
+				        case .audio(let id):
+				            return id.description
+				        }
+				    }
+				}
+				static func resourceIdentifier(_ id: ID) -> ResourceIdentifier {
+					switch id {
+					case .image(let id):
+						return ResourceIdentifier(type: Image.Definition.resourceType, id: id.description)
+					case .audio(let id):
+						return ResourceIdentifier(type: Audio.Definition.resourceType, id: id.description)
 					}
 				}
 			}
@@ -162,12 +185,35 @@ final class ResourceUnionMacroTests: XCTestCase {
 						return value.type
 					}
 				}
-				public var id: String {
+				public var id: ID {
 					switch self {
 					case .image(let value):
-						return String(describing: value.id)
+						return .image(value.id)
 					case .audio(let value):
-						return String(describing: value.id)
+						return .audio(value.id)
+					}
+				}
+			}
+
+			extension Attachment: JSONAPI.ResourceLinkageProviding {
+				public enum ID: Hashable, CustomStringConvertible {
+				    case image(Image.ID)
+				    case audio(Audio.ID)
+				    public var description: String {
+				        switch self {
+				        case .image(let id):
+				            return id.description
+				        case .audio(let id):
+				            return id.description
+				        }
+				    }
+				}
+				public static func resourceIdentifier(_ id: ID) -> ResourceIdentifier {
+					switch id {
+					case .image(let id):
+						return ResourceIdentifier(type: Image.Definition.resourceType, id: id.description)
+					case .audio(let id):
+						return ResourceIdentifier(type: Audio.Definition.resourceType, id: id.description)
 					}
 				}
 			}
@@ -224,12 +270,36 @@ final class ResourceUnionMacroTests: XCTestCase {
 						return value.type
 					}
 				}
-				public var id: String {
+				public var id: ID {
 					switch self {
 					case .image(let value):
-						return String(describing: value.id)
+						return .image(value.id)
 					case .audio(let value):
-						return String(describing: value.id)
+						return .audio(value.id)
+					}
+				}
+			}
+
+			@available(macOS, unavailable)
+			extension Attachment: JSONAPI.ResourceLinkageProviding {
+				public enum ID: Hashable, CustomStringConvertible {
+				    case image(Image.ID)
+				    case audio(Audio.ID)
+				    public var description: String {
+				        switch self {
+				        case .image(let id):
+				            return id.description
+				        case .audio(let id):
+				            return id.description
+				        }
+				    }
+				}
+				public static func resourceIdentifier(_ id: ID) -> ResourceIdentifier {
+					switch id {
+					case .image(let id):
+						return ResourceIdentifier(type: Image.Definition.resourceType, id: id.description)
+					case .audio(let id):
+						return ResourceIdentifier(type: Audio.Definition.resourceType, id: id.description)
 					}
 				}
 			}

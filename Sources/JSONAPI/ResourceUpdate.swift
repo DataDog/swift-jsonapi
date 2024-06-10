@@ -43,6 +43,12 @@ where
 	}
 }
 
+extension ResourceUpdate: ResourceLinkageProviding {
+	public static func resourceIdentifier(_ id: ID) -> ResourceIdentifier {
+		ResourceIdentifier(type: Definition.resourceType, id: String(describing: id))
+	}
+}
+
 extension ResourceUpdate where Attributes == Unit {
 	public init(id: ID? = nil, relationships: Relationships) {
 		self.init(id: id, attributes: Unit(), relationships: relationships)

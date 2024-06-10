@@ -39,12 +39,47 @@ public struct ResourceUnionMacro: ExtensionMacro {
 
 		return [
 			try .makeResourceIdentifiableExtension(attachedTo: declaration, providingExtensionsOf: type),
+			try .makeResourceLinkageProvidingExtension(attachedTo: declaration, providingExtensionsOf: type),
 			try .makeCodableExtension(attachedTo: declaration, providingExtensionsOf: type),
 		]
 	}
 }
 
 extension ExtensionDeclSyntax {
+	fileprivate static func makeResourceLinkageProvidingExtension(
+		attachedTo declaration: some DeclGroupSyntax,
+		providingExtensionsOf type: some TypeSyntaxProtocol
+	) throws -> ExtensionDeclSyntax {
+		let resourceIdentifier = SwitchExprSyntax(subject: ExprSyntax("id")) {
+			for element in declaration.enumCaseElements {
+				SwitchCaseSyntax("case .\(element.name)(let id):") {
+					ExprSyntax(
+						"""
+						return ResourceIdentifier(type: \(element.firstParameterType).Definition.resourceType, \
+						id: id.description)
+						"""
+					)
+				}
+			}
+		}
+
+		let members = try MemberBlockItemListSyntax {
+			DeclSyntax.makeUnionID(for: declaration)
+			try FunctionDeclSyntax(
+				"\(declaration.publicModifier)static func resourceIdentifier(_ id: ID) -> ResourceIdentifier"
+			) {
+				DeclSyntax("\(resourceIdentifier.formatted())")
+			}
+		}
+
+		return try ExtensionDeclSyntax(
+			"""
+			\(declaration.attributes.availability)
+			extension \(type): JSONAPI.ResourceLinkageProviding\(MemberBlockSyntax(members: members))
+			"""
+		)
+	}
+
 	fileprivate static func makeResourceIdentifiableExtension(
 		attachedTo declaration: some DeclGroupSyntax,
 		providingExtensionsOf type: some TypeSyntaxProtocol
@@ -59,13 +94,13 @@ extension ExtensionDeclSyntax {
 		let extractId = SwitchExprSyntax(subject: ExprSyntax("self")) {
 			for enumCaseElement in declaration.enumCaseElements {
 				SwitchCaseSyntax("case .\(enumCaseElement.name)(let value):") {
-					ExprSyntax("return String(describing: value.id)")
+					ExprSyntax("return .\(enumCaseElement.name)(value.id)")
 				}
 			}
 		}
 		let members = MemberBlockItemListSyntax {
 			DeclSyntax("\(declaration.publicModifier)var type: String { \(extractType.formatted()) }")
-			DeclSyntax("\(declaration.publicModifier)var id: String { \(extractId.formatted()) }")
+			DeclSyntax("\(declaration.publicModifier)var id: ID { \(extractId.formatted()) }")
 		}
 
 		return try ExtensionDeclSyntax(
@@ -114,5 +149,49 @@ extension ExtensionDeclSyntax {
 			extension \(type): Codable\(MemberBlockSyntax(members: members))
 			"""
 		)
+	}
+}
+
+extension DeclSyntax {
+	fileprivate static func makeUnionID(for declaration: some DeclGroupSyntax) -> DeclSyntax {
+		let extractDescription = SwitchExprSyntax(subject: ExprSyntax("self")) {
+			for enumCaseElement in declaration.enumCaseElements {
+				SwitchCaseSyntax("case .\(enumCaseElement.name)(let id):") {
+					ExprSyntax("return id.description")
+				}
+			}
+		}
+
+		let syntax = EnumDeclSyntax(
+			modifiers: DeclModifierListSyntax {
+				if let publicModifier = declaration.publicModifier {
+					publicModifier
+				}
+			},
+			name: "ID",
+			inheritanceClause: InheritanceClauseSyntax {
+				InheritedTypeSyntax(type: TypeSyntax("Hashable"))
+				InheritedTypeSyntax(type: TypeSyntax("CustomStringConvertible"))
+			}
+		) {
+			for element in declaration.enumCaseElements {
+				MemberBlockItemSyntax(
+					decl: EnumCaseDeclSyntax {
+						EnumCaseElementSyntax(
+							name: element.name,
+							parameterClause: EnumCaseParameterClauseSyntax(
+								parameters: EnumCaseParameterListSyntax {
+									"\(element.firstParameterType).ID"
+								}
+							)
+						)
+					}
+				)
+			}
+
+			DeclSyntax("\(declaration.publicModifier)var description: String { \(extractDescription.formatted()) }")
+		}.formatted()
+
+		return "\(syntax)"
 	}
 }

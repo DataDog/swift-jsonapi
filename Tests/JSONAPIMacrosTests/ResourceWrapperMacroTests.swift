@@ -95,7 +95,7 @@ final class ResourceWrapperMacroTests: XCTestCase {
 				var comments: [Comment]
 			}
 
-			extension Article {
+			extension Article: JSONAPI.ResourceDefinitionProviding {
 				struct Definition: JSONAPI.ResourceDefinition {
 					struct Attributes: Codable {
 						var title: String
@@ -111,8 +111,8 @@ final class ResourceWrapperMacroTests: XCTestCase {
 						var title: String?
 					}
 					struct Relationships: Codable {
-						var author: JSONAPI.RawRelationshipOne?
-						var comments: JSONAPI.RawRelationshipMany?
+						var author: JSONAPI.RelationshipOne<Person>?
+						var comments: JSONAPI.RelationshipMany<Comment>?
 					}
 					static let resourceType = Definition.resourceType
 				}
@@ -121,9 +121,10 @@ final class ResourceWrapperMacroTests: XCTestCase {
 			}
 
 			extension Article: JSONAPI.ResourceIdentifiable {
-				var type: String {
-					Definition.resourceType
-				}
+			}
+
+			extension Article: JSONAPI.ResourceLinkageProviding {
+				typealias ID = UUID
 			}
 
 			extension Article: Codable {
@@ -167,7 +168,7 @@ final class ResourceWrapperMacroTests: XCTestCase {
 				var related: Person?
 			}
 
-			extension Person {
+			extension Person: JSONAPI.ResourceDefinitionProviding {
 				struct Definition: JSONAPI.ResourceDefinition {
 					struct Attributes: Equatable, Codable {
 						private enum CodingKeys: String, CodingKey {
@@ -198,7 +199,7 @@ final class ResourceWrapperMacroTests: XCTestCase {
 						private enum CodingKeys: String, CodingKey {
 						    case related = "related_person"
 						}
-						var related: JSONAPI.RawRelationshipOne?
+						var related: JSONAPI.RelationshipOne<Person>?
 					}
 					static let resourceType = Definition.resourceType
 				}
@@ -207,9 +208,10 @@ final class ResourceWrapperMacroTests: XCTestCase {
 			}
 
 			extension Person: JSONAPI.ResourceIdentifiable {
-				var type: String {
-					Definition.resourceType
-				}
+			}
+
+			extension Person: JSONAPI.ResourceLinkageProviding {
+				typealias ID = String
 			}
 
 			extension Person: Codable {
@@ -253,7 +255,7 @@ final class ResourceWrapperMacroTests: XCTestCase {
 				public var related: Person?
 			}
 
-			extension Person {
+			extension Person: JSONAPI.ResourceDefinitionProviding {
 				public struct Definition: JSONAPI.ResourceDefinition {
 					public struct Attributes: Equatable, Codable {
 						public var firstName: String
@@ -270,7 +272,7 @@ final class ResourceWrapperMacroTests: XCTestCase {
 						var lastName: String?
 					}
 					public struct Relationships: Equatable, Codable {
-						public var related: JSONAPI.RawRelationshipOne?
+						public var related: JSONAPI.RelationshipOne<Person>?
 					}
 					public static let resourceType = Definition.resourceType
 				}
@@ -279,9 +281,10 @@ final class ResourceWrapperMacroTests: XCTestCase {
 			}
 
 			extension Person: JSONAPI.ResourceIdentifiable {
-				public var type: String {
-					Definition.resourceType
-				}
+			}
+
+			extension Person: JSONAPI.ResourceLinkageProviding {
+				public typealias ID = String
 			}
 
 			extension Person: Codable {
@@ -320,7 +323,7 @@ final class ResourceWrapperMacroTests: XCTestCase {
 			}
 
 			@available(iOS, unavailable)
-			extension Person {
+			extension Person: JSONAPI.ResourceDefinitionProviding {
 				public struct Definition: JSONAPI.ResourceDefinition {
 					public static let resourceType = "people"
 				}
@@ -333,9 +336,11 @@ final class ResourceWrapperMacroTests: XCTestCase {
 
 			@available(iOS, unavailable)
 			extension Person: JSONAPI.ResourceIdentifiable {
-				public var type: String {
-					Definition.resourceType
-				}
+			}
+
+			@available(iOS, unavailable)
+			extension Person: JSONAPI.ResourceLinkageProviding {
+				public typealias ID = String
 			}
 
 			@available(iOS, unavailable)
@@ -375,7 +380,7 @@ final class ResourceWrapperMacroTests: XCTestCase {
 				var tags: [String]
 			}
 
-			extension Schedule {
+			extension Schedule: JSONAPI.ResourceDefinitionProviding {
 				struct Definition: JSONAPI.ResourceDefinition {
 					struct Attributes: Equatable, Codable {
 						var name: String
@@ -397,9 +402,10 @@ final class ResourceWrapperMacroTests: XCTestCase {
 			}
 
 			extension Schedule: JSONAPI.ResourceIdentifiable {
-				var type: String {
-					Definition.resourceType
-				}
+			}
+
+			extension Schedule: JSONAPI.ResourceLinkageProviding {
+				typealias ID = UUID
 			}
 
 			extension Schedule: Codable {
