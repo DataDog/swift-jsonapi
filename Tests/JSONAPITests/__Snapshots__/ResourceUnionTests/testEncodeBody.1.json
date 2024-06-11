@@ -1,0 +1,28 @@
+{
+  "data" : {
+    "attributes" : {
+      "title" : "A guide to parsing JSON:API with Swift"
+    },
+    "relationships" : {
+      "contributors" : {
+        "data" : [
+          {
+            "id" : "12",
+            "type" : "people"
+          },
+          {
+            "id" : "00000000-0000-0000-0000-000000000001",
+            "type" : "organizations"
+          }
+        ]
+      },
+      "reviewer" : {
+        "data" : {
+          "id" : "00000000-0000-0000-0000-000000000001",
+          "type" : "organizations"
+        }
+      }
+    },
+    "type" : "articles"
+  }
+}
