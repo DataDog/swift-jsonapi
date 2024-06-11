@@ -27,18 +27,36 @@ where
 	}
 
 	public func encode(to encoder: any Encoder) throws {
+		func isEmpty<T>(_ value: T) -> Bool {
+			let mirror = Mirror(reflecting: value)
+
+			for child in mirror.children {
+				let childMirror = Mirror(reflecting: child.value)
+
+				guard childMirror.displayStyle == .optional else {
+					return false
+				}
+
+				guard childMirror.children.isEmpty else {
+					return false
+				}
+			}
+
+			return true
+		}
+
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		var nestedContainer = container.nestedContainer(keyedBy: ResourceCodingKeys.self, forKey: .data)
 
 		try nestedContainer.encode(self.type, forKey: .type)
 		try nestedContainer.encodeIfPresent(self.id, forKey: .id)
 
-		if Attributes.self != Unit.self {
-			try nestedContainer.encodeIfPresent(self.attributes, forKey: .attributes)
+		if Attributes.self != Unit.self, let attributes, !isEmpty(attributes) {
+			try nestedContainer.encode(attributes, forKey: .attributes)
 		}
 
-		if Relationships.self != Unit.self {
-			try nestedContainer.encodeIfPresent(self.relationships, forKey: .relationships)
+		if Relationships.self != Unit.self, let relationships, !isEmpty(relationships) {
+			try nestedContainer.encode(relationships, forKey: .relationships)
 		}
 	}
 }
