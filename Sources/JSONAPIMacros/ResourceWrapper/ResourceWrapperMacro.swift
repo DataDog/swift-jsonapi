@@ -41,6 +41,7 @@ public struct ResourceWrapperMacro: ExtensionMacro {
 			try .makeResourceIdentifiableExtension(attachedTo: declaration, providingExtensionsOf: type),
 			try .makeResourceLinkageProvidingExtension(attachedTo: declaration, providingExtensionsOf: type),
 			try .makeCodableExtension(attachedTo: declaration, providingExtensionsOf: type),
+			try .makeBodyExtension(attachedTo: declaration, providingExtensionsOf: type),
 		]
 	}
 }
@@ -192,6 +193,78 @@ extension ExtensionDeclSyntax {
 	}
 }
 
+extension ExtensionDeclSyntax {
+	fileprivate static func makeBodyExtension(
+		attachedTo declaration: some DeclGroupSyntax,
+		providingExtensionsOf type: some TypeSyntaxProtocol
+	) throws -> ExtensionDeclSyntax {
+		let modifiers = DeclModifierListSyntax {
+			if let publicModifier = declaration.publicModifier {
+				publicModifier
+			}
+		}
+		guard let identifier = declaration.definedVariables.first(where: \.isIdentifier) else {
+			throw DiagnosticsError(
+				syntax: declaration,
+				message: "'@ResourceWrapper' requires a valid 'id' property.",
+				id: .missingResourceType
+			)
+		}
+		let resourceAttributes = declaration.definedVariables.filter(\.hasResourceAttributeMacro)
+		let resourceRelationships = declaration.definedVariables.filter(\.hasResourceRelationshipMacro)
+
+		let parameterList = FunctionParameterListSyntax {
+			for resourceAttribute in resourceAttributes {
+				FunctionParameterSyntax(
+					"\(resourceAttribute.identifier): \(resourceAttribute.type?.optionalType) = nil"
+				)
+			}
+			for resourceRelationship in resourceRelationships {
+				FunctionParameterSyntax(
+					"\(resourceRelationship.identifier): \(resourceRelationship.relationshipType) = nil"
+				)
+			}
+		}
+		let createParameterList = FunctionParameterListSyntax {
+			FunctionParameterSyntax("id: \(identifier.type?.optionalType) = nil")
+			parameterList
+		}
+		let updateParameterList = FunctionParameterListSyntax {
+			FunctionParameterSyntax("id: \(identifier.type)")
+			parameterList
+		}
+		let makeBody = CodeBlockItemListSyntax {
+			if !resourceAttributes.isEmpty {
+				StmtSyntax(
+					"let attributes = \(FunctionCallExprSyntax.makeBodyAttributes(resourceAttributes))"
+				)
+			}
+
+			if !resourceRelationships.isEmpty {
+				StmtSyntax(
+					"let relationships = \(FunctionCallExprSyntax.makeBodyRelationships(resourceRelationships))"
+				)
+			}
+
+			StmtSyntax("return \(FunctionCallExprSyntax.makeBody(resourceAttributes, resourceRelationships))")
+		}
+
+		let members = try MemberBlockItemListSyntax {
+			try FunctionDeclSyntax("\(modifiers)static func createBody(\(createParameterList)) -> \(type).Body") {
+				makeBody
+			}
+
+			try FunctionDeclSyntax("\(modifiers)static func updateBody(\(updateParameterList)) -> \(type).Body") {
+				makeBody
+			}
+		}
+
+		return try ExtensionDeclSyntax(
+			"\(declaration.attributes.availability)\nextension \(type)\(MemberBlockSyntax(members: members))"
+		)
+	}
+}
+
 extension StructDeclSyntax {
 	fileprivate static func makeDefinition(
 		modifiers: DeclModifierListSyntax,
@@ -242,7 +315,7 @@ extension StructDeclSyntax {
 					modifiers: modifiers,
 					inheritedTypeList: inheritedTypeList,
 					resourceRelationships: resourceRelationships,
-					typeKeyPath: \.rawRelationshipType
+					typeKeyPath: \.relationshipType
 				)
 			}
 			DeclSyntax("\(modifiers)static let resourceType = Definition.resourceType")
@@ -285,7 +358,7 @@ extension StructDeclSyntax {
 		modifiers: DeclModifierListSyntax,
 		inheritedTypeList: InheritedTypeListSyntax,
 		resourceRelationships: [VariableDeclSyntax],
-		typeKeyPath: KeyPath<VariableDeclSyntax, TypeSyntax?> = \.relationshipType
+		typeKeyPath: KeyPath<VariableDeclSyntax, TypeSyntax?> = \.inlineRelationshipType
 	) throws -> StructDeclSyntax {
 		try StructDeclSyntax("\(modifiers)struct Relationships:\(inheritedTypeList)") {
 			if resourceRelationships.containsResourceRelationshipKeys {
@@ -348,6 +421,49 @@ extension FunctionCallExprSyntax {
 	) -> FunctionCallExprSyntax {
 		FunctionCallExprSyntax(callee: ExprSyntax("Wrapped")) {
 			LabeledExprSyntax(label: "id", expression: ExprSyntax("self.id"))
+			if !resourceAttributes.isEmpty {
+				LabeledExprSyntax(label: "attributes", expression: ExprSyntax("attributes"))
+			}
+			if !resourceRelationships.isEmpty {
+				LabeledExprSyntax(label: "relationships", expression: ExprSyntax("relationships"))
+			}
+		}
+	}
+
+	fileprivate static func makeBodyAttributes(
+		_ resourceAttributes: [VariableDeclSyntax]
+	) -> FunctionCallExprSyntax {
+		FunctionCallExprSyntax(callee: ExprSyntax("Body.Attributes")) {
+			for resourceAttribute in resourceAttributes {
+				LabeledExprSyntax(
+					label: resourceAttribute.identifier,
+					colon: .colonToken(trailingTrivia: .space),
+					expression: ExprSyntax("\(resourceAttribute.identifier)")
+				)
+			}
+		}
+	}
+
+	fileprivate static func makeBodyRelationships(
+		_ resourceRelationships: [VariableDeclSyntax]
+	) -> FunctionCallExprSyntax {
+		FunctionCallExprSyntax(callee: ExprSyntax("Body.Relationships")) {
+			for resourceRelationship in resourceRelationships {
+				LabeledExprSyntax(
+					label: resourceRelationship.identifier,
+					colon: .colonToken(trailingTrivia: .space),
+					expression: ExprSyntax("\(resourceRelationship.identifier)")
+				)
+			}
+		}
+	}
+
+	fileprivate static func makeBody(
+		_ resourceAttributes: [VariableDeclSyntax],
+		_ resourceRelationships: [VariableDeclSyntax]
+	) -> FunctionCallExprSyntax {
+		FunctionCallExprSyntax(callee: ExprSyntax("Body")) {
+			LabeledExprSyntax(label: "id", expression: ExprSyntax("id"))
 			if !resourceAttributes.isEmpty {
 				LabeledExprSyntax(label: "attributes", expression: ExprSyntax("attributes"))
 			}
@@ -438,7 +554,7 @@ extension VariableDeclSyntax {
 		self.attribute(named: "ResourceRelationship")?.firstArgumentStringLiteralSegment
 	}
 
-	fileprivate var relationshipType: TypeSyntax? {
+	fileprivate var inlineRelationshipType: TypeSyntax? {
 		guard let resourceType = self.isOptional ? self.optionalWrappedType : self.type else {
 			return nil
 		}
@@ -458,7 +574,7 @@ extension VariableDeclSyntax {
 		return resourceType.isArray ? "resources" : "resource"
 	}
 
-	fileprivate var rawRelationshipType: TypeSyntax? {
+	fileprivate var relationshipType: TypeSyntax? {
 		guard let resourceType = self.isOptional ? self.optionalWrappedType : self.type else {
 			return nil
 		}

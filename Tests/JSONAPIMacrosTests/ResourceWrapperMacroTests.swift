@@ -142,6 +142,19 @@ final class ResourceWrapperMacroTests: XCTestCase {
 					try wrapped.encode(to: encoder)
 				}
 			}
+
+			extension Article {
+				static func createBody(id: UUID? = nil, title: String? = nil, author: JSONAPI.RelationshipOne<Person>? = nil, comments: JSONAPI.RelationshipMany<Comment>? = nil) -> Article.Body {
+					let attributes = Body.Attributes(title: title)
+					let relationships = Body.Relationships(author: author, comments: comments)
+					return Body(id: id, attributes: attributes, relationships: relationships)
+				}
+				static func updateBody(id: UUID, title: String? = nil, author: JSONAPI.RelationshipOne<Person>? = nil, comments: JSONAPI.RelationshipMany<Comment>? = nil) -> Article.Body {
+					let attributes = Body.Attributes(title: title)
+					let relationships = Body.Relationships(author: author, comments: comments)
+					return Body(id: id, attributes: attributes, relationships: relationships)
+				}
+			}
 			"""
 		}
 	}
@@ -229,6 +242,19 @@ final class ResourceWrapperMacroTests: XCTestCase {
 					try wrapped.encode(to: encoder)
 				}
 			}
+
+			extension Person {
+				static func createBody(id: String? = nil, firstName: String? = nil, lastName: String? = nil, related: JSONAPI.RelationshipOne<Person>? = nil) -> Person.Body {
+					let attributes = Body.Attributes(firstName: firstName, lastName: lastName)
+					let relationships = Body.Relationships(related: related)
+					return Body(id: id, attributes: attributes, relationships: relationships)
+				}
+				static func updateBody(id: String, firstName: String? = nil, lastName: String? = nil, related: JSONAPI.RelationshipOne<Person>? = nil) -> Person.Body {
+					let attributes = Body.Attributes(firstName: firstName, lastName: lastName)
+					let relationships = Body.Relationships(related: related)
+					return Body(id: id, attributes: attributes, relationships: relationships)
+				}
+			}
 			"""
 		}
 	}
@@ -302,6 +328,19 @@ final class ResourceWrapperMacroTests: XCTestCase {
 					try wrapped.encode(to: encoder)
 				}
 			}
+
+			extension Person {
+				public static func createBody(id: String? = nil, firstName: String? = nil, lastName: String? = nil, related: JSONAPI.RelationshipOne<Person>? = nil) -> Person.Body {
+					let attributes = Body.Attributes(firstName: firstName, lastName: lastName)
+					let relationships = Body.Relationships(related: related)
+					return Body(id: id, attributes: attributes, relationships: relationships)
+				}
+				public static func updateBody(id: String, firstName: String? = nil, lastName: String? = nil, related: JSONAPI.RelationshipOne<Person>? = nil) -> Person.Body {
+					let attributes = Body.Attributes(firstName: firstName, lastName: lastName)
+					let relationships = Body.Relationships(related: related)
+					return Body(id: id, attributes: attributes, relationships: relationships)
+				}
+			}
 			"""
 		}
 	}
@@ -352,6 +391,16 @@ final class ResourceWrapperMacroTests: XCTestCase {
 				public func encode(to encoder: any Encoder) throws {
 					let wrapped = Wrapped(id: self.id)
 					try wrapped.encode(to: encoder)
+				}
+			}
+
+			@available(iOS, unavailable)
+			extension Person {
+				public static func createBody(id: String? = nil) -> Person.Body {
+					return Body(id: id)
+				}
+				public static func updateBody(id: String) -> Person.Body {
+					return Body(id: id)
 				}
 			}
 			"""
@@ -419,6 +468,17 @@ final class ResourceWrapperMacroTests: XCTestCase {
 					let attributes = Wrapped.Attributes(name: self.name, tags: self.tags)
 					let wrapped = Wrapped(id: self.id, attributes: attributes)
 					try wrapped.encode(to: encoder)
+				}
+			}
+
+			extension Schedule {
+				static func createBody(id: UUID? = nil, name: String? = nil, tags: [String]? = nil) -> Schedule.Body {
+					let attributes = Body.Attributes(name: name, tags: tags)
+					return Body(id: id, attributes: attributes)
+				}
+				static func updateBody(id: UUID, name: String? = nil, tags: [String]? = nil) -> Schedule.Body {
+					let attributes = Body.Attributes(name: name, tags: tags)
+					return Body(id: id, attributes: attributes)
 				}
 			}
 			"""

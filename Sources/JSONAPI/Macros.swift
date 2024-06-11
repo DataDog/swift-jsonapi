@@ -2,7 +2,7 @@
 	extension,
 	conformances: ResourceIdentifiable, ResourceDefinitionProviding, ResourceLinkageProviding, Codable,
 	names: named(ID), named(Definition), named(BodyDefinition), named(Wrapped), named(Body), named(type),
-	named(init(from:)), named(encode(to:))
+	named(init(from:)), named(encode(to:)), named(createBody), named(updateBody)
 )
 public macro ResourceWrapper(type: String) = #externalMacro(module: "JSONAPIMacros", type: "ResourceWrapperMacro")
 

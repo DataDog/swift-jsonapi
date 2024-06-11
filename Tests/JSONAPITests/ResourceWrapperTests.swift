@@ -115,4 +115,28 @@ final class ResourceWrapperTests: XCTestCase {
 	func testEncodeArray() {
 		assertSnapshot(of: Fixtures.articles, as: .jsonAPI())
 	}
+
+	func testEncodeBodyOnlyAttributes() {
+		// given
+		let commentUpdate = Comment.updateBody(id: "1", body: "I like XML better")
+
+		// then
+		assertSnapshot(of: commentUpdate, as: .json)
+	}
+
+	func testEncodeBodyNullRelationship() {
+		// given
+		let commentUpdate = Comment.updateBody(id: "1", body: "I like XML better", author: .null)
+
+		// then
+		assertSnapshot(of: commentUpdate, as: .json)
+	}
+
+	func testEncodeBodyRelationships() {
+		// given
+		let articleUpdate = Article.updateBody(id: "1", author: "9", comments: ["5", "12"])
+
+		// then
+		assertSnapshot(of: articleUpdate, as: .json)
+	}
 }
