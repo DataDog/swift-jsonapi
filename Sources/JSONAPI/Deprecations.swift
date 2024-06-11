@@ -7,7 +7,7 @@ public typealias Document = CompoundDocument
 @attached(
 	extension,
 	conformances: ResourceIdentifiable, ResourceDefinitionProviding, ResourceLinkageProviding, Codable,
-	names: named(ID), named(Definition), named(UpdateDefinition), named(Wrapped), named(Update), named(type),
+	names: named(ID), named(Definition), named(BodyDefinition), named(Wrapped), named(Body), named(type),
 	named(init(from:)), named(encode(to:))
 )
 public macro CodableResource(type: String) = #externalMacro(module: "JSONAPIMacros", type: "ResourceWrapperMacro")

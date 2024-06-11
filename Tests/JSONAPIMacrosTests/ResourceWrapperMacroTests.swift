@@ -106,7 +106,7 @@ final class ResourceWrapperMacroTests: XCTestCase {
 					}
 					static let resourceType = "articles"
 				}
-				struct UpdateDefinition: JSONAPI.ResourceDefinition {
+				struct BodyDefinition: JSONAPI.ResourceDefinition {
 					struct Attributes: Codable {
 						var title: String?
 					}
@@ -117,7 +117,7 @@ final class ResourceWrapperMacroTests: XCTestCase {
 					static let resourceType = Definition.resourceType
 				}
 				typealias Wrapped = JSONAPI.Resource<UUID, Definition>
-				typealias Update = JSONAPI.ResourceUpdate<UUID, UpdateDefinition>
+				typealias Body = JSONAPI.ResourceBody<UUID, BodyDefinition>
 			}
 
 			extension Article: JSONAPI.ResourceIdentifiable {
@@ -186,7 +186,7 @@ final class ResourceWrapperMacroTests: XCTestCase {
 					}
 					static let resourceType = "people"
 				}
-				struct UpdateDefinition: JSONAPI.ResourceDefinition {
+				struct BodyDefinition: JSONAPI.ResourceDefinition {
 					struct Attributes: Equatable, Codable {
 						private enum CodingKeys: String, CodingKey {
 						    case firstName = "first_name"
@@ -204,7 +204,7 @@ final class ResourceWrapperMacroTests: XCTestCase {
 					static let resourceType = Definition.resourceType
 				}
 				typealias Wrapped = JSONAPI.Resource<String, Definition>
-				typealias Update = JSONAPI.ResourceUpdate<String, UpdateDefinition>
+				typealias Body = JSONAPI.ResourceBody<String, BodyDefinition>
 			}
 
 			extension Person: JSONAPI.ResourceIdentifiable {
@@ -266,7 +266,7 @@ final class ResourceWrapperMacroTests: XCTestCase {
 					}
 					public static let resourceType = "people"
 				}
-				public struct UpdateDefinition: JSONAPI.ResourceDefinition {
+				public struct BodyDefinition: JSONAPI.ResourceDefinition {
 					public struct Attributes: Equatable, Codable {
 						public var firstName: String?
 						var lastName: String?
@@ -277,7 +277,7 @@ final class ResourceWrapperMacroTests: XCTestCase {
 					public static let resourceType = Definition.resourceType
 				}
 				public typealias Wrapped = JSONAPI.Resource<String, Definition>
-				public typealias Update = JSONAPI.ResourceUpdate<String, UpdateDefinition>
+				public typealias Body = JSONAPI.ResourceBody<String, BodyDefinition>
 			}
 
 			extension Person: JSONAPI.ResourceIdentifiable {
@@ -327,11 +327,11 @@ final class ResourceWrapperMacroTests: XCTestCase {
 				public struct Definition: JSONAPI.ResourceDefinition {
 					public static let resourceType = "people"
 				}
-				public struct UpdateDefinition: JSONAPI.ResourceDefinition {
+				public struct BodyDefinition: JSONAPI.ResourceDefinition {
 					public static let resourceType = Definition.resourceType
 				}
 				public typealias Wrapped = JSONAPI.Resource<String, Definition>
-				public typealias Update = JSONAPI.ResourceUpdate<String, UpdateDefinition>
+				public typealias Body = JSONAPI.ResourceBody<String, BodyDefinition>
 			}
 
 			@available(iOS, unavailable)
@@ -389,7 +389,7 @@ final class ResourceWrapperMacroTests: XCTestCase {
 					}
 					static let resourceType = "schedules"
 				}
-				struct UpdateDefinition: JSONAPI.ResourceDefinition {
+				struct BodyDefinition: JSONAPI.ResourceDefinition {
 					struct Attributes: Equatable, Codable {
 						var name: String?
 
@@ -398,7 +398,7 @@ final class ResourceWrapperMacroTests: XCTestCase {
 					static let resourceType = Definition.resourceType
 				}
 				typealias Wrapped = JSONAPI.Resource<UUID, Definition>
-				typealias Update = JSONAPI.ResourceUpdate<UUID, UpdateDefinition>
+				typealias Body = JSONAPI.ResourceBody<UUID, BodyDefinition>
 			}
 
 			extension Schedule: JSONAPI.ResourceIdentifiable {

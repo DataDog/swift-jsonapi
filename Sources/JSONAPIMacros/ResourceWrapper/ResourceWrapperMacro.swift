@@ -78,14 +78,14 @@ extension ExtensionDeclSyntax {
 				resourceRelationships: resourceRelationships,
 				resourceType: resourceType
 			)
-			try StructDeclSyntax.makeUpdateDefinition(
+			try StructDeclSyntax.makeBodyDefinition(
 				modifiers: modifiers,
 				inheritedTypeList: inheritedTypeList,
 				resourceAttributes: resourceAttributes,
 				resourceRelationships: resourceRelationships
 			)
 			DeclSyntax("\(modifiers)typealias Wrapped = JSONAPI.Resource<\(identifier.type), Definition>")
-			DeclSyntax("\(modifiers)typealias Update = JSONAPI.ResourceUpdate<\(identifier.type), UpdateDefinition>")
+			DeclSyntax("\(modifiers)typealias Body = JSONAPI.ResourceBody<\(identifier.type), BodyDefinition>")
 		}
 
 		return try ExtensionDeclSyntax(
@@ -222,13 +222,13 @@ extension StructDeclSyntax {
 		}
 	}
 
-	fileprivate static func makeUpdateDefinition(
+	fileprivate static func makeBodyDefinition(
 		modifiers: DeclModifierListSyntax,
 		inheritedTypeList: InheritedTypeListSyntax,
 		resourceAttributes: [VariableDeclSyntax],
 		resourceRelationships: [VariableDeclSyntax]
 	) throws -> StructDeclSyntax {
-		try StructDeclSyntax("\(modifiers)struct UpdateDefinition: JSONAPI.ResourceDefinition") {
+		try StructDeclSyntax("\(modifiers)struct BodyDefinition: JSONAPI.ResourceDefinition") {
 			if !resourceAttributes.isEmpty {
 				try StructDeclSyntax.makeDefinitionAttributes(
 					modifiers: modifiers,

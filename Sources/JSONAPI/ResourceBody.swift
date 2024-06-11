@@ -1,6 +1,6 @@
 import Foundation
 
-public struct ResourceUpdate<ID, Definition>: Encodable
+public struct ResourceBody<ID, Definition>: Encodable
 where
 	ID: Hashable & Encodable,
 	Definition: ResourceDefinition,
@@ -43,23 +43,23 @@ where
 	}
 }
 
-extension ResourceUpdate: ResourceLinkageProviding {
+extension ResourceBody: ResourceLinkageProviding {
 	public static func resourceIdentifier(_ id: ID) -> ResourceIdentifier {
 		ResourceIdentifier(type: Definition.resourceType, id: String(describing: id))
 	}
 }
 
-extension ResourceUpdate where Attributes == Unit {
+extension ResourceBody where Attributes == Unit {
 	public init(id: ID? = nil, relationships: Relationships) {
 		self.init(id: id, attributes: Unit(), relationships: relationships)
 	}
 }
 
-extension ResourceUpdate where Relationships == Unit {
+extension ResourceBody where Relationships == Unit {
 	public init(id: ID? = nil, attributes: Attributes) {
 		self.init(id: id, attributes: attributes, relationships: Unit())
 	}
 }
 
-extension ResourceUpdate: Equatable where ID: Equatable, Attributes: Equatable, Relationships: Equatable {
+extension ResourceBody: Equatable where ID: Equatable, Attributes: Equatable, Relationships: Equatable {
 }

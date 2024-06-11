@@ -2,7 +2,7 @@ import JSONAPI
 import SnapshotTesting
 import XCTest
 
-final class ResourceUpdateTests: XCTestCase {
+final class ResourceBodyTests: XCTestCase {
 	private struct PersonDefinition: ResourceDefinition {
 		struct Attributes: Encodable {
 			var firstName: String?
@@ -13,7 +13,7 @@ final class ResourceUpdateTests: XCTestCase {
 		static let resourceType = "people"
 	}
 
-	private typealias PersonUpdate = ResourceUpdate<String, PersonDefinition>
+	private typealias PersonBody = ResourceBody<String, PersonDefinition>
 
 	private struct CommentDefinition: ResourceDefinition {
 		struct Attributes: Encodable {
@@ -21,17 +21,17 @@ final class ResourceUpdateTests: XCTestCase {
 		}
 
 		struct Relationships: Encodable {
-			var author: RelationshipOne<PersonUpdate>?
+			var author: RelationshipOne<PersonBody>?
 		}
 
 		static let resourceType = "comments"
 	}
 
-	private typealias CommentUpdate = ResourceUpdate<String, CommentDefinition>
+	private typealias CommentBody = ResourceBody<String, CommentDefinition>
 
 	func testEncodeOnlyAttributes() {
 		// given
-		let comment = CommentUpdate(attributes: .init(body: "I like XML better"))
+		let comment = CommentBody(attributes: .init(body: "I like XML better"))
 
 		// then
 		assertSnapshot(of: comment, as: .json)
@@ -39,7 +39,7 @@ final class ResourceUpdateTests: XCTestCase {
 
 	func testEncodeEmptyRelationshipOne() {
 		// given
-		let comment = CommentUpdate(attributes: .init(body: "I like XML better"), relationships: .init(author: .null))
+		let comment = CommentBody(attributes: .init(body: "I like XML better"), relationships: .init(author: .null))
 
 		// then
 		assertSnapshot(of: comment, as: .json)
@@ -47,7 +47,7 @@ final class ResourceUpdateTests: XCTestCase {
 
 	func testEncodeRelationshipOne() {
 		// given
-		let comment = CommentUpdate(
+		let comment = CommentBody(
 			attributes: .init(body: "I like XML better"),
 			relationships: .init(author: "9")
 		)
