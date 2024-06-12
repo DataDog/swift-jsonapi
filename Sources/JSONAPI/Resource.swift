@@ -5,7 +5,7 @@ public enum ResourceCodingKeys: String, CodingKey {
 }
 
 @dynamicMemberLookup
-public struct Resource<ID, Definition>: ResourceIdentifiable
+public struct Resource<ID, Definition>: ResourceDefinitionProviding, ResourceIdentifiable, ResourceLinkageProviding
 where
 	ID: Hashable & CustomStringConvertible,
 	Definition: ResourceDefinition
