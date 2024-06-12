@@ -1,51 +1,51 @@
 import Foundation
 
-@dynamicMemberLookup
-public struct RelationshipOne<R> {
-	public var resource: R
-
-	public init(_ resource: R) {
-		self.resource = resource
+public struct RelationshipOne<Destination: ResourceLinkageProviding>: Equatable, Codable {
+	public static var null: RelationshipOne {
+		RelationshipOne(data: nil)
 	}
 
-	public subscript<V>(dynamicMember keyPath: KeyPath<R, V>) -> V {
-		self.resource[keyPath: keyPath]
+	public var data: ResourceIdentifier?
+
+	public init(id: Destination.ID) {
+		self.init(data: Destination.resourceIdentifier(id))
 	}
-}
 
-extension RelationshipOne: Equatable where R: Equatable {
-}
-
-extension RelationshipOne: Decodable where R: Decodable {
-	public init(from decoder: any Decoder) throws {
-		let resourceLinkage = try ResourceLinkageOne(from: decoder)
-
-		guard let data = resourceLinkage.data else {
-			throw DecodingError.valueNotFound(
-				Self.self,
-				DecodingError.Context(
-					codingPath: decoder.codingPath,
-					debugDescription: "Could not find a resource identifier for this relationship."
-				)
-			)
-		}
-
-		guard let resourceDecoder = decoder.resourceDecoder else {
-			fatalError("You must use a 'JSONAPIDecoder' instance to decode a JSON:API response.")
-		}
-
-		self.resource = try resourceDecoder.decode(R.self, identifier: data)
+	init(data: ResourceIdentifier?) {
+		self.data = data
 	}
-}
 
-extension RelationshipOne: Encodable where R: Encodable & ResourceIdentifiable {
 	public func encode(to encoder: any Encoder) throws {
-		try ResourceLinkageOne(self.resource).encode(to: encoder)
+		var container = encoder.container(keyedBy: CodingKeys.self)
 
-		guard let resourceEncoder = encoder.resourceEncoder else {
-			fatalError("You must use a 'JSONAPIEncoder' instance to encode a JSON:API resource.")
-		}
+		// explicitly encode nil values
+		try container.encode(self.data, forKey: .data)
+	}
+}
 
-		resourceEncoder.encode(self.resource)
+extension RelationshipOne: ExpressibleByUnicodeScalarLiteral where Destination.ID: ExpressibleByUnicodeScalarLiteral {
+	public typealias UnicodeScalarLiteralType = Destination.ID.UnicodeScalarLiteralType
+
+	public init(unicodeScalarLiteral: UnicodeScalarLiteralType) {
+		self.init(id: Destination.ID(unicodeScalarLiteral: unicodeScalarLiteral))
+	}
+}
+
+extension RelationshipOne: ExpressibleByExtendedGraphemeClusterLiteral
+where
+	Destination.ID: ExpressibleByExtendedGraphemeClusterLiteral
+{
+	public typealias ExtendedGraphemeClusterLiteralType = Destination.ID.ExtendedGraphemeClusterLiteralType
+
+	public init(extendedGraphemeClusterLiteral: ExtendedGraphemeClusterLiteralType) {
+		self.init(id: Destination.ID(extendedGraphemeClusterLiteral: extendedGraphemeClusterLiteral))
+	}
+}
+
+extension RelationshipOne: ExpressibleByStringLiteral where Destination.ID: ExpressibleByStringLiteral {
+	public typealias StringLiteralType = Destination.ID.StringLiteralType
+
+	public init(stringLiteral: StringLiteralType) {
+		self.init(id: Destination.ID(stringLiteral: stringLiteral))
 	}
 }

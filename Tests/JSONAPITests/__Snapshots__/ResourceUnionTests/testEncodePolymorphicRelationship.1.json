@@ -1,0 +1,62 @@
+{
+  "data" : {
+    "attributes" : {
+      "title" : "A guide to parsing JSON:API with Swift"
+    },
+    "id" : "1",
+    "relationships" : {
+      "author" : {
+        "data" : {
+          "id" : "9",
+          "type" : "people"
+        }
+      },
+      "contributors" : {
+        "data" : [
+          {
+            "id" : "12",
+            "type" : "people"
+          },
+          {
+            "id" : "00000000-0000-0000-0000-000000000001",
+            "type" : "organizations"
+          }
+        ]
+      },
+      "reviewer" : {
+        "data" : {
+          "id" : "00000000-0000-0000-0000-000000000001",
+          "type" : "organizations"
+        }
+      }
+    },
+    "type" : "articles"
+  },
+  "included" : [
+    {
+      "attributes" : {
+        "firstName" : "John",
+        "lastName" : "Doe",
+        "twitter" : "johndoe"
+      },
+      "id" : "9",
+      "type" : "people"
+    },
+    {
+      "attributes" : {
+        "firstName" : "Jane",
+        "lastName" : "Smith"
+      },
+      "id" : "12",
+      "type" : "people"
+    },
+    {
+      "attributes" : {
+        "contactEmail" : "contact@swiftenthusiasts.org",
+        "name" : "Swift Enthusiasts"
+      },
+      "id" : "00000000-0000-0000-0000-000000000001",
+      "type" : "organizations"
+    }
+  ]
+}

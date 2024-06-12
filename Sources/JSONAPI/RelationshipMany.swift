@@ -1,61 +1,21 @@
 import Foundation
 
-public struct RelationshipMany<R> {
-	public var resources: [R]
+public struct RelationshipMany<Destination: ResourceLinkageProviding>: Equatable, Codable {
+	public var data: [ResourceIdentifier]
 
-	public init(_ resources: [R]) {
-		self.resources = resources
+	public init(identifiers: [Destination.ID]) {
+		self.init(data: identifiers.map(Destination.resourceIdentifier(_:)))
+	}
+
+	init(data: [ResourceIdentifier]) {
+		self.data = data
 	}
 }
 
-extension RelationshipMany: RandomAccessCollection {
-	public typealias Index = Int
-	public typealias Element = R
+extension RelationshipMany: ExpressibleByArrayLiteral {
+	public typealias ArrayLiteralElement = Destination.ID
 
-	public var startIndex: Int {
-		self.resources.startIndex
-	}
-
-	public var endIndex: Int {
-		self.resources.endIndex
-	}
-
-	public func index(after i: Int) -> Int {
-		self.resources.index(after: i)
-	}
-
-	public func index(before i: Int) -> Int {
-		self.resources.index(before: i)
-	}
-
-	public subscript(position: Int) -> R {
-		self.resources[position]
-	}
-}
-
-extension RelationshipMany: Equatable where R: Equatable {
-}
-
-extension RelationshipMany: Decodable where R: Decodable {
-	public init(from decoder: any Decoder) throws {
-		let resourceLinkage = try ResourceLinkageMany(from: decoder)
-
-		guard let resourceDecoder = decoder.resourceDecoder else {
-			fatalError("You must use a 'JSONAPIDecoder' instance to decode a JSON:API response.")
-		}
-
-		self.resources = try resourceDecoder.decode([R].self, identifiers: resourceLinkage.data)
-	}
-}
-
-extension RelationshipMany: Encodable where R: Encodable & ResourceIdentifiable {
-	public func encode(to encoder: any Encoder) throws {
-		try ResourceLinkageMany(self.resources).encode(to: encoder)
-
-		guard let resourceEncoder = encoder.resourceEncoder else {
-			fatalError("You must use a 'JSONAPIEncoder' instance to encode a JSON:API resource.")
-		}
-
-		resourceEncoder.encode(self.resources)
+	public init(arrayLiteral elements: ArrayLiteralElement...) {
+		self.init(identifiers: elements)
 	}
 }

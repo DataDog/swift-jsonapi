@@ -26,8 +26,8 @@
 			},
 			"reviewer": {
 				"data": {
-					"type": "teams",
-					"id": "30"
+					"type": "organizations",
+					"id": "00000000-0000-0000-0000-000000000001"
 				}
 			}
 		}
@@ -56,14 +56,6 @@
 			"attributes": {
 				"name": "Swift Enthusiasts",
 				"contactEmail": "contact@swiftenthusiasts.org"
-			}
-		},
-		{
-			"type": "teams",
-			"id": "30",
-			"attributes": {
-				"name": "iOS Development Team",
-				"lead": "Alice Johnson"
 			}
 		}
 	]

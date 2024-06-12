@@ -1,39 +1,73 @@
 {
 	"data": {
-		"type": "messages",
+		"type": "articles",
 		"id": "1",
 		"attributes": {
-			"text": "Look what I just found!"
+			"title": "A guide to parsing JSON:API with Swift"
 		},
 		"relationships": {
-			"attachments": {
+			"author": {
+				"data": {
+					"type": "people",
+					"id": "9"
+				}
+			},
+			"contributors": {
 				"data": [
 					{
-						"type": "videos",
-						"id": "42"
+						"type": "people",
+						"id": "12"
 					},
 					{
-						"type": "audios",
-						"id": "66"
+						"type": "organizations",
+						"id": "00000000-0000-0000-0000-000000000001"
+					},
+					{
+						"type": "teams",
+						"id": "30"
 					}
 				]
+			},
+			"reviewer": {
+				"data": {
+					"type": "organizations",
+					"id": "00000000-0000-0000-0000-000000000001"
+				}
 			}
 		}
 	},
 	"included": [
 		{
-			"type": "videos",
-			"id": "42",
+			"type": "people",
+			"id": "9",
 			"attributes": {
-				"url": "https://example.com/video.mp4"
+				"firstName": "John",
+				"lastName": "Doe",
+				"twitter": "johndoe"
 			}
 		},
 		{
-			"type": "audios",
-			"id": "66",
+			"type": "people",
+			"id": "12",
 			"attributes": {
-				"url": "https://audio.com/NeverGonnaGiveYouUp.mp3",
-				"title": "Never Gonna Give You Up"
+				"firstName": "Jane",
+				"lastName": "Smith"
+			}
+		},
+		{
+			"type": "organizations",
+			"id": "00000000-0000-0000-0000-000000000001",
+			"attributes": {
+				"name": "Swift Enthusiasts",
+				"contactEmail": "contact@swiftenthusiasts.org"
+			}
+		},
+		{
+			"type": "teams",
+			"id": "30",
+			"attributes": {
+				"name": "iOS Development Team",
+				"lead": "Alice Johnson"
 			}
 		}
 	]

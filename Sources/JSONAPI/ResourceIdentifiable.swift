@@ -6,3 +6,9 @@ public protocol ResourceIdentifiable {
 	var type: String { get }
 	var id: ID { get }
 }
+
+extension ResourceIdentifiable where Self: ResourceDefinitionProviding {
+	public var type: String {
+		Definition.resourceType
+	}
+}

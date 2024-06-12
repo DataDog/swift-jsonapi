@@ -1,8 +1,8 @@
 @attached(
 	extension,
-	conformances: ResourceIdentifiable, Codable,
-	names: named(FieldSet), named(UpdateFieldSet), named(Wrapped), named(Update), named(type), named(init(from:)),
-	named(encode(to:))
+	conformances: ResourceIdentifiable, ResourceDefinitionProviding, ResourceLinkageProviding, Codable,
+	names: named(ID), named(Definition), named(BodyDefinition), named(Wrapped), named(Body), named(type),
+	named(init(from:)), named(encode(to:)), named(createBody), named(updateBody)
 )
 public macro ResourceWrapper(type: String) = #externalMacro(module: "JSONAPIMacros", type: "ResourceWrapperMacro")
 
@@ -22,7 +22,7 @@ public macro ResourceRelationship(key: String? = nil) =
 
 @attached(
 	extension,
-	conformances: ResourceIdentifiable, Codable,
-	names: named(type), named(id), named(init(from:)), named(encode(to:))
+	conformances: ResourceIdentifiable, ResourceLinkageProviding, Codable,
+	names: named(type), named(id), named(ID), named(resourceIdentifier), named(init(from:)), named(encode(to:))
 )
 public macro ResourceUnion() = #externalMacro(module: "JSONAPIMacros", type: "ResourceUnionMacro")

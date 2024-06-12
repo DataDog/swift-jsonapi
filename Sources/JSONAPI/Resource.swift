@@ -5,15 +5,15 @@ public enum ResourceCodingKeys: String, CodingKey {
 }
 
 @dynamicMemberLookup
-public struct Resource<ID, FieldSet>: ResourceIdentifiable
+public struct Resource<ID, Definition>: ResourceDefinitionProviding, ResourceIdentifiable, ResourceLinkageProviding
 where
 	ID: Hashable & CustomStringConvertible,
-	FieldSet: ResourceFieldSet
+	Definition: ResourceDefinition
 {
-	public typealias Attributes = FieldSet.Attributes
-	public typealias Relationships = FieldSet.Relationships
+	public typealias Attributes = Definition.Attributes
+	public typealias Relationships = Definition.Relationships
 
-	public let type: String = FieldSet.resourceType
+	public let type: String = Definition.resourceType
 
 	public let id: ID
 	public let attributes: Attributes
@@ -61,13 +61,13 @@ extension Resource: Decodable where ID: Decodable, Attributes: Decodable, Relati
 
 		let type = try container.decode(String.self, forKey: .type)
 
-		if type != FieldSet.resourceType {
+		if type != Definition.resourceType {
 			throw DecodingError.typeMismatch(
-				FieldSet.self,
+				Definition.self,
 				DecodingError.Context(
 					codingPath: [ResourceCodingKeys.type],
 					debugDescription:
-						"Resource type '\(type)' does not match expected type '\(FieldSet.resourceType)'"
+						"Resource type '\(type)' does not match expected type '\(Definition.resourceType)'"
 				)
 			)
 		}

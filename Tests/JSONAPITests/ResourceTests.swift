@@ -3,7 +3,7 @@ import SnapshotTesting
 import XCTest
 
 final class ResourceTests: XCTestCase {
-	private struct PersonFieldSet: ResourceFieldSet {
+	private struct PersonDefinition: ResourceDefinition {
 		struct Attributes: Equatable, Codable {
 			var firstName: String
 			var lastName: String
@@ -13,36 +13,36 @@ final class ResourceTests: XCTestCase {
 		static let resourceType = "people"
 	}
 
-	private typealias Person = Resource<String, PersonFieldSet>
+	private typealias Person = Resource<String, PersonDefinition>
 
-	private struct CommentFieldSet: ResourceFieldSet {
+	private struct CommentDefinition: ResourceDefinition {
 		struct Attributes: Equatable, Codable {
 			var body: String
 		}
 
 		struct Relationships: Equatable, Codable {
-			var author: RelationshipOptional<Person>
+			var author: InlineRelationshipOptional<Person>
 		}
 
 		static let resourceType = "comments"
 	}
 
-	private typealias Comment = Resource<String, CommentFieldSet>
+	private typealias Comment = Resource<String, CommentDefinition>
 
-	private struct ArticleFieldSet: ResourceFieldSet {
+	private struct ArticleDefinition: ResourceDefinition {
 		struct Attributes: Equatable, Codable {
 			var title: String
 		}
 
 		struct Relationships: Equatable, Codable {
-			var author: RelationshipOne<Person>
-			var comments: RelationshipMany<Comment>
+			var author: InlineRelationshipOne<Person>
+			var comments: InlineRelationshipMany<Comment>
 		}
 
 		static let resourceType = "articles"
 	}
 
-	private typealias Article = Resource<String, ArticleFieldSet>
+	private typealias Article = Resource<String, ArticleDefinition>
 
 	private struct CopyrightInfo: Equatable, Codable {
 		var copyright: String
@@ -176,7 +176,7 @@ final class ResourceTests: XCTestCase {
 			XCTFail("Should throw DecodingError.typeMismatch.")
 		} catch let DecodingError.typeMismatch(type, context) {
 			// then
-			XCTAssertEqual(String(describing: type), String(describing: CommentFieldSet.self))
+			XCTAssertEqual(String(describing: type), String(describing: CommentDefinition.self))
 			XCTAssertEqual(
 				context.debugDescription, "Resource type 'people' does not match expected type 'comments'")
 		} catch {

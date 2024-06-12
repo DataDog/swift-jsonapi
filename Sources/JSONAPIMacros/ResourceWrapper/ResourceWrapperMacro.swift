@@ -33,19 +33,21 @@ public struct ResourceWrapperMacro: ExtensionMacro {
 		}
 
 		return [
-			try .makeFieldSetExtension(
+			try .makeDefinitionExtension(
 				attachedTo: declaration,
 				providingExtensionsOf: type,
 				resourceType: resourceType.content.text
 			),
 			try .makeResourceIdentifiableExtension(attachedTo: declaration, providingExtensionsOf: type),
+			try .makeResourceLinkageProvidingExtension(attachedTo: declaration, providingExtensionsOf: type),
 			try .makeCodableExtension(attachedTo: declaration, providingExtensionsOf: type),
+			try .makeBodyExtension(attachedTo: declaration, providingExtensionsOf: type),
 		]
 	}
 }
 
 extension ExtensionDeclSyntax {
-	fileprivate static func makeFieldSetExtension(
+	fileprivate static func makeDefinitionExtension(
 		attachedTo declaration: some DeclGroupSyntax,
 		providingExtensionsOf type: some TypeSyntaxProtocol,
 		resourceType: String
@@ -55,7 +57,7 @@ extension ExtensionDeclSyntax {
 				publicModifier
 			}
 		}
-		let inheritedTypeList = InheritedTypeListSyntax.makeFieldSetAssociatedTypesInheritedTypeList(
+		let inheritedTypeList = InheritedTypeListSyntax.makeDefinitionAssociatedTypesInheritedTypeList(
 			attachedTo: declaration
 		)
 		let resourceAttributes = declaration.definedVariables.filter(\.hasResourceAttributeMacro)
@@ -70,27 +72,27 @@ extension ExtensionDeclSyntax {
 		}
 
 		let members = try MemberBlockItemListSyntax {
-			try StructDeclSyntax.makeFieldSet(
+			try StructDeclSyntax.makeDefinition(
 				modifiers: modifiers,
 				inheritedTypeList: inheritedTypeList,
 				resourceAttributes: resourceAttributes,
 				resourceRelationships: resourceRelationships,
 				resourceType: resourceType
 			)
-			try StructDeclSyntax.makeUpdateFieldSet(
+			try StructDeclSyntax.makeBodyDefinition(
 				modifiers: modifiers,
 				inheritedTypeList: inheritedTypeList,
 				resourceAttributes: resourceAttributes,
 				resourceRelationships: resourceRelationships
 			)
-			DeclSyntax("\(modifiers)typealias Wrapped = JSONAPI.Resource<\(identifier.type), FieldSet>")
-			DeclSyntax("\(modifiers)typealias Update = JSONAPI.ResourceUpdate<\(identifier.type), UpdateFieldSet>")
+			DeclSyntax("\(modifiers)typealias Wrapped = JSONAPI.Resource<\(identifier.type), Definition>")
+			DeclSyntax("\(modifiers)typealias Body = JSONAPI.ResourceBody<\(identifier.type), BodyDefinition>")
 		}
 
 		return try ExtensionDeclSyntax(
 			"""
 			\(declaration.attributes.availability)
-			extension \(type)\(MemberBlockSyntax(members: members))
+			extension \(type): JSONAPI.ResourceDefinitionProviding\(MemberBlockSyntax(members: members))
 			"""
 		)
 	}
@@ -99,19 +101,37 @@ extension ExtensionDeclSyntax {
 		attachedTo declaration: some DeclGroupSyntax,
 		providingExtensionsOf type: some TypeSyntaxProtocol
 	) throws -> ExtensionDeclSyntax {
+		try ExtensionDeclSyntax(
+			"\(declaration.attributes.availability)\nextension \(type): JSONAPI.ResourceIdentifiable {}"
+		)
+	}
+
+	fileprivate static func makeResourceLinkageProvidingExtension(
+		attachedTo declaration: some DeclGroupSyntax,
+		providingExtensionsOf type: some TypeSyntaxProtocol
+	) throws -> ExtensionDeclSyntax {
 		let modifiers = DeclModifierListSyntax {
 			if let publicModifier = declaration.publicModifier {
 				publicModifier
 			}
 		}
+
+		guard let identifier = declaration.definedVariables.first(where: \.isIdentifier) else {
+			throw DiagnosticsError(
+				syntax: declaration,
+				message: "'@ResourceWrapper' requires a valid 'id' property.",
+				id: .missingResourceType
+			)
+		}
+
 		let members = MemberBlockItemListSyntax {
-			DeclSyntax("\(modifiers)var type: String { FieldSet.resourceType }")
+			DeclSyntax("\(modifiers)typealias ID = \(identifier.type)")
 		}
 
 		return try ExtensionDeclSyntax(
 			"""
 			\(declaration.attributes.availability)
-			extension \(type): JSONAPI.ResourceIdentifiable\(MemberBlockSyntax(members: members))
+			extension \(type): JSONAPI.ResourceLinkageProviding\(MemberBlockSyntax(members: members))
 			"""
 		)
 	}
@@ -173,17 +193,89 @@ extension ExtensionDeclSyntax {
 	}
 }
 
+extension ExtensionDeclSyntax {
+	fileprivate static func makeBodyExtension(
+		attachedTo declaration: some DeclGroupSyntax,
+		providingExtensionsOf type: some TypeSyntaxProtocol
+	) throws -> ExtensionDeclSyntax {
+		let modifiers = DeclModifierListSyntax {
+			if let publicModifier = declaration.publicModifier {
+				publicModifier
+			}
+		}
+		guard let identifier = declaration.definedVariables.first(where: \.isIdentifier) else {
+			throw DiagnosticsError(
+				syntax: declaration,
+				message: "'@ResourceWrapper' requires a valid 'id' property.",
+				id: .missingResourceType
+			)
+		}
+		let resourceAttributes = declaration.definedVariables.filter(\.hasResourceAttributeMacro)
+		let resourceRelationships = declaration.definedVariables.filter(\.hasResourceRelationshipMacro)
+
+		let parameterList = FunctionParameterListSyntax {
+			for resourceAttribute in resourceAttributes {
+				FunctionParameterSyntax(
+					"\(resourceAttribute.identifier): \(resourceAttribute.type?.optionalType) = nil"
+				)
+			}
+			for resourceRelationship in resourceRelationships {
+				FunctionParameterSyntax(
+					"\(resourceRelationship.identifier): \(resourceRelationship.relationshipType) = nil"
+				)
+			}
+		}
+		let createParameterList = FunctionParameterListSyntax {
+			FunctionParameterSyntax("id: \(identifier.type?.optionalType) = nil")
+			parameterList
+		}
+		let updateParameterList = FunctionParameterListSyntax {
+			FunctionParameterSyntax("id: \(identifier.type)")
+			parameterList
+		}
+		let makeBody = CodeBlockItemListSyntax {
+			if !resourceAttributes.isEmpty {
+				StmtSyntax(
+					"let attributes = \(FunctionCallExprSyntax.makeBodyAttributes(resourceAttributes))"
+				)
+			}
+
+			if !resourceRelationships.isEmpty {
+				StmtSyntax(
+					"let relationships = \(FunctionCallExprSyntax.makeBodyRelationships(resourceRelationships))"
+				)
+			}
+
+			StmtSyntax("return \(FunctionCallExprSyntax.makeBody(resourceAttributes, resourceRelationships))")
+		}
+
+		let members = try MemberBlockItemListSyntax {
+			try FunctionDeclSyntax("\(modifiers)static func createBody(\(createParameterList)) -> \(type).Body") {
+				makeBody
+			}
+
+			try FunctionDeclSyntax("\(modifiers)static func updateBody(\(updateParameterList)) -> \(type).Body") {
+				makeBody
+			}
+		}
+
+		return try ExtensionDeclSyntax(
+			"\(declaration.attributes.availability)\nextension \(type)\(MemberBlockSyntax(members: members))"
+		)
+	}
+}
+
 extension StructDeclSyntax {
-	fileprivate static func makeFieldSet(
+	fileprivate static func makeDefinition(
 		modifiers: DeclModifierListSyntax,
 		inheritedTypeList: InheritedTypeListSyntax,
 		resourceAttributes: [VariableDeclSyntax],
 		resourceRelationships: [VariableDeclSyntax],
 		resourceType: String
 	) throws -> StructDeclSyntax {
-		try StructDeclSyntax("\(modifiers)struct FieldSet: JSONAPI.ResourceFieldSet") {
+		try StructDeclSyntax("\(modifiers)struct Definition: JSONAPI.ResourceDefinition") {
 			if !resourceAttributes.isEmpty {
-				try StructDeclSyntax.makeFieldSetAttributes(
+				try StructDeclSyntax.makeDefinitionAttributes(
 					arrayAttributes: AttributeListSyntax {
 						AttributeSyntax("@DefaultEmpty")
 					},
@@ -193,7 +285,7 @@ extension StructDeclSyntax {
 				)
 			}
 			if !resourceRelationships.isEmpty {
-				try StructDeclSyntax.makeFieldSetRelationships(
+				try StructDeclSyntax.makeDefinitionRelationships(
 					modifiers: modifiers,
 					inheritedTypeList: inheritedTypeList,
 					resourceRelationships: resourceRelationships
@@ -203,15 +295,15 @@ extension StructDeclSyntax {
 		}
 	}
 
-	fileprivate static func makeUpdateFieldSet(
+	fileprivate static func makeBodyDefinition(
 		modifiers: DeclModifierListSyntax,
 		inheritedTypeList: InheritedTypeListSyntax,
 		resourceAttributes: [VariableDeclSyntax],
 		resourceRelationships: [VariableDeclSyntax]
 	) throws -> StructDeclSyntax {
-		try StructDeclSyntax("\(modifiers)struct UpdateFieldSet: JSONAPI.ResourceFieldSet") {
+		try StructDeclSyntax("\(modifiers)struct BodyDefinition: JSONAPI.ResourceDefinition") {
 			if !resourceAttributes.isEmpty {
-				try StructDeclSyntax.makeFieldSetAttributes(
+				try StructDeclSyntax.makeDefinitionAttributes(
 					modifiers: modifiers,
 					inheritedTypeList: inheritedTypeList,
 					resourceAttributes: resourceAttributes,
@@ -219,18 +311,18 @@ extension StructDeclSyntax {
 				)
 			}
 			if !resourceRelationships.isEmpty {
-				try StructDeclSyntax.makeFieldSetRelationships(
+				try StructDeclSyntax.makeDefinitionRelationships(
 					modifiers: modifiers,
 					inheritedTypeList: inheritedTypeList,
 					resourceRelationships: resourceRelationships,
-					typeKeyPath: \.resourceLinkageType
+					typeKeyPath: \.relationshipType
 				)
 			}
-			DeclSyntax("\(modifiers)static let resourceType = FieldSet.resourceType")
+			DeclSyntax("\(modifiers)static let resourceType = Definition.resourceType")
 		}
 	}
 
-	fileprivate static func makeFieldSetAttributes(
+	fileprivate static func makeDefinitionAttributes(
 		arrayAttributes: AttributeListSyntax = [],
 		modifiers: DeclModifierListSyntax,
 		inheritedTypeList: InheritedTypeListSyntax,
@@ -262,11 +354,11 @@ extension StructDeclSyntax {
 		}
 	}
 
-	fileprivate static func makeFieldSetRelationships(
+	fileprivate static func makeDefinitionRelationships(
 		modifiers: DeclModifierListSyntax,
 		inheritedTypeList: InheritedTypeListSyntax,
 		resourceRelationships: [VariableDeclSyntax],
-		typeKeyPath: KeyPath<VariableDeclSyntax, TypeSyntax?> = \.relationshipType
+		typeKeyPath: KeyPath<VariableDeclSyntax, TypeSyntax?> = \.inlineRelationshipType
 	) throws -> StructDeclSyntax {
 		try StructDeclSyntax("\(modifiers)struct Relationships:\(inheritedTypeList)") {
 			if resourceRelationships.containsResourceRelationshipKeys {
@@ -337,6 +429,49 @@ extension FunctionCallExprSyntax {
 			}
 		}
 	}
+
+	fileprivate static func makeBodyAttributes(
+		_ resourceAttributes: [VariableDeclSyntax]
+	) -> FunctionCallExprSyntax {
+		FunctionCallExprSyntax(callee: ExprSyntax("Body.Attributes")) {
+			for resourceAttribute in resourceAttributes {
+				LabeledExprSyntax(
+					label: resourceAttribute.identifier,
+					colon: .colonToken(trailingTrivia: .space),
+					expression: ExprSyntax("\(resourceAttribute.identifier)")
+				)
+			}
+		}
+	}
+
+	fileprivate static func makeBodyRelationships(
+		_ resourceRelationships: [VariableDeclSyntax]
+	) -> FunctionCallExprSyntax {
+		FunctionCallExprSyntax(callee: ExprSyntax("Body.Relationships")) {
+			for resourceRelationship in resourceRelationships {
+				LabeledExprSyntax(
+					label: resourceRelationship.identifier,
+					colon: .colonToken(trailingTrivia: .space),
+					expression: ExprSyntax("\(resourceRelationship.identifier)")
+				)
+			}
+		}
+	}
+
+	fileprivate static func makeBody(
+		_ resourceAttributes: [VariableDeclSyntax],
+		_ resourceRelationships: [VariableDeclSyntax]
+	) -> FunctionCallExprSyntax {
+		FunctionCallExprSyntax(callee: ExprSyntax("Body")) {
+			LabeledExprSyntax(label: "id", expression: ExprSyntax("id"))
+			if !resourceAttributes.isEmpty {
+				LabeledExprSyntax(label: "attributes", expression: ExprSyntax("attributes"))
+			}
+			if !resourceRelationships.isEmpty {
+				LabeledExprSyntax(label: "relationships", expression: ExprSyntax("relationships"))
+			}
+		}
+	}
 }
 
 extension DeclSyntax {
@@ -373,7 +508,7 @@ extension DeclSyntax {
 }
 
 extension InheritedTypeListSyntax {
-	fileprivate static func makeFieldSetAssociatedTypesInheritedTypeList(
+	fileprivate static func makeDefinitionAssociatedTypesInheritedTypeList(
 		attachedTo declaration: some DeclGroupSyntax
 	) -> InheritedTypeListSyntax {
 		let inheritedTypes = [
@@ -419,16 +554,16 @@ extension VariableDeclSyntax {
 		self.attribute(named: "ResourceRelationship")?.firstArgumentStringLiteralSegment
 	}
 
-	fileprivate var relationshipType: TypeSyntax? {
+	fileprivate var inlineRelationshipType: TypeSyntax? {
 		guard let resourceType = self.isOptional ? self.optionalWrappedType : self.type else {
 			return nil
 		}
 		if self.isOptional, !resourceType.isArray {
-			return TypeSyntax("JSONAPI.RelationshipOptional<\(resourceType)>")
+			return TypeSyntax("JSONAPI.InlineRelationshipOptional<\(resourceType)>")
 		} else if resourceType.isArray {
-			return TypeSyntax("JSONAPI.RelationshipMany<\(resourceType.arrayElementType)>")
+			return TypeSyntax("JSONAPI.InlineRelationshipMany<\(resourceType.arrayElementType)>")
 		} else {
-			return TypeSyntax("JSONAPI.RelationshipOne<\(resourceType)>")
+			return TypeSyntax("JSONAPI.InlineRelationshipOne<\(resourceType)>")
 		}
 	}
 
@@ -439,14 +574,14 @@ extension VariableDeclSyntax {
 		return resourceType.isArray ? "resources" : "resource"
 	}
 
-	fileprivate var resourceLinkageType: TypeSyntax? {
+	fileprivate var relationshipType: TypeSyntax? {
 		guard let resourceType = self.isOptional ? self.optionalWrappedType : self.type else {
 			return nil
 		}
 		if resourceType.isArray {
-			return TypeSyntax("JSONAPI.ResourceLinkageMany").optionalType
+			return TypeSyntax("JSONAPI.RelationshipMany<\(resourceType.arrayElementType)>").optionalType
 		} else {
-			return TypeSyntax("JSONAPI.ResourceLinkageOne").optionalType
+			return TypeSyntax("JSONAPI.RelationshipOne<\(resourceType)>").optionalType
 		}
 	}
 }

@@ -3,123 +3,83 @@ import SnapshotTesting
 import XCTest
 
 final class ResourceUnionTests: XCTestCase {
-	@ResourceWrapper(type: "images")
-	fileprivate struct Image: Equatable {
+	@ResourceWrapper(type: "people")
+	fileprivate struct Person: Equatable {
 		var id: String
 
-		@ResourceAttribute
-		var url: URL
-
-		@ResourceAttribute
-		var width: Int
-
-		@ResourceAttribute
-		var height: Int
+		@ResourceAttribute var firstName: String
+		@ResourceAttribute var lastName: String
+		@ResourceAttribute var twitter: String?
 	}
 
-	@ResourceWrapper(type: "audios")
-	fileprivate struct Audio: Equatable {
-		var id: String
+	@ResourceWrapper(type: "organizations")
+	fileprivate struct Organization: Equatable {
+		var id: UUID
 
-		@ResourceAttribute
-		var url: URL
-
-		@ResourceAttribute
-		var title: String
+		@ResourceAttribute var name: String
+		@ResourceAttribute var contactEmail: String
 	}
 
 	@ResourceUnion
-	fileprivate enum Attachment: Equatable {
-		case image(ResourceUnionTests.Image)
-		case audio(ResourceUnionTests.Audio)
+	fileprivate enum Contributor: Equatable {
+		case person(ResourceUnionTests.Person)
+		case organization(ResourceUnionTests.Organization)
 	}
 
-	@ResourceWrapper(type: "single_attachment_messages")
-	fileprivate struct SingleAttachmentMessage: Equatable {
+	@ResourceWrapper(type: "articles")
+	fileprivate struct Article: Equatable {
 		var id: String
 
-		@ResourceAttribute
-		var text: String
+		@ResourceAttribute var title: String
 
-		@ResourceRelationship
-		var attachment: ResourceUnionTests.Attachment?
-	}
-
-	@ResourceWrapper(type: "messages")
-	fileprivate struct Message: Equatable {
-		var id: String
-
-		@ResourceAttribute
-		var text: String
-
-		@ResourceRelationship
-		var attachments: [ResourceUnionTests.Attachment]
+		@ResourceRelationship var author: ResourceUnionTests.Person
+		@ResourceRelationship var contributors: [ResourceUnionTests.Contributor]
+		@ResourceRelationship var reviewer: ResourceUnionTests.Contributor?
 	}
 
 	private enum Fixtures {
-		static let singleAttachmentMessage = SingleAttachmentMessage(
+		static let article = Article(
 			id: "1",
-			text: "Look what I just found!",
-			attachment: .image(
-				Image(
-					id: "42",
-					url: URL(string: "https://via.placeholder.com/640x480")!,
-					width: 640,
-					height: 480
+			title: "A guide to parsing JSON:API with Swift",
+			author: Person(
+				id: "9",
+				firstName: "John",
+				lastName: "Doe",
+				twitter: "johndoe"
+			),
+			contributors: [
+				.person(Person(id: "12", firstName: "Jane", lastName: "Smith")),
+				.organization(
+					Organization(
+						id: UUID(uuidString: "00000000-0000-0000-0000-000000000001")!,
+						name: "Swift Enthusiasts",
+						contactEmail: "contact@swiftenthusiasts.org"
+					)
+				),
+			],
+			reviewer: .organization(
+				Organization(
+					id: UUID(uuidString: "00000000-0000-0000-0000-000000000001")!,
+					name: "Swift Enthusiasts",
+					contactEmail: "contact@swiftenthusiasts.org"
 				)
 			)
 		)
-		static let message = Message(
-			id: "1",
-			text: "Look what I just found!",
-			attachments: [
-				.image(
-					Image(
-						id: "42",
-						url: URL(string: "https://via.placeholder.com/640x480")!,
-						width: 640,
-						height: 480
-					)
-				),
-				.audio(
-					Audio(
-						id: "66",
-						url: URL(string: "https://audio.com/NeverGonnaGiveYouUp.mp3")!,
-						title: "Never Gonna Give You Up"
-					)
-				),
-			]
-		)
 	}
 
-	func testDecodePolymorphicRelationshipOne() throws {
+	func testDecodePolymorphicRelationship() throws {
 		// given
 		let json = try XCTUnwrap(
-			Bundle.module.url(forResource: "Fixtures/PolymorphicRelationshipOne", withExtension: "json").map {
+			Bundle.module.url(forResource: "Fixtures/ArticlePolymorphic", withExtension: "json").map {
 				try Data(contentsOf: $0)
 			}
 		)
 
 		// when
-		let message = try JSONAPIDecoder().decode(SingleAttachmentMessage.self, from: json)
+		let article = try JSONAPIDecoder().decode(Article.self, from: json)
 
 		// then
-		XCTAssertEqual(message, Fixtures.singleAttachmentMessage)
-	}
-
-	func testDecodePolymorphicRelationshipMany() throws {
-		// given
-		let json = try XCTUnwrap(
-			Bundle.module.url(forResource: "Fixtures/PolymorphicRelationshipMany", withExtension: "json").map {
-				try Data(contentsOf: $0)
-			}
-		)
-
-		// when
-		let message = try JSONAPIDecoder().decode(Message.self, from: json)
-
-		// then
-		XCTAssertEqual(message, Fixtures.message)
+		XCTAssertEqual(article, Fixtures.article)
 	}
 
 	func testDecodeUnhandledResourceType() throws {
@@ -132,12 +92,12 @@ final class ResourceUnionTests: XCTestCase {
 
 		do {
 			// when
-			_ = try JSONAPIDecoder().decode(SingleAttachmentMessage.self, from: json)
+			_ = try JSONAPIDecoder().decode(Article.self, from: json)
 			XCTFail("Should throw JSONAPIDecodingError.unhandledResourceType.")
 		} catch let JSONAPIDecodingError.unhandledResourceType(unionType, resourceType) {
 			// then
-			XCTAssertEqual(String(describing: unionType), String(describing: Attachment.self))
-			XCTAssertEqual(resourceType, "videos")
+			XCTAssertEqual(String(describing: unionType), String(describing: Contributor.self))
+			XCTAssertEqual(resourceType, "teams")
 		} catch {
 			XCTFail("Expected JSONAPIDecodingError.unhandledResourceType but got \(error).")
 		}
@@ -155,10 +115,10 @@ final class ResourceUnionTests: XCTestCase {
 		decoder.ignoresUnhandledResourceTypes = true
 
 		// when
-		let message = try decoder.decode(SingleAttachmentMessage.self, from: json)
+		let article = try decoder.decode(Article.self, from: json)
 
 		// then
-		XCTAssertEqual(SingleAttachmentMessage(id: "1", text: "Look what I just found!"), message)
+		XCTAssertNil(article.reviewer)
 	}
 
 	func testDecodeIgnoresUnhandledResourceTypeMany() throws {
@@ -174,32 +134,30 @@ final class ResourceUnionTests: XCTestCase {
 		decoder.ignoresUnhandledResourceTypes = true
 
 		// when
-		let message = try decoder.decode(Message.self, from: json)
+		let article = try decoder.decode(Article.self, from: json)
 
 		// then
-		XCTAssertEqual(
-			Message(
-				id: "1",
-				text: "Look what I just found!",
-				attachments: [
-					.audio(
-						Audio(
-							id: "66",
-							url: URL(string: "https://audio.com/NeverGonnaGiveYouUp.mp3")!,
-							title: "Never Gonna Give You Up"
-						)
-					)
-				]
-			),
-			message
+		XCTAssertEqual(article, Fixtures.article)
+	}
+
+	func testEncodePolymorphicRelationship() {
+		assertSnapshot(of: Fixtures.article, as: .jsonAPI())
+	}
+
+	func testEncodeBody() {
+		// given
+		let articleBody = Article.createBody(
+			title: "A guide to parsing JSON:API with Swift",
+			contributors: [
+				.person("12"),
+				.organization(UUID(uuidString: "00000000-0000-0000-0000-000000000001")!),
+			],
+			reviewer: RelationshipOne(
+				id: .organization(UUID(uuidString: "00000000-0000-0000-0000-000000000001")!)
+			)
 		)
-	}
 
-	func testEncodePolymorphicRelationshipOne() {
-		assertSnapshot(of: Fixtures.singleAttachmentMessage, as: .jsonAPI())
-	}
-
-	func testEncodePolymorphicRelationshipMany() {
-		assertSnapshot(of: Fixtures.message, as: .jsonAPI())
+		// then
+		assertSnapshot(of: articleBody, as: .json)
 	}
 }
