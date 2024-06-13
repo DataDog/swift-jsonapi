@@ -1,7 +1,12 @@
 import Foundation
 
+/// A JSON:API optional to-one relationship that includes the related resource.
+///
+/// Use `InlineRelationshipOptional` when providing a ``ResourceDefinition`` to define an optional to-one relationship
+/// that embeds the related resource in the JSON:API document `included` section.
 @dynamicMemberLookup
 public struct InlineRelationshipOptional<Destination> {
+	/// The related resource.
 	public var resource: Destination?
 
 	public init(_ resource: Destination?) {

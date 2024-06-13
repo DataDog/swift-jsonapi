@@ -1,6 +1,11 @@
 import Foundation
 
+/// A JSON:API to-many relationship that includes the related resources.
+///
+/// Use `InlineRelationshipMany` when providing a ``ResourceDefinition`` to define a to-many relationship that embeds
+/// the related resources in the JSON:API document `included` section.
 public struct InlineRelationshipMany<Destination> {
+	/// The related resources.
 	public var resources: [Destination]
 
 	public init(_ resources: [Destination]) {
