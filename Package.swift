@@ -4,7 +4,7 @@ import CompilerPluginSupport
 import PackageDescription
 
 let package = Package(
-	name: "swift-json-api",
+	name: "swift-jsonapi",
 	platforms: [
 		.macOS(.v10_15),
 		.iOS(.v13),
