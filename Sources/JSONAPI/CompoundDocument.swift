@@ -1,11 +1,61 @@
 import Foundation
 
+/// A JSON:API document that includes related resources along with the requested primary resources.
+///
+/// Some JSON:API responses may include top-level meta information to provide additional details that don't fit into the primary data,
+/// such as request identifiers or pagination metadata.
+///
+/// ```json
+/// {
+///   "meta": {
+///     "requestId": "abcd-1234",
+///     "pagination": {
+///       "totalPages": 10,
+///       "currentPage": 2
+///     },
+///   },
+///   "data": [
+///     {
+///       "type": "articles",
+///       "id": "1",
+///       ...
+///     },
+///     ...
+///   ]
+/// }
+/// ```
+///
+/// You can use a `CompoundDocument` to access the top-level meta information by providing a suitable `Codable` model for the
+/// `meta` property.
+///
+/// ```swift
+/// struct Meta: Equatable, Codable {
+///   struct Pagination: Equatable, Codable {
+///     let totalPages: Int
+///     let currentPage: Int
+///   }
+///
+///   let requestId: String
+///   let pagination: Pagination
+/// }
+///
+/// typealias ArticlesDocument = CompoundDocument<[Article], Meta>
+///
+/// let decoder = JSONAPIDecoder()
+/// let document = try decoder.decode(ArticlesDocument.self, from: json)
+///
+/// let currentPage = document.meta.pagination.currentPage
+/// let articles = document.data
+/// ```
 public struct CompoundDocument<PrimaryData, Meta> {
 	private enum CodingKeys: String, CodingKey {
 		case data, meta, included
 	}
 
+	/// The document's primary data.
 	public var data: PrimaryData
+
+	/// A meta value that contains non-standard meta-information.
 	public var meta: Meta
 
 	public init(data: PrimaryData, meta: Meta) {
