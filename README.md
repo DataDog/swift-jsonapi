@@ -92,7 +92,10 @@ The `@ResourceWrapper` macro generates convenience methods to build the body of 
 Here is an example showing how to obtain the body for a request to create a new article:
 
 ```swift
-let newArticle = Article.createBody(title: "A guide to parsing JSON:API with Swift", author: "9")
+let newArticle = Article.createBody(
+  title: "A guide to parsing JSON:API with Swift",
+  author: "9"
+)
 
 // You can use a regular `JSONEncoder` to encode the request body
 let encoder = JSONEncoder()
