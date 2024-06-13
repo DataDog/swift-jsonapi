@@ -1,5 +1,9 @@
 import Foundation
 
+/// A property wrapper that decodes a `nil` value into an empty instance.
+///
+/// Use the `DefaultEmpty` property wrapper on `RangeReplaceableCollection` properties to decode `nil` values into
+/// empty collections instead of using an optional type.
 @propertyWrapper
 public struct DefaultEmpty<T> where T: RangeReplaceableCollection {
 	public var wrappedValue: T
