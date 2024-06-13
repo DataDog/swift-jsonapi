@@ -90,7 +90,7 @@ public macro ResourceAttribute(key: String? = nil) =
 /// The property type must be either a ``Resource``, another type annotated with the `@ResourceWrapper` macro,
 /// an optional resource, or an array of resources.
 ///
-/// At build time, the ``@ResourceWrapper`` macro generates a ``ResourceDefinition`` implementation, mapping the properties
+/// At build time, the ``ResourceWrapper(type:)`` macro generates a ``ResourceDefinition`` implementation, mapping the properties
 /// annotated with the `@ResourceRelationship` macro as follows:
 ///
 /// - Single resource properties are mapped to ``InlineRelationshipOne`` properties.
