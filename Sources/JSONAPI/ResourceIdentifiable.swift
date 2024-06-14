@@ -1,5 +1,6 @@
 import Foundation
 
+/// A type that can be identified as a JSON:API resource.
 public protocol ResourceIdentifiable {
 	associatedtype ID: Hashable & CustomStringConvertible
 
