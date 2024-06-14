@@ -1,5 +1,32 @@
 import Foundation
 
+/// A JSON:API resource payload for create or update requests.
+///
+/// When creating or updating a JSON:API resource, you are not required to provide an
+/// identifier, nor all attributes or relationships. The recommended approach for this use case
+/// is to create an alternative resource definition and use it with `ResourceBody`.
+///
+/// Here is an example of how you can create an alternative definition for creating and
+/// updating resources of type `"comments"`:
+///
+/// ```swift
+/// struct CommentBodyDefinition: ResourceDefinition {
+///   struct Attributes: Encodable {
+///     var body: String?
+///   }
+///
+///   struct Relationships: Encodable {
+///     var author: RelationshipOne<Person>?
+///   }
+///
+///   static let resourceType = "comments"
+/// }
+///
+/// typealias CommentBody = ResourceBody<String, CommentBodyDefinition>
+/// ```
+///
+/// Alternatively, consider using the ``ResourceWrapper(type:)`` macro, which generates convenient methods for building
+/// the body of create or update requests.
 public struct ResourceBody<ID, Definition>: Encodable
 where
 	ID: Hashable & Encodable,
