@@ -4,6 +4,49 @@ public enum ResourceCodingKeys: String, CodingKey {
 	case type, id, attributes, relationships
 }
 
+/// A JSON:API resource.
+///
+/// To define a JSON:API resource, you need to provide its type, attributes, and relationships by creating a type that conforms
+/// to the ``ResourceDefinition`` protocol.
+///
+/// The resource attributes may contain any `Codable` property, including complex types involving dictionaries and arrays.
+///
+/// For resource relationships, use the ``InlineRelationshipOne``, ``InlineRelationshipMany``, or
+/// ``InlineRelationshipOptional`` types. These types offer direct access to related resources within the
+/// `included` section of a JSON:API document.
+///
+/// Here is an example of how you can define two related JSON:API resources:
+///
+/// ```swift
+/// struct PersonDefinition: ResourceDefinition {
+///   struct Attributes: Equatable, Codable {
+///     var firstName: String
+///     var lastName: String
+///     var twitter: String?
+///   }
+///
+///   static let resourceType = "people"
+/// }
+///
+/// typealias Person = Resource<String, PersonDefinition>
+///
+/// struct CommentDefinition: ResourceDefinition {
+///   struct Attributes: Equatable, Codable {
+///     var body: String
+///   }
+///
+///   struct Relationships: Equatable, Codable {
+///     var author: RelationshipOptional<Person>
+///   }
+///
+///   static let resourceType = "comments"
+/// }
+///
+/// typealias Comment = Resource<String, CommentDefinition>
+/// ```
+///
+/// Alternatively, you can use the ``ResourceWrapper(type:)`` macro to eliminate the boilerplate required to define
+/// a JSON:API resource.
 @dynamicMemberLookup
 public struct Resource<ID, Definition>: ResourceDefinitionProviding, ResourceIdentifiable, ResourceLinkageProviding
 where

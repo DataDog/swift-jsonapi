@@ -1,11 +1,66 @@
 import Foundation
 
+/// An object that decodes JSON:API documents.
+///
+/// The example below demonstrates how to decode an array of `Article` values from a
+/// [JSON:API](https://jsonapi.org) document. The types involved use the
+/// ``ResourceWrapper(type:)`` macro to enable JSON:API decoding.
+///
+/// ```swift
+/// @ResourceWrapper(type: "people")
+/// struct Person: Equatable {
+///   var id: String
+///
+///   @ResourceAttribute var firstName: String
+///   @ResourceAttribute var lastName: String
+///   @ResourceAttribute var twitter: String?
+/// }
+///
+/// @ResourceWrapper(type: "comments")
+/// struct Comment: Equatable {
+///   var id: String
+///
+///   @ResourceAttribute var body: String
+///   @ResourceRelationship var author: Person?
+/// }
+///
+/// @ResourceWrapper(type: "articles")
+/// struct Article: Equatable {
+///   var id: String
+///
+///   @ResourceAttribute var title: String
+///   @ResourceRelationship var author: Person
+///   @ResourceRelationship var comments: [Comment]
+/// }
+///
+/// let json = """
+/// {
+///   "data": [
+///     {
+///       "type": "articles",
+///       "id": "1",
+///       ...
+///     },
+///     ...
+///   ]
+/// }
+/// """.data(using: .utf8)!
+///
+/// let decoder = JSONAPIDecoder()
+/// let articles = try decoder.decode([Article].self, from: json)
+/// ```
 public class JSONAPIDecoder: JSONDecoder {
+	/// Indicates whether the decoder should ignore missing included resources when decoding a to-many relationship.
+	///
+	/// The default value of this property is `false`.
 	public var ignoresMissingResources: Bool {
 		get { userInfo.ignoresMissingResources }
 		set { userInfo.ignoresMissingResources = newValue }
 	}
 
+	/// Indicates whether the decoder should ignore unknown resource types when decoding polymorphic relationships.
+	///
+	/// The default value of this property is `false`.
 	public var ignoresUnhandledResourceTypes: Bool {
 		get { userInfo.ignoresUnhandledResourceTypes }
 		set { userInfo.ignoresUnhandledResourceTypes = newValue }

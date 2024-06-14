@@ -1,5 +1,6 @@
 import Foundation
 
+/// A type that provides resource linkage for an identifier type.
 public protocol ResourceLinkageProviding {
 	associatedtype ID
 

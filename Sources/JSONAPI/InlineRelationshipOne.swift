@@ -1,7 +1,12 @@
 import Foundation
 
+/// A JSON:API to-one relationship that includes the related resource.
+///
+/// Use `InlineRelationshipOne` when providing a ``ResourceDefinition`` to define a to-one relationship that embeds
+/// the related resource in the JSON:API document `included` section.
 @dynamicMemberLookup
 public struct InlineRelationshipOne<Destination> {
+	/// The related resource.
 	public var resource: Destination
 
 	public init(_ resource: Destination) {
