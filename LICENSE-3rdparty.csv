@@ -1,0 +1,5 @@
+Component,Origin,License,Copyright
+SwiftSyntax,"https://github.com/apple/swift-syntax",Apache-2.0,Copyright (c) 2014 - 2024 Apple Inc. and the Swift project authors
+Swift-DocC Plugin,"https://github.com/apple/swift-docc-plugin",Apache-2.0,Copyright (c) 2022 Apple Inc. and the Swift project authors
+Swift Macro Testing,"https://github.com/pointfreeco/swift-macro-testing",MIT,Copyright (c) 2023 Point-Free
+Swift Snapshot Testing,"https://github.com/pointfreeco/swift-snapshot-testing",MIT,"Copyright (c) 2019 Point-Free, Inc."
