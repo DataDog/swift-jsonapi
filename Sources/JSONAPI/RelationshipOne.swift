@@ -1,6 +1,38 @@
 import Foundation
 
+/// A JSON:API to-one relationship, tagged with the related resource type.
+///
+/// The `RelationshipOne` type provides a type-safe way to create a JSON:API to-one relationship.
+///
+/// ```swift
+/// @ResourceWrapper(type: "people")
+/// struct Person: Equatable {
+///   var id: String
+///
+///   @ResourceAttribute var firstName: String
+///   @ResourceAttribute var lastName: String
+///   @ResourceAttribute var twitter: String?
+/// }
+///
+/// let author: RelationshipOne<Person> = "9"
+///
+/// let encoder = JSONEncoder()
+/// encoder.outputFormatting = .prettyPrinted
+///
+/// let data = try encoder.encode(author)
+/// print(String(data: data, encoding: .utf8)!)
+///
+/// /* Prints:
+/// {
+///   "data": {
+///     "id": "9",
+///     "type": "people"
+///   }
+/// }
+/// */
+/// ```
 public struct RelationshipOne<Destination: ResourceLinkageProviding>: Equatable, Codable {
+	/// A `null` to-one relationship.
 	public static var null: RelationshipOne {
 		RelationshipOne(data: nil)
 	}

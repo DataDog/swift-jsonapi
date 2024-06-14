@@ -1,7 +1,7 @@
 import Foundation
 
 /// An object that decodes JSON:API documents.
-/// 
+///
 /// The example below demonstrates how to decode an array of `Article` values from a
 /// [JSON:API](https://jsonapi.org) document. The types involved use the
 /// ``ResourceWrapper(type:)`` macro to enable JSON:API decoding.
