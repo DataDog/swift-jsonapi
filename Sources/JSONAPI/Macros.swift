@@ -1,3 +1,9 @@
+// Unless explicitly stated otherwise all files in this repository are licensed under
+// the MIT License.
+//
+// This product includes software developed at Datadog (https://www.datadoghq.com/).
+// Copyright 2024-Present Datadog, Inc.
+
 /// Transforms a Swift struct into a JSON:API resource that can be encoded or decoded from a JSON:API response.
 ///
 /// Annotate your models with the `@ResourceWrapper` macro to enable JSON:API encoding and decoding. At build time,
