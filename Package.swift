@@ -19,8 +19,8 @@ let package = Package(
 		)
 	],
 	dependencies: [
-		.package(url: "https://github.com/apple/swift-syntax", "509.0.0"..<"511.0.0"),
-		.package(url: "https://github.com/pointfreeco/swift-macro-testing", from: "0.2.0"),
+		.package(url: "https://github.com/swiftlang/swift-syntax", "509.0.0"..<"511.0.0"),
+		.package(url: "https://github.com/pointfreeco/swift-macro-testing", from: "0.5.2"),
 		.package(url: "https://github.com/pointfreeco/swift-snapshot-testing", from: "1.15.0"),
 		.package(url: "https://github.com/apple/swift-docc-plugin", from: "1.0.0"),
 	],
