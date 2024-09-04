@@ -284,6 +284,7 @@ extension StructDeclSyntax {
 				try StructDeclSyntax.makeDefinitionAttributes(
 					arrayAttributes: AttributeListSyntax {
 						AttributeSyntax("@DefaultEmpty")
+							.with(\.trailingTrivia, .space)
 					},
 					modifiers: modifiers,
 					inheritedTypeList: inheritedTypeList,
