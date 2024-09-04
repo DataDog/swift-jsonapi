@@ -420,17 +420,15 @@ final class ResourceWrapperMacroTests: XCTestCase {
 			struct Schedule: Equatable {
 				var id: UUID
 
-				@ResourceAttribute
-				var name: String
-
-				@ResourceAttribute
-				var tags: [String]
+				@ResourceAttribute var name: String
+				@ResourceAttribute var tags: [String]
 			}
 			"""
 		} expansion: {
 			"""
 			struct Schedule: Equatable {
 				var id: UUID
+
 				var name: String
 				var tags: [String]
 			}
@@ -439,15 +437,13 @@ final class ResourceWrapperMacroTests: XCTestCase {
 				struct Definition: JSONAPI.ResourceDefinition {
 					struct Attributes: Equatable, Codable {
 						var name: String
-						@DefaultEmpty
-							var tags: [String]
+						@DefaultEmpty var tags: [String]
 					}
 					static let resourceType = "schedules"
 				}
 				struct BodyDefinition: JSONAPI.ResourceDefinition {
 					struct Attributes: Equatable, Codable {
 						var name: String?
-
 						var tags: [String]?
 					}
 					static let resourceType = Definition.resourceType
