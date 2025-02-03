@@ -53,7 +53,7 @@ extension InlineRelationshipMany: Decodable where Destination: Decodable {
 		let data = try container.decodeIfPresent([ResourceIdentifier].self, forKey: .data) ?? []
 
 		guard let resourceDecoder = decoder.resourceDecoder else {
-			fatalError("You must use a 'JSONAPIDecoder' instance to decode a JSON:API response.")
+			throw JSONAPIDecodingError.resourceDecoderNotFound
 		}
 
 		self.resources = try resourceDecoder.decode([Destination].self, identifiers: data)
@@ -68,7 +68,7 @@ extension InlineRelationshipMany: Encodable where Destination: Encodable & Resou
 		try container.encode(data, forKey: .data)
 
 		guard let resourceEncoder = encoder.resourceEncoder else {
-			fatalError("You must use a 'JSONAPIEncoder' instance to encode a JSON:API resource.")
+			throw JSONAPIEncodingError.resourceEncoderNotFound
 		}
 
 		resourceEncoder.encode(self.resources)
