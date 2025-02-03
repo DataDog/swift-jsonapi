@@ -13,4 +13,10 @@ public enum JSONAPIDecodingError: Error {
 	///
 	/// As associated values this case contains the union type and the unhandled resource type string.
 	case unhandledResourceType(any Any.Type, String)
+
+	/// Indicates that the decoder couldn't find the associated resource decoder.
+	///
+	/// This error typically happens when trying to decode a JSON:API response using a `JSONDecoder`
+	/// instead of a ``JSONAPIDecoder``.
+	case resourceDecoderNotFound
 }

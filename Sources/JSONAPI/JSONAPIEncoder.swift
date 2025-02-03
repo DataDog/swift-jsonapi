@@ -113,6 +113,8 @@ public class JSONAPIEncoder: JSONEncoder {
 	}
 }
 
+extension JSONAPIEncoder: @unchecked Sendable {}
+
 extension Encoder {
 	var resourceEncoder: ResourceEncoder? {
 		self.userInfo.resourceEncoder
