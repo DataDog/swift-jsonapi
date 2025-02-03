@@ -101,6 +101,8 @@ public class JSONAPIDecoder: JSONDecoder {
 	}
 }
 
+extension JSONAPIDecoder: @unchecked Sendable {}
+
 extension Decoder {
 	var resourceDecoder: ResourceDecoder? {
 		self.userInfo.resourceDecoderStorage?.resourceDecoder
