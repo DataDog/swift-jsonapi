@@ -44,6 +44,19 @@ extension InlineRelationshipMany: RandomAccessCollection {
 	}
 }
 
+extension InlineRelationshipMany: RangeReplaceableCollection {
+	public init() {
+		self.resources = []
+	}
+
+	public mutating func replaceSubrange<C>(
+		_ subrange: Range<Self.Index>,
+		with newElements: C
+	) where C: Collection, Self.Element == C.Element {
+		self.resources.replaceSubrange(subrange, with: Array(newElements))
+	}
+}
+
 extension InlineRelationshipMany: Equatable where Destination: Equatable {
 }
 

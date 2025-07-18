@@ -89,6 +89,8 @@ final class ResourceWrapperMacroTests: XCTestCase {
 				@ResourceAttribute var title: String
 				@ResourceRelationship var author: Person
 				@ResourceRelationship var comments: [Comment]
+				@ResourceRelationship var edition: Edition?
+				@ResourceRelationship var links: [Link]?
 			}
 			"""
 		} expansion: {
@@ -99,6 +101,8 @@ final class ResourceWrapperMacroTests: XCTestCase {
 				var title: String
 				var author: Person
 				var comments: [Comment]
+				var edition: Edition?
+				var links: [Link]?
 			}
 
 			extension Article: JSONAPI.ResourceDefinitionProviding {
@@ -109,6 +113,8 @@ final class ResourceWrapperMacroTests: XCTestCase {
 					struct Relationships: Codable {
 						var author: JSONAPI.InlineRelationshipOne<Person>
 						var comments: JSONAPI.InlineRelationshipMany<Comment>
+						var edition: JSONAPI.InlineRelationshipOptional<Edition>?
+						var links: JSONAPI.InlineRelationshipMany<Link>?
 					}
 					static let resourceType = "articles"
 				}
@@ -119,6 +125,8 @@ final class ResourceWrapperMacroTests: XCTestCase {
 					struct Relationships: Codable {
 						var author: JSONAPI.RelationshipOne<Person>?
 						var comments: JSONAPI.RelationshipMany<Comment>?
+						var edition: JSONAPI.RelationshipOne<Edition>?
+						var links: JSONAPI.RelationshipMany<Link>?
 					}
 					static let resourceType = Definition.resourceType
 				}
@@ -140,24 +148,26 @@ final class ResourceWrapperMacroTests: XCTestCase {
 					self.title = wrapped.title
 					self.author = wrapped.author.resource
 					self.comments = wrapped.comments.resources
+					self.edition = wrapped.edition?.resource
+					self.links = wrapped.links?.resources
 				}
 				func encode(to encoder: any Encoder) throws {
 					let attributes = Wrapped.Attributes(title: self.title)
-					let relationships = Wrapped.Relationships(author: .init(self.author), comments: .init(self.comments))
+					let relationships = Wrapped.Relationships(author: .init(self.author), comments: .init(self.comments), edition: .init(self.edition), links: .init(self.links))
 					let wrapped = Wrapped(id: self.id, attributes: attributes, relationships: relationships)
 					try wrapped.encode(to: encoder)
 				}
 			}
 
 			extension Article {
-				static func createBody(id: UUID? = nil, title: String? = nil, author: JSONAPI.RelationshipOne<Person>? = nil, comments: JSONAPI.RelationshipMany<Comment>? = nil) -> Article.Body {
+				static func createBody(id: UUID? = nil, title: String? = nil, author: JSONAPI.RelationshipOne<Person>? = nil, comments: JSONAPI.RelationshipMany<Comment>? = nil, edition: JSONAPI.RelationshipOne<Edition>? = nil, links: JSONAPI.RelationshipMany<Link>? = nil) -> Article.Body {
 					let attributes = Body.Attributes(title: title)
-					let relationships = Body.Relationships(author: author, comments: comments)
+					let relationships = Body.Relationships(author: author, comments: comments, edition: edition, links: links)
 					return Body(id: id, attributes: attributes, relationships: relationships)
 				}
-				static func updateBody(id: UUID, title: String? = nil, author: JSONAPI.RelationshipOne<Person>? = nil, comments: JSONAPI.RelationshipMany<Comment>? = nil) -> Article.Body {
+				static func updateBody(id: UUID, title: String? = nil, author: JSONAPI.RelationshipOne<Person>? = nil, comments: JSONAPI.RelationshipMany<Comment>? = nil, edition: JSONAPI.RelationshipOne<Edition>? = nil, links: JSONAPI.RelationshipMany<Link>? = nil) -> Article.Body {
 					let attributes = Body.Attributes(title: title)
-					let relationships = Body.Relationships(author: author, comments: comments)
+					let relationships = Body.Relationships(author: author, comments: comments, edition: edition, links: links)
 					return Body(id: id, attributes: attributes, relationships: relationships)
 				}
 			}
@@ -201,7 +211,7 @@ final class ResourceWrapperMacroTests: XCTestCase {
 						private enum CodingKeys: String, CodingKey {
 						    case related = "related_person"
 						}
-						var related: JSONAPI.InlineRelationshipOptional<Person>
+						var related: JSONAPI.InlineRelationshipOptional<Person>?
 					}
 					static let resourceType = "people"
 				}
@@ -239,7 +249,7 @@ final class ResourceWrapperMacroTests: XCTestCase {
 					self.id = wrapped.id
 					self.firstName = wrapped.firstName
 					self.lastName = wrapped.lastName
-					self.related = wrapped.related.resource
+					self.related = wrapped.related?.resource
 				}
 				func encode(to encoder: any Encoder) throws {
 					let attributes = Wrapped.Attributes(firstName: self.firstName, lastName: self.lastName)
@@ -294,7 +304,7 @@ final class ResourceWrapperMacroTests: XCTestCase {
 						var lastName: String
 					}
 					public struct Relationships: Equatable, Codable {
-						public var related: JSONAPI.InlineRelationshipOptional<Person>
+						public var related: JSONAPI.InlineRelationshipOptional<Person>?
 					}
 					public static let resourceType = "people"
 				}
@@ -325,7 +335,7 @@ final class ResourceWrapperMacroTests: XCTestCase {
 					self.id = wrapped.id
 					self.firstName = wrapped.firstName
 					self.lastName = wrapped.lastName
-					self.related = wrapped.related.resource
+					self.related = wrapped.related?.resource
 				}
 				public func encode(to encoder: any Encoder) throws {
 					let attributes = Wrapped.Attributes(firstName: self.firstName, lastName: self.lastName)
