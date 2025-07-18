@@ -168,6 +168,38 @@ final class ResourceTests: XCTestCase {
 		XCTAssertTrue(articles.first!.comments.isEmpty)
 	}
 
+	func testDecodeMissingRelationshipOne() throws {
+		// given
+		struct CommentDefinition: ResourceDefinition {
+			struct Attributes: Equatable, Codable {
+				var body: String
+			}
+
+			struct Relationships: Equatable, Codable {
+				var author: InlineRelationshipOne<Person>?
+			}
+
+			static let resourceType = "comments"
+		}
+
+		typealias Comment = Resource<String, CommentDefinition>
+
+		let json = try XCTUnwrap(
+			Bundle.module.url(forResource: "Fixtures/MissingRelationship", withExtension: "json").map {
+				try Data(contentsOf: $0)
+			}
+		)
+
+		let decoder = JSONAPIDecoder()
+		decoder.ignoresMissingResources = true
+
+		// when
+		let comment = try decoder.decode(Comment.self, from: json)
+
+		// then
+		XCTAssertNil(comment.author?.resource)
+	}
+
 	func testDecodeTypeMismatch() throws {
 		// given
 		let json = try XCTUnwrap(
