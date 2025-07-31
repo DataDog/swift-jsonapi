@@ -163,12 +163,21 @@ extension ExtensionDeclSyntax {
 						.with(\.trailingTrivia, .newline)
 				}
 				for resourceRelationship in resourceRelationships {
-					StmtSyntax(
-						"""
-						self.\(resourceRelationship.identifier) = \
-						wrapped.\(resourceRelationship.identifier).\(resourceRelationship.relationshipResource)
-						"""
-					).with(\.trailingTrivia, .newline)
+					if resourceRelationship.isOptional {
+						StmtSyntax(
+							"""
+							self.\(resourceRelationship.identifier) = \
+							wrapped.\(resourceRelationship.identifier)?.\(resourceRelationship.relationshipResource)
+							"""
+						).with(\.trailingTrivia, .newline)
+					} else {
+						StmtSyntax(
+							"""
+							self.\(resourceRelationship.identifier) = \
+							wrapped.\(resourceRelationship.identifier).\(resourceRelationship.relationshipResource)
+							"""
+						).with(\.trailingTrivia, .newline)
+					}
 				}
 			}
 
@@ -565,13 +574,17 @@ extension VariableDeclSyntax {
 		guard let resourceType = self.isOptional ? self.optionalWrappedType : self.type else {
 			return nil
 		}
-		if self.isOptional, !resourceType.isArray {
-			return TypeSyntax("JSONAPI.InlineRelationshipOptional<\(resourceType)>")
-		} else if resourceType.isArray {
-			return TypeSyntax("JSONAPI.InlineRelationshipMany<\(resourceType.arrayElementType)>")
-		} else {
-			return TypeSyntax("JSONAPI.InlineRelationshipOne<\(resourceType)>")
-		}
+		let inlineRelationshipType =
+			if self.isOptional, !resourceType.isArray {
+				TypeSyntax("JSONAPI.InlineRelationshipOptional<\(resourceType)>")
+			} else if resourceType.isArray {
+				TypeSyntax("JSONAPI.InlineRelationshipMany<\(resourceType.arrayElementType)>")
+			} else {
+				TypeSyntax("JSONAPI.InlineRelationshipOne<\(resourceType)>")
+			}
+
+		return self.isOptional
+			? TypeSyntax(OptionalTypeSyntax(wrappedType: inlineRelationshipType)) : inlineRelationshipType
 	}
 
 	fileprivate var relationshipResource: TokenSyntax? {

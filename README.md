@@ -84,6 +84,11 @@ let data = try encoder.encode(articles)
 > We advise against mutating relationships in a model annotated with `@ResourceWrapper` since maintaining consistency
 > across duplicated instances can be challenging.
 
+> **_NOTE:_** To provide greater flexibility, the library allows a field annotated with `@ResourceRelationship` and marked
+> as `Optional` to be omitted from the JSON:API response. While this behavior deviates from the JSON:API specification
+> —which recommends including relationship fields even when they are empty—it can be useful in cases where strict adherence
+> to the spec is either impractical or unnecessary.
+
 ## Creating and updating resources
 
 When sending a create or update request to a JSON:API backend, you are not required to provide all the attributes or

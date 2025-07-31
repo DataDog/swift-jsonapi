@@ -1,0 +1,10 @@
+{
+    "data": {
+        "type": "comments",
+        "id": "12",
+        "attributes": {
+            "body": "I like XML better"
+        },
+        "relationships": {}
+    }
+}
