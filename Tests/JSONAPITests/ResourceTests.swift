@@ -173,6 +173,7 @@ final class ResourceTests: XCTestCase {
 		struct CommentDefinition: ResourceDefinition {
 			struct Attributes: Equatable, Codable {
 				var body: String
+                var author: Person?
 			}
 
 			struct Relationships: Equatable, Codable {
@@ -185,7 +186,7 @@ final class ResourceTests: XCTestCase {
 		typealias Comment = Resource<String, CommentDefinition>
 
 		let json = try XCTUnwrap(
-			Bundle.module.url(forResource: "Fixtures/MissingRelationship", withExtension: "json").map {
+			Bundle.module.url(forResource: "Fixtures/MissingRelationshipLink", withExtension: "json").map {
 				try Data(contentsOf: $0)
 			}
 		)
