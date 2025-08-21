@@ -186,7 +186,7 @@ final class ResourceTests: XCTestCase {
 		typealias Comment = Resource<String, CommentDefinition>
 
 		let json = try XCTUnwrap(
-			Bundle.module.url(forResource: "Fixtures/MissingRelationshipLink", withExtension: "json").map {
+			Bundle.module.url(forResource: "Fixtures/MissingRelationship", withExtension: "json").map {
 				try Data(contentsOf: $0)
 			}
 		)
@@ -200,6 +200,39 @@ final class ResourceTests: XCTestCase {
 		// then
 		XCTAssertNil(comment.author?.resource)
 	}
+    
+    func testDecodeMissingRelationshipLink() throws {
+        // given
+        struct CommentDefinition: ResourceDefinition {
+            struct Attributes: Equatable, Codable {
+                var body: String
+            }
+
+            struct Relationships: Equatable, Codable {
+                var author: InlineRelationshipOne<Person>?
+            }
+
+            static let resourceType = "comments"
+        }
+
+        typealias Comment = Resource<String, CommentDefinition>
+
+        let json = try XCTUnwrap(
+            Bundle.module.url(forResource: "Fixtures/MissingRelationship", withExtension: "json").map {
+                try Data(contentsOf: $0)
+            }
+        )
+
+        let decoder = JSONAPIDecoder()
+        decoder.ignoresMissingResources = true
+
+        // when
+        let comment = try decoder.decode(Comment.self, from: json)
+
+        // then
+        XCTAssertNil(comment.author?.resource)
+        XCTAssertEqual(comment.body, "I like XML better")
+    }
 
 	func testDecodeTypeMismatch() throws {
 		// given
@@ -288,4 +321,44 @@ final class ResourceTests: XCTestCase {
 	func testEncodeMeta() {
 		assertSnapshot(of: CompoundDocument(data: Fixtures.article, meta: Fixtures.copyrightInfo), as: .jsonAPI())
 	}
+
+
+    // Test case replicating the missing monitor_counts key issue
+	func testDecodeAPMEntityMissingOptionalRelationship() throws {
+		// given
+		let json = try XCTUnwrap(
+			Bundle.module.url(forResource: "Fixtures/APMEntityMissingMonitorCounts", withExtension: "json").map {
+				try Data(contentsOf: $0)
+			}
+		)
+
+		let decoder = JSONAPIDecoder()
+		decoder.ignoresMissingResources = true
+
+		do {
+			// when - This should fail with keyNotFound error
+			_ = try decoder.decode([APMEntity].self, from: json)
+			XCTFail("Expected DecodingError.keyNotFound but decoding succeeded")
+		} catch let DecodingError.keyNotFound(key, context) {
+			// then - Verify we get the expected keyNotFound error for monitor_counts
+			XCTAssertEqual(key.stringValue, "monitor_counts")
+			XCTAssertTrue(context.debugDescription.contains("monitor_counts"))
+			XCTAssertTrue(context.codingPath.contains { $0.stringValue == "Index 1" }) // Second entity missing the key
+		} catch {
+			XCTFail("Expected DecodingError.keyNotFound but got \(error)")
+		}
+	}
+}
+
+@ResourceWrapper(type: "apm-entity")
+public struct APMEntity: Identifiable {
+    public var id: String
+    
+    @ResourceRelationship(key: "monitor_counts")
+    public var monitorCounts: MonitorCounts?
+}
+
+@ResourceWrapper(type: "apm-monitor-counts")
+public struct MonitorCounts {
+    public let id: String
 }

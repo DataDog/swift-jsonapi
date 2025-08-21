@@ -1,0 +1,78 @@
+{
+  "data": [
+    {
+      "id": "39378e6665",
+      "type": "apm-entity",
+      "attributes": {
+        "id_tags": {
+          "service": "vendored-orders-service"
+        },
+        "metadata": {
+          "is_traced": false,
+          "is_usm": true,
+          "product_areas": ["USM", "Logs", "Network"]
+        },
+        "stats": {
+          "operation": "universal.http.server",
+          "hits": "15301",
+          "errors": "9374",
+          "total_duration": "4061081759012"
+        }
+      },
+      "relationships": {
+        "catalog_definition": {
+          "data": {
+            "id": "1a8b2af37a",
+            "type": "apm-catalog-definition"
+          }
+        },
+        "monitor_counts": {
+          "data": {
+            "id": "b453277f42",
+            "type": "apm-monitor-counts"
+          }
+        },
+        "type": {
+          "data": {
+            "id": "2b7861731c",
+            "type": "apm-entity-type"
+          }
+        }
+      }
+    },
+    {
+      "id": "6b5e86c465",
+      "type": "apm-entity",
+      "attributes": {
+        "id_tags": {
+          "service": "flight-query-engine"
+        },
+        "metadata": {
+          "is_traced": true,
+          "is_usm": false,
+          "languages": ["python"],
+          "product_areas": ["APM"]
+        },
+        "stats": {
+          "operation": "flight.query.engine",
+          "hits": "20596",
+          "total_duration": "17864152471913"
+        }
+      },
+      "relationships": {
+        "catalog_definition": {
+          "data": {
+            "id": "67bf6a54d1",
+            "type": "apm-catalog-definition"
+          }
+        },
+        "type": {
+          "data": {
+            "id": "671eb4a267",
+            "type": "apm-entity-type"
+          }
+        }
+      }
+    }
+  ]
+}
