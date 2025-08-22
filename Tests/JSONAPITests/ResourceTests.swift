@@ -346,55 +346,55 @@ final class ResourceTests: XCTestCase {
 	}
 }
 
-@ResourceWrapper(type: "apm-entity")
-public struct APMEntity: Identifiable {
-    public var id: String
-    
-    @ResourceRelationship(key: "monitor_counts")
-    public var monitorCounts: MonitorCounts?
-}
-
-@ResourceAttribute(key: "non_synthetics_monitors")
-public var nonSyntheticsMonitors: Metadata?
-
-@ResourceAttribute(key: "synthetics_monitors")
-public var syntheticsMonitors: Metadata?
-
-public struct Metadata: Codable {
-    let alert: Int
-    let warn: Int
-    let ok: Int
-    let noData: Int
-
-    enum CodingKeys: String, CodingKey {
-        case alert
-        case warn
-        case ok
-        case noData = "no_data"
-    }
-}
-
-@ResourceWrapper(type: "apm-monitor-counts")
-public struct MonitorCounts {
-    public let id: String
-    
-    @ResourceAttribute(key: "non_synthetics_monitors")
-    public var nonSyntheticsMonitors: Metadata?
-
-    @ResourceAttribute(key: "synthetics_monitors")
-    public var syntheticsMonitors: Metadata?
-
-    public struct Metadata: Codable {
-        let alert: Int
-        let warn: Int
-        let ok: Int
-        let noData: Int
-
-        enum CodingKeys: String, CodingKey {
-            case alert
-            case warn
-            case ok
-            case noData = "no_data"
-        }
-    }
-}
+//@ResourceWrapper(type: "apm-entity")
+//public struct APMEntity: Identifiable {
+//    public var id: String
+//    
+//    @ResourceRelationship(key: "monitor_counts")
+//    public var monitorCounts: MonitorCounts?
+//}
+//
+//@ResourceAttribute(key: "non_synthetics_monitors")
+//public var nonSyntheticsMonitors: Metadata?
+//
+//@ResourceAttribute(key: "synthetics_monitors")
+//public var syntheticsMonitors: Metadata?
+//
+//public struct Metadata: Codable {
+//    let alert: Int
+//    let warn: Int
+//    let ok: Int
+//    let noData: Int
+//
+//    enum CodingKeys: String, CodingKey {
+//        case alert
+//        case warn
+//        case ok
+//        case noData = "no_data"
+//    }
+//}
+//
+//@ResourceWrapper(type: "apm-monitor-counts")
+//public struct MonitorCounts {
+//    public let id: String
+//    
+//    @ResourceAttribute(key: "non_synthetics_monitors")
+//    public var nonSyntheticsMonitors: Metadata?
+//
+//    @ResourceAttribute(key: "synthetics_monitors")
+//    public var syntheticsMonitors: Metadata?
+//
+//    public struct Metadata: Codable {
+//        let alert: Int
+//        let warn: Int
+//        let ok: Int
+//        let noData: Int
+//
+//        enum CodingKeys: String, CodingKey {
+//            case alert
+//            case warn
+//            case ok
+//            case noData = "no_data"
+//        }
+//    }
+//}
