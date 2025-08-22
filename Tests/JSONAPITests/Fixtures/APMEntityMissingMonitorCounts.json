@@ -10,13 +10,27 @@
         "metadata": {
           "is_traced": false,
           "is_usm": true,
-          "product_areas": ["USM", "Logs", "Network"]
+          "product_areas": [
+            "USM",
+            "Logs",
+            "Network"
+          ]
         },
         "stats": {
           "operation": "universal.http.server",
-          "hits": "15301",
-          "errors": "9374",
-          "total_duration": "4061081759012"
+          "hits": "22350",
+          "errors": "12651",
+          "total_duration": "5909681955999",
+          "requests_per_second": 6.208333333333333,
+          "errors_percentage": 0.5660402684563758,
+          "latency_avg": 264415300.044698,
+          "latency_p50": 33009790.322156236,
+          "latency_p75": 497719585.78872776,
+          "latency_p90": 817434524.1987034,
+          "latency_p95": 911143234.426768,
+          "latency_p99": 1015594483.7972978,
+          "latency_max": 30799215191.417805,
+          "operation_mode": "primary"
         }
       },
       "relationships": {
@@ -41,6 +55,58 @@
       }
     },
     {
+      "id": "718665f1b8",
+      "type": "apm-entity",
+      "attributes": {
+        "id_tags": {
+          "service": "payment"
+        },
+        "metadata": {
+          "is_traced": false,
+          "is_usm": true,
+          "product_areas": [
+            "USM",
+            "Network",
+            "Logs"
+          ]
+        },
+        "stats": {
+          "operation": "universal.http.server",
+          "hits": "2380",
+          "total_duration": "832019281",
+          "requests_per_second": 0.6611111111111111,
+          "latency_avg": 349587.93319327733,
+          "latency_p50": 320155.78281263984,
+          "latency_p75": 356857.66484880407,
+          "latency_p90": 403982.07035370794,
+          "latency_p95": 450293.5945766644,
+          "latency_p99": 633330.1854973341,
+          "latency_max": 9924202.51049798,
+          "operation_mode": "primary"
+        }
+      },
+      "relationships": {
+        "catalog_definition": {
+          "data": {
+            "id": "acb2ac113e",
+            "type": "apm-catalog-definition"
+          }
+        },
+        "monitor_counts": {
+          "data": {
+            "id": "1db8015c2b",
+            "type": "apm-monitor-counts"
+          }
+        },
+        "type": {
+          "data": {
+            "id": "2b7861731c",
+            "type": "apm-entity-type"
+          }
+        }
+      }
+    },
+    {
       "id": "6b5e86c465",
       "type": "apm-entity",
       "attributes": {
@@ -50,13 +116,27 @@
         "metadata": {
           "is_traced": true,
           "is_usm": false,
-          "languages": ["python"],
-          "product_areas": ["APM"]
+          "languages": [
+            "python"
+          ],
+          "product_areas": [
+            "APM"
+          ]
         },
         "stats": {
           "operation": "flight.query.engine",
-          "hits": "20596",
-          "total_duration": "17864152471913"
+          "span.kind": "internal",
+          "hits": "11513",
+          "total_duration": "8999455289763",
+          "requests_per_second": 3.1980555555555554,
+          "latency_avg": 781677693.8906454,
+          "latency_p50": 563445341.1774436,
+          "latency_p75": 647816844.3559282,
+          "latency_p90": 2137581592.6243048,
+          "latency_p95": 2345972932.178786,
+          "latency_p99": 2574680198.1761,
+          "latency_max": 3771297869.403596,
+          "operation_mode": "primary"
         }
       },
       "relationships": {
@@ -71,6 +151,1307 @@
             "id": "671eb4a267",
             "type": "apm-entity-type"
           }
+        }
+      }
+    },
+    {
+      "id": "81f4b495b0",
+      "type": "apm-entity",
+      "attributes": {
+        "id_tags": {
+          "service": "flight-query-api"
+        },
+        "metadata": {
+          "is_traced": true,
+          "is_usm": false,
+          "languages": [
+            "python"
+          ],
+          "product_areas": [
+            "APM"
+          ]
+        },
+        "stats": {
+          "operation": "flight.query",
+          "span.kind": "internal",
+          "hits": "11513",
+          "total_duration": "14291510239603",
+          "requests_per_second": 3.1980555555555554,
+          "latency_avg": 1241336770.572657,
+          "latency_p50": 1015594483.7972978,
+          "latency_p75": 1132019770.9292219,
+          "latency_p90": 2655767538.4018607,
+          "latency_p95": 2782211914.9536552,
+          "latency_p99": 3149613530.206619,
+          "latency_max": 4515090382.840829,
+          "operation_mode": "primary"
+        }
+      },
+      "relationships": {
+        "catalog_definition": {
+          "data": {
+            "id": "02f573cb9a",
+            "type": "apm-catalog-definition"
+          }
+        },
+        "monitor_counts": {
+          "data": {
+            "id": "848d935102",
+            "type": "apm-monitor-counts"
+          }
+        },
+        "type": {
+          "data": {
+            "id": "671eb4a267",
+            "type": "apm-entity-type"
+          }
+        }
+      }
+    },
+    {
+      "id": "aff710380a",
+      "type": "apm-entity",
+      "attributes": {
+        "id_tags": {
+          "service": "flight-itinerary-service"
+        },
+        "metadata": {
+          "is_traced": true,
+          "is_usm": false,
+          "languages": [
+            "python"
+          ],
+          "product_areas": [
+            "APM"
+          ]
+        },
+        "stats": {
+          "operation": "flight.search",
+          "span.kind": "internal",
+          "hits": "11513",
+          "total_duration": "37883321286124",
+          "requests_per_second": 3.1980555555555554,
+          "latency_avg": 3290482175.4646053,
+          "latency_p50": 3053447815.319837,
+          "latency_p75": 3198826241.6160975,
+          "latency_p90": 4640789116.022353,
+          "latency_p95": 4861742824.507289,
+          "latency_p99": 5335710743.797154,
+          "latency_max": 6735813160.836902,
+          "operation_mode": "primary"
+        }
+      },
+      "relationships": {
+        "catalog_definition": {
+          "data": {
+            "id": "7ecb0650f3",
+            "type": "apm-catalog-definition"
+          }
+        },
+        "type": {
+          "data": {
+            "id": "671eb4a267",
+            "type": "apm-entity-type"
+          }
+        }
+      }
+    },
+    {
+      "id": "7224e0e8c7",
+      "type": "apm-entity",
+      "attributes": {
+        "id_tags": {
+          "service": "flight-db"
+        },
+        "metadata": {
+          "is_traced": true,
+          "is_usm": false,
+          "languages": [
+            "python"
+          ],
+          "product_areas": [
+            "APM"
+          ]
+        },
+        "stats": {
+          "operation": "flight.db.query",
+          "span.kind": "internal",
+          "hits": "11514",
+          "total_duration": "4799866212199",
+          "requests_per_second": 3.1983333333333333,
+          "latency_avg": 416872174.06626713,
+          "latency_p50": 218834328.19760475,
+          "latency_p75": 259527067.41027948,
+          "latency_p90": 1667971318.2797432,
+          "latency_p95": 2009042714.0272102,
+          "latency_p99": 2104695721.9685462,
+          "latency_max": 3087656959.0146933,
+          "operation_mode": "primary"
+        }
+      },
+      "relationships": {
+        "catalog_definition": {
+          "data": {
+            "id": "a22e534d8f",
+            "type": "apm-catalog-definition"
+          }
+        },
+        "type": {
+          "data": {
+            "id": "671eb4a267",
+            "type": "apm-entity-type"
+          }
+        }
+      }
+    },
+    {
+      "id": "f12ae2600d",
+      "type": "apm-entity",
+      "attributes": {
+        "id_tags": {
+          "service": "first-party-orders-service"
+        },
+        "metadata": {
+          "is_traced": false,
+          "is_usm": true,
+          "product_areas": [
+            "USM",
+            "Logs",
+            "Network"
+          ]
+        },
+        "stats": {
+          "operation": "universal.http.server",
+          "hits": "1331",
+          "errors": "56",
+          "total_duration": "167678827013",
+          "requests_per_second": 0.36972222222222223,
+          "errors_percentage": 0.042073628850488355,
+          "latency_avg": 125979584.5326822,
+          "latency_p50": 2478379.805357965,
+          "latency_p75": 2719995.3251329307,
+          "latency_p90": 3432170.8424134897,
+          "latency_p95": 3946111.400577759,
+          "latency_p99": 1261791770.4547276,
+          "latency_max": 30799215191.417805,
+          "operation_mode": "primary"
+        }
+      },
+      "relationships": {
+        "catalog_definition": {
+          "data": {
+            "id": "aa9d7d4206",
+            "type": "apm-catalog-definition"
+          }
+        },
+        "monitor_counts": {
+          "data": {
+            "id": "2583d4e20e",
+            "type": "apm-monitor-counts"
+          }
+        },
+        "type": {
+          "data": {
+            "id": "2b7861731c",
+            "type": "apm-entity-type"
+          }
+        }
+      }
+    },
+    {
+      "id": "851ef1ca54",
+      "type": "apm-entity",
+      "attributes": {
+        "id_tags": {
+          "service": "carts"
+        },
+        "metadata": {
+          "is_traced": false,
+          "is_usm": true,
+          "languages": [
+            "jvm"
+          ],
+          "apdex_threshold": "0.5",
+          "product_areas": [
+            "USM",
+            "Network",
+            "Logs"
+          ]
+        },
+        "stats": {
+          "operation": "universal.http.server",
+          "hits": "11653",
+          "errors": "11653",
+          "total_duration": "271856108234",
+          "requests_per_second": 3.2369444444444446,
+          "errors_percentage": 1,
+          "latency_avg": 23329280.72032953,
+          "latency_p50": 4264187.126696104,
+          "latency_p75": 20413050.185204536,
+          "latency_p90": 83684634.80682297,
+          "latency_p95": 117700997.57983205,
+          "latency_p99": 184522037.24088398,
+          "latency_max": 322174227.6004794,
+          "apdex": {
+            "score": 0
+          },
+          "operation_mode": "primary"
+        }
+      },
+      "relationships": {
+        "catalog_definition": {
+          "data": {
+            "id": "360d7f6a3c",
+            "type": "apm-catalog-definition"
+          }
+        },
+        "monitor_counts": {
+          "data": {
+            "id": "bf794c3762",
+            "type": "apm-monitor-counts"
+          }
+        },
+        "type": {
+          "data": {
+            "id": "1d691d5b04",
+            "type": "apm-entity-type"
+          }
+        }
+      }
+    },
+    {
+      "id": "9ae04e4535",
+      "type": "apm-entity",
+      "attributes": {
+        "id_tags": {
+          "service": "bitsburg"
+        },
+        "metadata": {
+          "is_traced": true,
+          "is_usm": false,
+          "languages": [
+            "dotnet"
+          ],
+          "apdex_threshold": "0.5",
+          "product_areas": [
+            "APM",
+            "RUM",
+            "Network",
+            "Profiling",
+            "Logs",
+            "Host"
+          ]
+        },
+        "stats": {
+          "operation": "aspnet_core.request",
+          "span.kind": "server",
+          "hits": "5867",
+          "errors": "4",
+          "total_duration": "470032733824",
+          "requests_per_second": 1.6297222222222223,
+          "errors_percentage": 0.0006817794443497528,
+          "latency_avg": 80114664.0231805,
+          "latency_p50": 31509580.242917888,
+          "latency_p75": 105595756.31916271,
+          "latency_p90": 247732229.6193002,
+          "latency_p95": 312595881.0917779,
+          "latency_p99": 439660723.0082462,
+          "latency_max": 1564224023.7587967,
+          "apdex": {
+            "score": 0.997869439236407
+          },
+          "operation_mode": "primary"
+        }
+      },
+      "relationships": {
+        "catalog_definition": {
+          "data": {
+            "id": "31e6bb7cd7",
+            "type": "apm-catalog-definition"
+          }
+        },
+        "monitor_counts": {
+          "data": {
+            "id": "47255b92a9",
+            "type": "apm-monitor-counts"
+          }
+        },
+        "type": {
+          "data": {
+            "id": "54427307f7",
+            "type": "apm-entity-type"
+          }
+        }
+      }
+    },
+    {
+      "id": "c67ff75d0b",
+      "type": "apm-entity",
+      "attributes": {
+        "id_tags": {
+          "service": "api-layer"
+        },
+        "metadata": {
+          "is_traced": false,
+          "is_usm": true,
+          "product_areas": [
+            "USM",
+            "Network",
+            "Logs"
+          ],
+          "override_default_top_level": "universal.http.client"
+        },
+        "stats": {
+          "operation": "universal.http.client",
+          "hits": "30138",
+          "errors": "11653",
+          "total_duration": "546988805698",
+          "requests_per_second": 8.371666666666666,
+          "errors_percentage": 0.38665472161390935,
+          "latency_avg": 18149472.615900192,
+          "latency_p50": 4198584.247823856,
+          "latency_p75": 4902715.5719963405,
+          "latency_p90": 32001917.43421348,
+          "latency_p95": 91842991.52531964,
+          "latency_p99": 276131651.26387006,
+          "latency_max": 2684267478.0434194,
+          "operation_mode": "primary"
+        }
+      },
+      "relationships": {
+        "catalog_definition": {
+          "data": {
+            "id": "e57afa507a",
+            "type": "apm-catalog-definition"
+          }
+        },
+        "monitor_counts": {
+          "data": {
+            "id": "ac83ecd46f",
+            "type": "apm-monitor-counts"
+          }
+        },
+        "type": {
+          "data": {
+            "id": "2b7861731c",
+            "type": "apm-entity-type"
+          }
+        }
+      }
+    }
+  ],
+  "meta": {
+    "page": {
+      "total_filtered_count": 10
+    }
+  },
+  "included": [
+    {
+      "id": "02f573cb9a",
+      "type": "apm-catalog-definition",
+      "attributes": {
+        "meta": {
+          "last_modified_time": {
+            "seconds": 1748367708,
+            "nanos": 332057372
+          },
+          "ingestion_source": "api",
+          "ingested_schema_version": "v3",
+          "origin": "dd_ui",
+          "origin_detail": "editor"
+        },
+        "team": "bits-airlines-ops",
+        "v2_2_definition": {
+          "schema_version": "v2.2",
+          "dd_service": "flight-query-api",
+          "team": "bits-airlines-ops",
+          "tier": "Tier 1",
+          "contacts": [
+            {
+              "name": "#alerts-devops",
+              "type": "slack",
+              "contact": "https://datadogincidents.slack.com/archives/C01EWN6319S"
+            },
+            {
+              "name": "Ben Barton",
+              "type": "email",
+              "contact": "ben@datadoghq.com"
+            }
+          ],
+          "links": [
+            {
+              "name": "Demo Dashboard",
+              "type": "dashboard",
+              "url": "https://app.datadoghq.com/dashboard/krp-bq6-362"
+            },
+            {
+              "name": "Runbook",
+              "type": "runbook",
+              "url": "https://shop-ist.atlassian.net/wiki/spaces/~5d7fe4af519d370d960d410b/pages/192282625/How+to+remediate+flight-db+CPU+saturation+issues",
+              "provider": "Confluence"
+            }
+          ],
+          "integrations": {
+            "pagerduty": {
+              "service_url": "https://datadog.pagerduty.com/service-directory/XXXXXXX"
+            }
+          },
+          "extensions": {
+            "shopist.com/release-scheduler": "conductor:\n    slack: release-train-shopist\n    targets:\n        - branch: hello-joe/staging\n          ci_pipeline: //domains/examples/apps/hello-joe/config/k8s:release-staging\n          name: staging\n          schedule: '* * * * 1'\n        - branch: hello-joe/prod\n          ci_pipeline: //domains/examples/apps/hello-joe/config/k8s:release-prod\n          name: prod\n          schedule: '* * * * 1'\n"
+          },
+          "lifecycle": "Production",
+          "languages": [
+            "python"
+          ],
+          "type": "custom"
+        }
+      }
+    },
+    {
+      "id": "1a8b2af37a",
+      "type": "apm-catalog-definition",
+      "attributes": {
+        "meta": {
+          "last_modified_time": {
+            "seconds": 1734025047,
+            "nanos": 958815793
+          },
+          "github_html_url": "https://github.com/DataDog/shopist/blob/prod/service-catalog/vendored-orders-service/service.datadog.yaml",
+          "ingestion_source": "github",
+          "ingested_schema_version": "v2.2",
+          "origin": "dd_git_webhook",
+          "origin_detail": "DefinitionFileEventTypeUpdated"
+        },
+        "team": "bitsboutique",
+        "v2_2_definition": {
+          "schema_version": "v2.2",
+          "dd_service": "vendored-orders-service",
+          "team": "bitsboutique",
+          "contacts": [
+            {
+              "type": "slack",
+              "contact": "https://datadogincidents.slack.com/archives/C01EWN6319S"
+            }
+          ],
+          "links": [
+            {
+              "name": "Demo Dashboard",
+              "type": "dashboard",
+              "url": "https://app.datadoghq.com/dashboard/krp-bq6-362"
+            },
+            {
+              "name": "Common Operations",
+              "type": "runbook",
+              "url": "https://datadoghq.atlassian.net/wiki/"
+            },
+            {
+              "name": "Disabling Deployments",
+              "type": "runbook",
+              "url": "https://datadoghq.atlassian.net/wiki/"
+            },
+            {
+              "name": "Rolling Back Deployments",
+              "type": "runbook",
+              "url": "https://datadoghq.atlassian.net/wiki/"
+            },
+            {
+              "name": "Source",
+              "type": "repo",
+              "url": "https://github.com/DataDog/bitsboutique",
+              "provider": "github"
+            },
+            {
+              "name": "Deployment",
+              "type": "repo",
+              "url": "https://github.com/DataDog/bitsboutique",
+              "provider": "github"
+            },
+            {
+              "name": "Deployment Information",
+              "type": "doc",
+              "url": "https://docs.datadoghq.com/",
+              "provider": "link"
+            },
+            {
+              "name": "Service Documentation",
+              "type": "doc",
+              "url": "https://docs.datadoghq.com/",
+              "provider": "link"
+            }
+          ],
+          "tags": [
+            "team:bitsboutique"
+          ],
+          "integrations": {}
+        }
+      }
+    },
+    {
+      "id": "1d691d5b04",
+      "type": "apm-entity-type",
+      "attributes": {
+        "catalog": {
+          "kind": "service",
+          "service": {
+            "type": "web"
+          }
+        },
+        "name_tag_key": "service"
+      }
+    },
+    {
+      "id": "1db8015c2b",
+      "type": "apm-monitor-counts",
+      "attributes": {
+        "non_synthetics_monitors": {
+          "alert": 1,
+          "warn": 0,
+          "ok": 1,
+          "no_data": 0
+        },
+        "paging_monitors": {
+          "alert": 0,
+          "warn": 0,
+          "ok": 0,
+          "no_data": 0
+        },
+        "synthetics_monitors": {
+          "alert": 0,
+          "warn": 0,
+          "ok": 0,
+          "no_data": 0
+        }
+      }
+    },
+    {
+      "id": "2583d4e20e",
+      "type": "apm-monitor-counts",
+      "attributes": {
+        "non_synthetics_monitors": {
+          "alert": 1,
+          "warn": 0,
+          "ok": 2,
+          "no_data": 0
+        },
+        "paging_monitors": {
+          "alert": 0,
+          "warn": 0,
+          "ok": 0,
+          "no_data": 0
+        },
+        "synthetics_monitors": {
+          "alert": 0,
+          "warn": 0,
+          "ok": 0,
+          "no_data": 0
+        }
+      }
+    },
+    {
+      "id": "2b7861731c",
+      "type": "apm-entity-type",
+      "attributes": {
+        "catalog": {
+          "kind": "service",
+          "service": {
+            "type": "http"
+          }
+        },
+        "name_tag_key": "service"
+      }
+    },
+    {
+      "id": "31e6bb7cd7",
+      "type": "apm-catalog-definition",
+      "attributes": {
+        "meta": {
+          "last_modified_time": {
+            "seconds": 1741891040,
+            "nanos": 423482112
+          },
+          "github_html_url": "https://github.com/DataDog/shopist/blob/prod/catalog-info.yaml",
+          "ingestion_source": "github",
+          "ingested_schema_version": "backstage.io/v1alpha1",
+          "origin": "dd_cwp",
+          "origin_detail": "DefinitionFileEventTypeUpdated"
+        },
+        "team": "bitsburg-team",
+        "v2_2_definition": {
+          "schema_version": "v2.2",
+          "dd_service": "bitsburg",
+          "team": "bitsburg-team",
+          "description": "A .NET IIS service for handling login and user-related APIs.",
+          "links": [
+            {
+              "name": "Source Code",
+              "type": "repo",
+              "url": "https://www.github.com/datadog/shopist",
+              "provider": "Github"
+            },
+            {
+              "name": "Wiki",
+              "type": "other",
+              "url": "https://backstage.core.shopist.org/docs/default/component/bitsburg"
+            },
+            {
+              "name": "Runbook",
+              "type": "other",
+              "url": "https://backstage.core.shopist.org/docs/default/component/rollback"
+            },
+            {
+              "name": "Source",
+              "type": "other",
+              "url": "https://gitlab.tcc.li/shopist/bitsburg"
+            },
+            {
+              "name": "JIRA",
+              "type": "other",
+              "url": "https://shopist.atlassian.net/browse/DA"
+            },
+            {
+              "name": "Diagram",
+              "type": "other",
+              "url": "https://shopist.atlassian.net/wiki/spaces/DA"
+            }
+          ],
+          "tags": [
+            "framework:dotnet",
+            "backstage.io/techdocs-ref:github://design/doc",
+            "owner:bitsburg-team",
+            "system:bitsburg",
+            "backstage.type:service"
+          ],
+          "integrations": {
+            "pagerduty": {
+              "service_url": "https://datadog.pagerduty.com/service-directory/ZZZZZZZ"
+            }
+          },
+          "lifecycle": "production",
+          "type": "service"
+        }
+      }
+    },
+    {
+      "id": "360d7f6a3c",
+      "type": "apm-catalog-definition",
+      "attributes": {
+        "meta": {
+          "last_modified_time": {
+            "seconds": 1734025047,
+            "nanos": 961891168
+          },
+          "github_html_url": "https://github.com/DataDog/shopist/blob/prod/service-catalog/carts/service.datadog.yaml",
+          "ingestion_source": "github",
+          "ingested_schema_version": "v2.2",
+          "origin": "dd_git_webhook",
+          "origin_detail": "DefinitionFileEventTypeUpdated"
+        },
+        "team": "bitsboutique",
+        "v2_2_definition": {
+          "schema_version": "v2.2",
+          "dd_service": "carts",
+          "team": "bitsboutique",
+          "contacts": [
+            {
+              "type": "slack",
+              "contact": "https://datadogincidents.slack.com/archives/C01EWN6319S"
+            }
+          ],
+          "links": [
+            {
+              "name": "Demo Dashboard",
+              "type": "dashboard",
+              "url": "https://app.datadoghq.com/dashboard/krp-bq6-362"
+            },
+            {
+              "name": "Common Operations",
+              "type": "runbook",
+              "url": "https://datadoghq.atlassian.net/wiki/"
+            },
+            {
+              "name": "Disabling Deployments",
+              "type": "runbook",
+              "url": "https://datadoghq.atlassian.net/wiki/"
+            },
+            {
+              "name": "Rolling Back Deployments",
+              "type": "runbook",
+              "url": "https://datadoghq.atlassian.net/wiki/"
+            },
+            {
+              "name": "Source",
+              "type": "repo",
+              "url": "https://github.com/DataDog/bitsboutique",
+              "provider": "github"
+            },
+            {
+              "name": "Deployment",
+              "type": "repo",
+              "url": "https://github.com/DataDog/bitsboutique",
+              "provider": "github"
+            },
+            {
+              "name": "Deployment Information",
+              "type": "doc",
+              "url": "https://docs.datadoghq.com/",
+              "provider": "link"
+            },
+            {
+              "name": "Service Documentation",
+              "type": "doc",
+              "url": "https://docs.datadoghq.com/",
+              "provider": "link"
+            }
+          ],
+          "tags": [
+            "team:bitsboutique"
+          ],
+          "integrations": {}
+        }
+      }
+    },
+    {
+      "id": "47255b92a9",
+      "type": "apm-monitor-counts",
+      "attributes": {
+        "non_synthetics_monitors": {
+          "alert": 1,
+          "warn": 0,
+          "ok": 13,
+          "no_data": 0
+        },
+        "paging_monitors": {
+          "alert": 0,
+          "warn": 0,
+          "ok": 1,
+          "no_data": 0
+        },
+        "synthetics_monitors": {
+          "alert": 0,
+          "warn": 0,
+          "ok": 0,
+          "no_data": 0
+        }
+      }
+    },
+    {
+      "id": "54427307f7",
+      "type": "apm-entity-type",
+      "attributes": {
+        "catalog": {
+          "kind": "service",
+          "service": {
+            "type": "service"
+          }
+        },
+        "name_tag_key": "service"
+      }
+    },
+    {
+      "id": "671eb4a267",
+      "type": "apm-entity-type",
+      "attributes": {
+        "catalog": {
+          "kind": "service",
+          "service": {
+            "type": "custom"
+          }
+        },
+        "name_tag_key": "service"
+      }
+    },
+    {
+      "id": "67bf6a54d1",
+      "type": "apm-catalog-definition",
+      "attributes": {
+        "meta": {
+          "last_modified_time": {
+            "seconds": 1748367743,
+            "nanos": 134615031
+          },
+          "ingestion_source": "api",
+          "ingested_schema_version": "v3",
+          "origin": "dd_ui",
+          "origin_detail": "editor"
+        },
+        "team": "bits-airlines-ops",
+        "v2_2_definition": {
+          "schema_version": "v2.2",
+          "dd_service": "flight-query-engine",
+          "team": "bits-airlines-ops",
+          "tier": "Tier 1",
+          "contacts": [
+            {
+              "name": "Ben Barton",
+              "type": "email",
+              "contact": "ben@datadoghq.com"
+            }
+          ],
+          "links": [
+            {
+              "name": "Runbook",
+              "type": "runbook",
+              "url": "https://shop-ist.atlassian.net/wiki/spaces/~5d7fe4af519d370d960d410b/pages/192282625/How+to+remediate+flight-db+CPU+saturation+issues",
+              "provider": "Confluence"
+            }
+          ],
+          "integrations": {
+            "pagerduty": {
+              "service_url": "https://datadog.pagerduty.com/service-directory/XXXXXXX"
+            }
+          },
+          "lifecycle": "Production",
+          "languages": [
+            "python"
+          ],
+          "type": "custom"
+        }
+      }
+    },
+    {
+      "id": "7ecb0650f3",
+      "type": "apm-catalog-definition",
+      "attributes": {
+        "meta": {
+          "last_modified_time": {
+            "seconds": 1748367697,
+            "nanos": 127097800
+          },
+          "ingestion_source": "api",
+          "ingested_schema_version": "v3",
+          "origin": "dd_ui",
+          "origin_detail": "editor"
+        },
+        "team": "bits-airlines-ops",
+        "v2_2_definition": {
+          "schema_version": "v2.2",
+          "dd_service": "flight-itinerary-service",
+          "team": "bits-airlines-ops",
+          "tier": "Tier 1",
+          "contacts": [
+            {
+              "name": "#alerts-devops",
+              "type": "slack",
+              "contact": "https://datadogincidents.slack.com/archives/C01EWN6319S"
+            },
+            {
+              "name": "Ben Barton",
+              "type": "email",
+              "contact": "ben@datadoghq.com"
+            }
+          ],
+          "links": [
+            {
+              "name": "Runbook",
+              "type": "runbook",
+              "url": "https://shop-ist.atlassian.net/wiki/spaces/~5d7fe4af519d370d960d410b/pages/192282625/How+to+remediate+flight-db+CPU+saturation+issues",
+              "provider": "Confluence"
+            }
+          ],
+          "integrations": {
+            "pagerduty": {
+              "service_url": "https://datadog.pagerduty.com/service-directory/XXXXXXX"
+            }
+          },
+          "lifecycle": "Production",
+          "languages": [
+            "python"
+          ],
+          "type": "custom"
+        }
+      }
+    },
+    {
+      "id": "848d935102",
+      "type": "apm-monitor-counts",
+      "attributes": {
+        "non_synthetics_monitors": {
+          "alert": 4,
+          "warn": 0,
+          "ok": 1,
+          "no_data": 0
+        },
+        "paging_monitors": {
+          "alert": 0,
+          "warn": 0,
+          "ok": 0,
+          "no_data": 0
+        },
+        "synthetics_monitors": {
+          "alert": 0,
+          "warn": 0,
+          "ok": 0,
+          "no_data": 0
+        }
+      }
+    },
+    {
+      "id": "a22e534d8f",
+      "type": "apm-catalog-definition",
+      "attributes": {
+        "meta": {
+          "last_modified_time": {
+            "seconds": 1748367676,
+            "nanos": 411995314
+          },
+          "ingestion_source": "api",
+          "ingested_schema_version": "v3",
+          "origin": "dd_ui",
+          "origin_detail": "editor"
+        },
+        "team": "bits-airlines-ops",
+        "v2_2_definition": {
+          "schema_version": "v2.2",
+          "dd_service": "flight-db",
+          "team": "bits-airlines-ops",
+          "tier": "Tier 1",
+          "contacts": [
+            {
+              "name": "#alerts-devops",
+              "type": "slack",
+              "contact": "https://datadogincidents.slack.com/archives/C01EWN6319S"
+            },
+            {
+              "name": "Ben Barton",
+              "type": "email",
+              "contact": "ben@datadoghq.com"
+            }
+          ],
+          "links": [
+            {
+              "name": "Runbook",
+              "type": "runbook",
+              "url": "https://shop-ist.atlassian.net/wiki/spaces/~5d7fe4af519d370d960d410b/pages/192282625/How+to+remediate+flight-db+CPU+saturation+issues",
+              "provider": "Confluence"
+            }
+          ],
+          "integrations": {
+            "pagerduty": {
+              "service_url": "https://datadog.pagerduty.com/service-directory/XXXXXXX"
+            }
+          },
+          "lifecycle": "Production",
+          "languages": [
+            "python"
+          ],
+          "type": "custom"
+        }
+      }
+    },
+    {
+      "id": "aa9d7d4206",
+      "type": "apm-catalog-definition",
+      "attributes": {
+        "meta": {
+          "last_modified_time": {
+            "seconds": 1734025048,
+            "nanos": 31153799
+          },
+          "github_html_url": "https://github.com/DataDog/shopist/blob/prod/service-catalog/first-party-orders-service/service.datadog.yaml",
+          "ingestion_source": "github",
+          "ingested_schema_version": "v2.2",
+          "origin": "dd_git_webhook",
+          "origin_detail": "DefinitionFileEventTypeUpdated"
+        },
+        "team": "bitsboutique",
+        "v2_2_definition": {
+          "schema_version": "v2.2",
+          "dd_service": "first-party-orders-service",
+          "team": "bitsboutique",
+          "contacts": [
+            {
+              "type": "slack",
+              "contact": "https://datadogincidents.slack.com/archives/C01EWN6319S"
+            }
+          ],
+          "links": [
+            {
+              "name": "Demo Dashboard",
+              "type": "dashboard",
+              "url": "https://app.datadoghq.com/dashboard/krp-bq6-362"
+            },
+            {
+              "name": "Common Operations",
+              "type": "runbook",
+              "url": "https://datadoghq.atlassian.net/wiki/"
+            },
+            {
+              "name": "Disabling Deployments",
+              "type": "runbook",
+              "url": "https://datadoghq.atlassian.net/wiki/"
+            },
+            {
+              "name": "Rolling Back Deployments",
+              "type": "runbook",
+              "url": "https://datadoghq.atlassian.net/wiki/"
+            },
+            {
+              "name": "Source",
+              "type": "repo",
+              "url": "https://github.com/DataDog/bitsboutique",
+              "provider": "github"
+            },
+            {
+              "name": "Deployment",
+              "type": "repo",
+              "url": "https://github.com/DataDog/bitsboutique",
+              "provider": "github"
+            },
+            {
+              "name": "Deployment Information",
+              "type": "doc",
+              "url": "https://docs.datadoghq.com/",
+              "provider": "link"
+            },
+            {
+              "name": "Service Documentation",
+              "type": "doc",
+              "url": "https://docs.datadoghq.com/",
+              "provider": "link"
+            }
+          ],
+          "tags": [
+            "team:bitsboutique"
+          ],
+          "integrations": {}
+        }
+      }
+    },
+    {
+      "id": "ac83ecd46f",
+      "type": "apm-monitor-counts",
+      "attributes": {
+        "non_synthetics_monitors": {
+          "alert": 2,
+          "warn": 0,
+          "ok": 1,
+          "no_data": 0
+        },
+        "paging_monitors": {
+          "alert": 0,
+          "warn": 0,
+          "ok": 0,
+          "no_data": 0
+        },
+        "synthetics_monitors": {
+          "alert": 0,
+          "warn": 0,
+          "ok": 0,
+          "no_data": 0
+        }
+      }
+    },
+    {
+      "id": "acb2ac113e",
+      "type": "apm-catalog-definition",
+      "attributes": {
+        "meta": {
+          "last_modified_time": {
+            "seconds": 1734025047,
+            "nanos": 956196628
+          },
+          "github_html_url": "https://github.com/DataDog/shopist/blob/prod/service-catalog/payment/service.datadog.yaml",
+          "ingestion_source": "github",
+          "ingested_schema_version": "v2.2",
+          "origin": "dd_git_webhook",
+          "origin_detail": "DefinitionFileEventTypeUpdated"
+        },
+        "team": "bitsboutique",
+        "v2_2_definition": {
+          "schema_version": "v2.2",
+          "dd_service": "payment",
+          "team": "bitsboutique",
+          "contacts": [
+            {
+              "type": "slack",
+              "contact": "https://datadogincidents.slack.com/archives/C01EWN6319S"
+            }
+          ],
+          "links": [
+            {
+              "name": "Demo Dashboard",
+              "type": "dashboard",
+              "url": "https://app.datadoghq.com/dashboard/krp-bq6-362"
+            },
+            {
+              "name": "Common Operations",
+              "type": "runbook",
+              "url": "https://datadoghq.atlassian.net/wiki/"
+            },
+            {
+              "name": "Disabling Deployments",
+              "type": "runbook",
+              "url": "https://datadoghq.atlassian.net/wiki/"
+            },
+            {
+              "name": "Rolling Back Deployments",
+              "type": "runbook",
+              "url": "https://datadoghq.atlassian.net/wiki/"
+            },
+            {
+              "name": "Source",
+              "type": "repo",
+              "url": "https://github.com/DataDog/bitsboutique",
+              "provider": "github"
+            },
+            {
+              "name": "Deployment",
+              "type": "repo",
+              "url": "https://github.com/DataDog/bitsboutique",
+              "provider": "github"
+            },
+            {
+              "name": "Deployment Information",
+              "type": "doc",
+              "url": "https://docs.datadoghq.com/",
+              "provider": "link"
+            },
+            {
+              "name": "Service Documentation",
+              "type": "doc",
+              "url": "https://docs.datadoghq.com/",
+              "provider": "link"
+            }
+          ],
+          "tags": [
+            "team:bitsboutique"
+          ],
+          "integrations": {},
+          "ci_pipeline_fingerprints": [
+            "ktIIaFmO98P5",
+            "h9oxG2pwfXrs",
+            "t9e3pfFBGdB6"
+          ]
+        }
+      }
+    },
+    {
+      "id": "b453277f42",
+      "type": "apm-monitor-counts",
+      "attributes": {
+        "non_synthetics_monitors": {
+          "alert": 2,
+          "warn": 0,
+          "ok": 2,
+          "no_data": 0
+        },
+        "paging_monitors": {
+          "alert": 0,
+          "warn": 0,
+          "ok": 0,
+          "no_data": 0
+        },
+        "synthetics_monitors": {
+          "alert": 0,
+          "warn": 0,
+          "ok": 0,
+          "no_data": 0
+        }
+      }
+    },
+    {
+      "id": "bf794c3762",
+      "type": "apm-monitor-counts",
+      "attributes": {
+        "non_synthetics_monitors": {
+          "alert": 2,
+          "warn": 0,
+          "ok": 5,
+          "no_data": 0
+        },
+        "paging_monitors": {
+          "alert": 0,
+          "warn": 0,
+          "ok": 0,
+          "no_data": 0
+        },
+        "synthetics_monitors": {
+          "alert": 0,
+          "warn": 0,
+          "ok": 0,
+          "no_data": 0
+        }
+      }
+    },
+    {
+      "id": "e57afa507a",
+      "type": "apm-catalog-definition",
+      "attributes": {
+        "meta": {
+          "last_modified_time": {
+            "seconds": 1734025048,
+            "nanos": 17145312
+          },
+          "github_html_url": "https://github.com/DataDog/shopist/blob/prod/service-catalog/api-layer/service.datadog.yaml",
+          "ingestion_source": "github",
+          "ingested_schema_version": "v2.2",
+          "origin": "dd_git_webhook",
+          "origin_detail": "DefinitionFileEventTypeUpdated"
+        },
+        "team": "bitsboutique",
+        "v2_2_definition": {
+          "schema_version": "v2.2",
+          "dd_service": "api-layer",
+          "team": "bitsboutique",
+          "contacts": [
+            {
+              "type": "slack",
+              "contact": "https://datadogincidents.slack.com/archives/C01EWN6319S"
+            }
+          ],
+          "links": [
+            {
+              "name": "Demo Dashboard",
+              "type": "dashboard",
+              "url": "https://app.datadoghq.com/dashboard/krp-bq6-362"
+            },
+            {
+              "name": "Common Operations",
+              "type": "runbook",
+              "url": "https://datadoghq.atlassian.net/wiki/"
+            },
+            {
+              "name": "Disabling Deployments",
+              "type": "runbook",
+              "url": "https://datadoghq.atlassian.net/wiki/"
+            },
+            {
+              "name": "Rolling Back Deployments",
+              "type": "runbook",
+              "url": "https://datadoghq.atlassian.net/wiki/"
+            },
+            {
+              "name": "Source",
+              "type": "repo",
+              "url": "https://github.com/DataDog/bitsboutique",
+              "provider": "github"
+            },
+            {
+              "name": "Deployment",
+              "type": "repo",
+              "url": "https://github.com/DataDog/bitsboutique",
+              "provider": "github"
+            },
+            {
+              "name": "Deployment Information",
+              "type": "doc",
+              "url": "https://docs.datadoghq.com/",
+              "provider": "link"
+            },
+            {
+              "name": "Service Documentation",
+              "type": "doc",
+              "url": "https://docs.datadoghq.com/",
+              "provider": "link"
+            }
+          ],
+          "tags": [
+            "team:bitsboutique"
+          ],
+          "integrations": {},
+          "ci_pipeline_fingerprints": [
+            "g4PY1ZvpsmcL"
+          ]
         }
       }
     }

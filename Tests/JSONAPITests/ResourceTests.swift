@@ -173,7 +173,6 @@ final class ResourceTests: XCTestCase {
 		struct CommentDefinition: ResourceDefinition {
 			struct Attributes: Equatable, Codable {
 				var body: String
-                var author: Person?
 			}
 
 			struct Relationships: Equatable, Codable {
@@ -322,7 +321,6 @@ final class ResourceTests: XCTestCase {
 		assertSnapshot(of: CompoundDocument(data: Fixtures.article, meta: Fixtures.copyrightInfo), as: .jsonAPI())
 	}
 
-
     // Test case replicating the missing monitor_counts key issue
 	func testDecodeAPMEntityMissingOptionalRelationship() throws {
 		// given
@@ -331,16 +329,14 @@ final class ResourceTests: XCTestCase {
 				try Data(contentsOf: $0)
 			}
 		)
-
+        
 		let decoder = JSONAPIDecoder()
 		decoder.ignoresMissingResources = true
 
 		do {
-			// when - This should fail with keyNotFound error
 			_ = try decoder.decode([APMEntity].self, from: json)
 			XCTFail("Expected DecodingError.keyNotFound but decoding succeeded")
 		} catch let DecodingError.keyNotFound(key, context) {
-			// then - Verify we get the expected keyNotFound error for monitor_counts
 			XCTAssertEqual(key.stringValue, "monitor_counts")
 			XCTAssertTrue(context.debugDescription.contains("monitor_counts"))
 			XCTAssertTrue(context.codingPath.contains { $0.stringValue == "Index 1" }) // Second entity missing the key
@@ -358,7 +354,47 @@ public struct APMEntity: Identifiable {
     public var monitorCounts: MonitorCounts?
 }
 
+@ResourceAttribute(key: "non_synthetics_monitors")
+public var nonSyntheticsMonitors: Metadata?
+
+@ResourceAttribute(key: "synthetics_monitors")
+public var syntheticsMonitors: Metadata?
+
+public struct Metadata: Codable {
+    let alert: Int
+    let warn: Int
+    let ok: Int
+    let noData: Int
+
+    enum CodingKeys: String, CodingKey {
+        case alert
+        case warn
+        case ok
+        case noData = "no_data"
+    }
+}
+
 @ResourceWrapper(type: "apm-monitor-counts")
 public struct MonitorCounts {
     public let id: String
+    
+    @ResourceAttribute(key: "non_synthetics_monitors")
+    public var nonSyntheticsMonitors: Metadata?
+
+    @ResourceAttribute(key: "synthetics_monitors")
+    public var syntheticsMonitors: Metadata?
+
+    public struct Metadata: Codable {
+        let alert: Int
+        let warn: Int
+        let ok: Int
+        let noData: Int
+
+        enum CodingKeys: String, CodingKey {
+            case alert
+            case warn
+            case ok
+            case noData = "no_data"
+        }
+    }
 }
