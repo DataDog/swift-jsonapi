@@ -82,6 +82,10 @@ public class JSONAPIDecoder: JSONDecoder {
 		try self.decode(CompoundDocument<R, Unit>.self, from: data).data
 	}
 
+	public func decode<R>(_: R?.Type, from data: Data) throws -> R? where R: ResourceIdentifiable & Decodable {
+		try self.decode(CompoundDocument<R?, Unit>.self, from: data).data
+	}
+
 	public func decode<C>(
 		_: C.Type,
 		from data: Data
