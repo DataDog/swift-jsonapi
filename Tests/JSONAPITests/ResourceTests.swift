@@ -112,6 +112,32 @@ final class ResourceTests: XCTestCase {
 		XCTAssertEqual(article, Fixtures.article)
 	}
 
+	func testDecodeNullSingle() throws {
+		// given
+		let json = try XCTUnwrap(#"{ "data": null }"#.data(using: .utf8))
+
+		// when
+		let article = try JSONAPIDecoder().decode(Article?.self, from: json)
+
+		// then
+		XCTAssertNil(article)
+	}
+
+	func testDecodeOptionalSingle() throws {
+		// given
+		let json = try XCTUnwrap(
+			Bundle.module.url(forResource: "Fixtures/Article", withExtension: "json").map {
+				try Data(contentsOf: $0)
+			}
+		)
+
+		// when
+		let article = try JSONAPIDecoder().decode(Article?.self, from: json)
+
+		// then
+		XCTAssertEqual(article, Fixtures.article)
+	}
+
 	func testDecodeArray() throws {
 		// given
 		let json = try XCTUnwrap(
