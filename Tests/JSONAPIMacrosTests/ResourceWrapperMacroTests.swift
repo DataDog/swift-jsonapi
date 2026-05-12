@@ -361,6 +361,87 @@ final class ResourceWrapperMacroTests: XCTestCase {
 		}
 	}
 
+	func testResourceWrapperPropagatesSendable() {
+		assertMacro {
+			"""
+			@ResourceWrapper(type: "people")
+			struct Person: Sendable {
+				var id: String
+
+				@ResourceAttribute var firstName: String
+				@ResourceRelationship var related: Person?
+			}
+			"""
+		} expansion: {
+			"""
+			struct Person: Sendable {
+				var id: String
+
+				var firstName: String
+				var related: Person?
+			}
+
+			extension Person: JSONAPI.ResourceDefinitionProviding {
+				struct Definition: JSONAPI.ResourceDefinition {
+					struct Attributes: Codable, Sendable {
+						var firstName: String
+					}
+					struct Relationships: Codable, Sendable {
+						var related: JSONAPI.InlineRelationshipOptional<Person>?
+					}
+					static let resourceType = "people"
+				}
+				struct BodyDefinition: JSONAPI.ResourceDefinition {
+					struct Attributes: Codable, Sendable {
+						var firstName: String?
+					}
+					struct Relationships: Codable, Sendable {
+						var related: JSONAPI.RelationshipOne<Person>?
+					}
+					static let resourceType = Definition.resourceType
+				}
+				typealias Wrapped = JSONAPI.Resource<String, Definition>
+				typealias Body = JSONAPI.ResourceBody<String, BodyDefinition>
+			}
+
+			extension Person: JSONAPI.ResourceIdentifiable {
+			}
+
+			extension Person: JSONAPI.ResourceLinkageProviding {
+				typealias ID = String
+			}
+
+			extension Person: Codable {
+				init(from decoder: any Decoder) throws {
+					let wrapped = try Wrapped(from: decoder)
+					self.id = wrapped.id
+					self.firstName = wrapped.firstName
+					self.related = wrapped.related?.resource
+				}
+				func encode(to encoder: any Encoder) throws {
+					let attributes = Wrapped.Attributes(firstName: self.firstName)
+					let relationships = Wrapped.Relationships(related: .init(self.related))
+					let wrapped = Wrapped(id: self.id, attributes: attributes, relationships: relationships)
+					try wrapped.encode(to: encoder)
+				}
+			}
+
+			extension Person {
+				static func createBody(id: String? = nil, firstName: String? = nil, related: JSONAPI.RelationshipOne<Person>? = nil) -> Person.Body {
+					let attributes = Body.Attributes(firstName: firstName)
+					let relationships = Body.Relationships(related: related)
+					return Body(id: id, attributes: attributes, relationships: relationships)
+				}
+				static func updateBody(id: String, firstName: String? = nil, related: JSONAPI.RelationshipOne<Person>? = nil) -> Person.Body {
+					let attributes = Body.Attributes(firstName: firstName)
+					let relationships = Body.Relationships(related: related)
+					return Body(id: id, attributes: attributes, relationships: relationships)
+				}
+			}
+			"""
+		}
+	}
+
 	func testAvailability() {
 		assertMacro {
 			"""

@@ -7,7 +7,7 @@
 import Foundation
 
 /// A unique identifier for a JSON:API resource.
-public struct ResourceIdentifier: Hashable, Codable {
+public struct ResourceIdentifier: Hashable, Codable, Sendable {
 	public var type: String
 	public var id: String
 

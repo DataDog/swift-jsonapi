@@ -153,3 +153,6 @@ extension Resource: Encodable where ID: Encodable, Attributes: Encodable, Relati
 		}
 	}
 }
+
+extension Resource: Sendable where ID: Sendable, Attributes: Sendable, Relationships: Sendable {
+}

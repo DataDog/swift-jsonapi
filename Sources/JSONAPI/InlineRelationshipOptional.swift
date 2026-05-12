@@ -64,3 +64,6 @@ extension InlineRelationshipOptional {
 		case data
 	}
 }
+
+extension InlineRelationshipOptional: Sendable where Destination: Sendable {
+}

@@ -63,3 +63,7 @@ extension RelationshipMany: ExpressibleByArrayLiteral {
 		self.init(identifiers: elements)
 	}
 }
+
+// `Destination` is phantom — `RelationshipMany` only stores `[ResourceIdentifier]` — so the
+// conformance is unconditional.
+extension RelationshipMany: Sendable {}

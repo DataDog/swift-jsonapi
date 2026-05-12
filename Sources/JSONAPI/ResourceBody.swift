@@ -114,3 +114,6 @@ extension ResourceBody where Relationships == Unit {
 
 extension ResourceBody: Equatable where ID: Equatable, Attributes: Equatable, Relationships: Equatable {
 }
+
+extension ResourceBody: Sendable where ID: Sendable, Attributes: Sendable, Relationships: Sendable {
+}

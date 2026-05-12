@@ -41,3 +41,6 @@ extension DefaultEmpty: Equatable where T: Equatable {
 
 extension DefaultEmpty: Hashable where T: Hashable {
 }
+
+extension DefaultEmpty: Sendable where T: Sendable {
+}

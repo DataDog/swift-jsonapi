@@ -60,3 +60,6 @@ extension InlineRelationshipOne {
 		case data
 	}
 }
+
+extension InlineRelationshipOne: Sendable where Destination: Sendable {
+}

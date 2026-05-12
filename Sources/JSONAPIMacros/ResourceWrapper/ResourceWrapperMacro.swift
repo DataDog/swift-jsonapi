@@ -527,13 +527,21 @@ extension InheritedTypeListSyntax {
 	fileprivate static func makeDefinitionAssociatedTypesInheritedTypeList(
 		attachedTo declaration: some DeclGroupSyntax
 	) -> InheritedTypeListSyntax {
-		let inheritedTypes = [
-			declaration.conformsToEquatable
-				? InheritedTypeSyntax(type: TypeSyntax("Equatable"), trailingComma: .commaToken())
-				: nil,
-			InheritedTypeSyntax(type: TypeSyntax("Codable")),
-		].compactMap { $0 }
-		return InheritedTypeListSyntax(inheritedTypes)
+		var types: [InheritedTypeSyntax] = []
+		if declaration.conformsToEquatable {
+			types.append(InheritedTypeSyntax(type: TypeSyntax("Equatable")))
+		}
+		types.append(InheritedTypeSyntax(type: TypeSyntax("Codable")))
+		if declaration.conformsToSendable {
+			types.append(InheritedTypeSyntax(type: TypeSyntax("Sendable")))
+		}
+
+		// Re-apply trailing commas so every entry except the last has one.
+		let withCommas = types.enumerated().map { index, type -> InheritedTypeSyntax in
+			guard index < types.count - 1 else { return type }
+			return type.with(\.trailingComma, .commaToken())
+		}
+		return InheritedTypeListSyntax(withCommas)
 	}
 }
 
@@ -545,6 +553,16 @@ extension DeclGroupSyntax {
 
 		return inheritanceClause.inheritedTypes.contains {
 			$0.type.as(IdentifierTypeSyntax.self)?.name.text == "Equatable"
+		}
+	}
+
+	fileprivate var conformsToSendable: Bool {
+		guard let inheritanceClause else {
+			return false
+		}
+
+		return inheritanceClause.inheritedTypes.contains {
+			$0.type.as(IdentifierTypeSyntax.self)?.name.text == "Sendable"
 		}
 	}
 }
