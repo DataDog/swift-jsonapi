@@ -87,3 +87,7 @@ extension RelationshipOne: ExpressibleByStringLiteral where Destination.ID: Expr
 		self.init(id: Destination.ID(stringLiteral: stringLiteral))
 	}
 }
+
+// `Destination` is phantom — `RelationshipOne` only stores a `ResourceIdentifier?` — so the
+// conformance is unconditional.
+extension RelationshipOne: Sendable {}

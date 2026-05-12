@@ -112,3 +112,6 @@ extension CompoundDocument: Encodable where PrimaryData: Encodable, Meta: Encoda
 		try encoder.resourceEncoder?.encodeResources(into: &includedContainer)
 	}
 }
+
+extension CompoundDocument: Sendable where PrimaryData: Sendable, Meta: Sendable {
+}

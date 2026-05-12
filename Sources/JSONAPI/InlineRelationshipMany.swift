@@ -93,3 +93,6 @@ extension InlineRelationshipMany {
 		case data
 	}
 }
+
+extension InlineRelationshipMany: Sendable where Destination: Sendable {
+}
