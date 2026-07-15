@@ -207,11 +207,14 @@ final class ResourceWrapperMacroTests: XCTestCase {
 						var firstName: String
 						var lastName: String
 					}
-					struct Relationships: Equatable, Codable {
+					struct Relationships: Equatable, Codable, JSONAPI.EmptyRepresentable {
 						private enum CodingKeys: String, CodingKey {
 						    case related = "related_person"
 						}
 						var related: JSONAPI.InlineRelationshipOptional<Person>?
+						static var empty: Self {
+							Relationships(related: nil)
+						}
 					}
 					static let resourceType = "people"
 				}
@@ -303,8 +306,11 @@ final class ResourceWrapperMacroTests: XCTestCase {
 						public var firstName: String
 						var lastName: String
 					}
-					public struct Relationships: Equatable, Codable {
+					public struct Relationships: Equatable, Codable, JSONAPI.EmptyRepresentable {
 						public var related: JSONAPI.InlineRelationshipOptional<Person>?
+						public static var empty: Self {
+							Relationships(related: nil)
+						}
 					}
 					public static let resourceType = "people"
 				}
@@ -386,8 +392,11 @@ final class ResourceWrapperMacroTests: XCTestCase {
 					struct Attributes: Codable, Sendable {
 						var firstName: String
 					}
-					struct Relationships: Codable, Sendable {
+					struct Relationships: Codable, Sendable, JSONAPI.EmptyRepresentable {
 						var related: JSONAPI.InlineRelationshipOptional<Person>?
+						static var empty: Self {
+							Relationships(related: nil)
+						}
 					}
 					static let resourceType = "people"
 				}
@@ -572,6 +581,256 @@ final class ResourceWrapperMacroTests: XCTestCase {
 				static func updateBody(id: UUID, name: String? = nil, tags: [String]? = nil) -> Schedule.Body {
 					let attributes = Body.Attributes(name: name, tags: tags)
 					return Body(id: id, attributes: attributes)
+				}
+			}
+			"""
+		}
+	}
+
+	func testResourceWrapperEmptyRepresentable() {
+		assertMacro {
+			"""
+			@ResourceWrapper(type: "people")
+			struct Person: Equatable {
+				var id: String
+
+				@ResourceAttribute var firstName: String?
+				@ResourceAttribute var lastName: String?
+				@ResourceRelationship var related: Person?
+			}
+			"""
+		} expansion: {
+			"""
+			struct Person: Equatable {
+				var id: String
+
+				var firstName: String?
+				var lastName: String?
+				var related: Person?
+			}
+
+			extension Person: JSONAPI.ResourceDefinitionProviding {
+				struct Definition: JSONAPI.ResourceDefinition {
+					struct Attributes: Equatable, Codable, JSONAPI.EmptyRepresentable {
+						var firstName: String?
+						var lastName: String?
+						static var empty: Self {
+							Attributes(firstName: nil, lastName: nil)
+						}
+					}
+					struct Relationships: Equatable, Codable, JSONAPI.EmptyRepresentable {
+						var related: JSONAPI.InlineRelationshipOptional<Person>?
+						static var empty: Self {
+							Relationships(related: nil)
+						}
+					}
+					static let resourceType = "people"
+				}
+				struct BodyDefinition: JSONAPI.ResourceDefinition {
+					struct Attributes: Equatable, Codable {
+						var firstName: String?
+						var lastName: String?
+					}
+					struct Relationships: Equatable, Codable {
+						var related: JSONAPI.RelationshipOne<Person>?
+					}
+					static let resourceType = Definition.resourceType
+				}
+				typealias Wrapped = JSONAPI.Resource<String, Definition>
+				typealias Body = JSONAPI.ResourceBody<String, BodyDefinition>
+			}
+
+			extension Person: JSONAPI.ResourceIdentifiable {
+			}
+
+			extension Person: JSONAPI.ResourceLinkageProviding {
+				typealias ID = String
+			}
+
+			extension Person: Codable {
+				init(from decoder: any Decoder) throws {
+					let wrapped = try Wrapped(from: decoder)
+					self.id = wrapped.id
+					self.firstName = wrapped.firstName
+					self.lastName = wrapped.lastName
+					self.related = wrapped.related?.resource
+				}
+				func encode(to encoder: any Encoder) throws {
+					let attributes = Wrapped.Attributes(firstName: self.firstName, lastName: self.lastName)
+					let relationships = Wrapped.Relationships(related: .init(self.related))
+					let wrapped = Wrapped(id: self.id, attributes: attributes, relationships: relationships)
+					try wrapped.encode(to: encoder)
+				}
+			}
+
+			extension Person {
+				static func createBody(id: String? = nil, firstName: String? = nil, lastName: String? = nil, related: JSONAPI.RelationshipOne<Person>? = nil) -> Person.Body {
+					let attributes = Body.Attributes(firstName: firstName, lastName: lastName)
+					let relationships = Body.Relationships(related: related)
+					return Body(id: id, attributes: attributes, relationships: relationships)
+				}
+				static func updateBody(id: String, firstName: String? = nil, lastName: String? = nil, related: JSONAPI.RelationshipOne<Person>? = nil) -> Person.Body {
+					let attributes = Body.Attributes(firstName: firstName, lastName: lastName)
+					let relationships = Body.Relationships(related: related)
+					return Body(id: id, attributes: attributes, relationships: relationships)
+				}
+			}
+			"""
+		}
+	}
+
+	func testResourceWrapperMixedOptionalAttributesNotEmptyRepresentable() {
+		assertMacro {
+			"""
+			@ResourceWrapper(type: "people")
+			struct Person: Equatable {
+				var id: String
+
+				@ResourceAttribute var firstName: String
+				@ResourceAttribute var lastName: String?
+			}
+			"""
+		} expansion: {
+			"""
+			struct Person: Equatable {
+				var id: String
+
+				var firstName: String
+				var lastName: String?
+			}
+
+			extension Person: JSONAPI.ResourceDefinitionProviding {
+				struct Definition: JSONAPI.ResourceDefinition {
+					struct Attributes: Equatable, Codable {
+						var firstName: String
+						var lastName: String?
+					}
+					static let resourceType = "people"
+				}
+				struct BodyDefinition: JSONAPI.ResourceDefinition {
+					struct Attributes: Equatable, Codable {
+						var firstName: String?
+						var lastName: String?
+					}
+					static let resourceType = Definition.resourceType
+				}
+				typealias Wrapped = JSONAPI.Resource<String, Definition>
+				typealias Body = JSONAPI.ResourceBody<String, BodyDefinition>
+			}
+
+			extension Person: JSONAPI.ResourceIdentifiable {
+			}
+
+			extension Person: JSONAPI.ResourceLinkageProviding {
+				typealias ID = String
+			}
+
+			extension Person: Codable {
+				init(from decoder: any Decoder) throws {
+					let wrapped = try Wrapped(from: decoder)
+					self.id = wrapped.id
+					self.firstName = wrapped.firstName
+					self.lastName = wrapped.lastName
+				}
+				func encode(to encoder: any Encoder) throws {
+					let attributes = Wrapped.Attributes(firstName: self.firstName, lastName: self.lastName)
+					let wrapped = Wrapped(id: self.id, attributes: attributes)
+					try wrapped.encode(to: encoder)
+				}
+			}
+
+			extension Person {
+				static func createBody(id: String? = nil, firstName: String? = nil, lastName: String? = nil) -> Person.Body {
+					let attributes = Body.Attributes(firstName: firstName, lastName: lastName)
+					return Body(id: id, attributes: attributes)
+				}
+				static func updateBody(id: String, firstName: String? = nil, lastName: String? = nil) -> Person.Body {
+					let attributes = Body.Attributes(firstName: firstName, lastName: lastName)
+					return Body(id: id, attributes: attributes)
+				}
+			}
+			"""
+		}
+	}
+
+	func testResourceWrapperAttributesEmptyRepresentableIndependentOfRelationships() {
+		assertMacro {
+			"""
+			@ResourceWrapper(type: "comments")
+			struct Comment: Equatable {
+				var id: String
+
+				@ResourceAttribute var body: String?
+				@ResourceRelationship var author: Person
+			}
+			"""
+		} expansion: {
+			"""
+			struct Comment: Equatable {
+				var id: String
+
+				var body: String?
+				var author: Person
+			}
+
+			extension Comment: JSONAPI.ResourceDefinitionProviding {
+				struct Definition: JSONAPI.ResourceDefinition {
+					struct Attributes: Equatable, Codable, JSONAPI.EmptyRepresentable {
+						var body: String?
+						static var empty: Self {
+							Attributes(body: nil)
+						}
+					}
+					struct Relationships: Equatable, Codable {
+						var author: JSONAPI.InlineRelationshipOne<Person>
+					}
+					static let resourceType = "comments"
+				}
+				struct BodyDefinition: JSONAPI.ResourceDefinition {
+					struct Attributes: Equatable, Codable {
+						var body: String?
+					}
+					struct Relationships: Equatable, Codable {
+						var author: JSONAPI.RelationshipOne<Person>?
+					}
+					static let resourceType = Definition.resourceType
+				}
+				typealias Wrapped = JSONAPI.Resource<String, Definition>
+				typealias Body = JSONAPI.ResourceBody<String, BodyDefinition>
+			}
+
+			extension Comment: JSONAPI.ResourceIdentifiable {
+			}
+
+			extension Comment: JSONAPI.ResourceLinkageProviding {
+				typealias ID = String
+			}
+
+			extension Comment: Codable {
+				init(from decoder: any Decoder) throws {
+					let wrapped = try Wrapped(from: decoder)
+					self.id = wrapped.id
+					self.body = wrapped.body
+					self.author = wrapped.author.resource
+				}
+				func encode(to encoder: any Encoder) throws {
+					let attributes = Wrapped.Attributes(body: self.body)
+					let relationships = Wrapped.Relationships(author: .init(self.author))
+					let wrapped = Wrapped(id: self.id, attributes: attributes, relationships: relationships)
+					try wrapped.encode(to: encoder)
+				}
+			}
+
+			extension Comment {
+				static func createBody(id: String? = nil, body: String? = nil, author: JSONAPI.RelationshipOne<Person>? = nil) -> Comment.Body {
+					let attributes = Body.Attributes(body: body)
+					let relationships = Body.Relationships(author: author)
+					return Body(id: id, attributes: attributes, relationships: relationships)
+				}
+				static func updateBody(id: String, body: String? = nil, author: JSONAPI.RelationshipOne<Person>? = nil) -> Comment.Body {
+					let attributes = Body.Attributes(body: body)
+					let relationships = Body.Relationships(author: author)
+					return Body(id: id, attributes: attributes, relationships: relationships)
 				}
 			}
 			"""

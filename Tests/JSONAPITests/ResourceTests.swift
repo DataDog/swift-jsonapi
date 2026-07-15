@@ -226,6 +226,128 @@ final class ResourceTests: XCTestCase {
 		XCTAssertNil(comment.author?.resource)
 	}
 
+	func testDecodeMissingAttributes() throws {
+		// given
+		struct PersonDefinition: ResourceDefinition {
+			struct Attributes: Equatable, Codable, EmptyRepresentable {
+				var firstName: String?
+				var lastName: String?
+				static let empty = Attributes(firstName: nil, lastName: nil)
+			}
+
+			static let resourceType = "people"
+		}
+
+		typealias Person = Resource<String, PersonDefinition>
+
+		let json = try XCTUnwrap(
+			Bundle.module.url(forResource: "Fixtures/MissingAttributesKey", withExtension: "json").map {
+				try Data(contentsOf: $0)
+			}
+		)
+
+		// when
+		let person = try JSONAPIDecoder().decode(Person.self, from: json)
+
+		// then
+		XCTAssertEqual(person.attributes, PersonDefinition.Attributes.empty)
+	}
+
+	func testDecodeAttributesPresentIgnoresEmptyRepresentable() throws {
+		// given
+		struct PersonDefinition: ResourceDefinition {
+			struct Attributes: Equatable, Codable, EmptyRepresentable {
+				var firstName: String?
+				var lastName: String?
+				var twitter: String?
+				static let empty = Attributes(firstName: nil, lastName: nil, twitter: nil)
+			}
+
+			static let resourceType = "people"
+		}
+
+		typealias Person = Resource<String, PersonDefinition>
+
+		let json = try XCTUnwrap(
+			Bundle.module.url(forResource: "Fixtures/Person", withExtension: "json").map {
+				try Data(contentsOf: $0)
+			}
+		)
+
+		// when
+		let person = try JSONAPIDecoder().decode(Person.self, from: json)
+
+		// then
+		XCTAssertEqual(
+			person.attributes,
+			PersonDefinition.Attributes(firstName: "Dan", lastName: "Gebhardt", twitter: "dgeb")
+		)
+	}
+
+	func testDecodeMissingAttributesThrowsWhenNotEmptyRepresentable() throws {
+		// given
+		let json = try XCTUnwrap(
+			Bundle.module.url(forResource: "Fixtures/MissingAttributesKey", withExtension: "json").map {
+				try Data(contentsOf: $0)
+			}
+		)
+
+		do {
+			// when
+			_ = try JSONAPIDecoder().decode(Person.self, from: json)
+			XCTFail("Should throw DecodingError.keyNotFound.")
+		} catch DecodingError.keyNotFound {
+			// then
+		}
+	}
+
+	func testDecodeMissingRelationships() throws {
+		// given
+		struct CommentDefinition: ResourceDefinition {
+			struct Attributes: Equatable, Codable {
+				var body: String
+			}
+
+			struct Relationships: Equatable, Codable, EmptyRepresentable {
+				var author: InlineRelationshipOptional<Person>?
+				static let empty = Relationships(author: nil)
+			}
+
+			static let resourceType = "comments"
+		}
+
+		typealias Comment = Resource<String, CommentDefinition>
+
+		let json = try XCTUnwrap(
+			Bundle.module.url(forResource: "Fixtures/MissingRelationshipsKey", withExtension: "json").map {
+				try Data(contentsOf: $0)
+			}
+		)
+
+		// when
+		let comment = try JSONAPIDecoder().decode(Comment.self, from: json)
+
+		// then
+		XCTAssertEqual(comment.relationships, CommentDefinition.Relationships.empty)
+	}
+
+	func testDecodeMissingRelationshipsThrowsWhenNotEmptyRepresentable() throws {
+		// given
+		let json = try XCTUnwrap(
+			Bundle.module.url(forResource: "Fixtures/MissingRelationshipsKey", withExtension: "json").map {
+				try Data(contentsOf: $0)
+			}
+		)
+
+		do {
+			// when
+			_ = try JSONAPIDecoder().decode(Comment.self, from: json)
+			XCTFail("Should throw DecodingError.keyNotFound.")
+		} catch DecodingError.keyNotFound {
+			// then
+		}
+	}
+
 	func testDecodeTypeMismatch() throws {
 		// given
 		let json = try XCTUnwrap(

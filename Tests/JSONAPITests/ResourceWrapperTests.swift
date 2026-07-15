@@ -46,6 +46,14 @@ final class ResourceWrapperTests: XCTestCase {
 		var tags: [String]
 	}
 
+	@ResourceWrapper(type: "profiles")
+	fileprivate struct Profile: Equatable {
+		var id: String
+
+		@ResourceAttribute var nickname: String?
+		@ResourceRelationship var favorite: ResourceWrapperTests.Person?
+	}
+
 	private enum Fixtures {
 		static let article = Article(
 			id: "1",
@@ -112,6 +120,44 @@ final class ResourceWrapperTests: XCTestCase {
 			],
 			schedules
 		)
+	}
+
+	func testDecodeMissingAttributes() throws {
+		// given
+		let json = try XCTUnwrap(#"{ "data": { "type": "profiles", "id": "1" } }"#.data(using: .utf8))
+
+		// when
+		let profile = try JSONAPIDecoder().decode(Profile.self, from: json)
+
+		// then
+		XCTAssertEqual(profile, Profile(id: "1", nickname: nil, favorite: nil))
+	}
+
+	func testDecodeMissingRelationships() throws {
+		// given
+		let json = try XCTUnwrap(
+			#"{ "data": { "type": "profiles", "id": "1", "attributes": { "nickname": "dg" } } }"#
+				.data(using: .utf8)
+		)
+
+		// when
+		let profile = try JSONAPIDecoder().decode(Profile.self, from: json)
+
+		// then
+		XCTAssertEqual(profile, Profile(id: "1", nickname: "dg", favorite: nil))
+	}
+
+	func testDecodeMissingAttributesThrowsWhenNotEligible() throws {
+		// given
+		let json = try XCTUnwrap(#"{ "data": { "type": "people", "id": "9" } }"#.data(using: .utf8))
+
+		do {
+			// when
+			_ = try JSONAPIDecoder().decode(Person.self, from: json)
+			XCTFail("Should throw DecodingError.keyNotFound.")
+		} catch DecodingError.keyNotFound {
+			// then
+		}
 	}
 
 	func testEncodeSingle() {

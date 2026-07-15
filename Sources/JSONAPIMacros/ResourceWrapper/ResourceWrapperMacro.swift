@@ -69,6 +69,14 @@ extension ExtensionDeclSyntax {
 		let resourceAttributes = declaration.definedVariables.filter(\.hasResourceAttributeMacro)
 		let resourceRelationships = declaration.definedVariables.filter(\.hasResourceRelationshipMacro)
 
+		// A resource's `attributes`/`relationships` may be entirely absent from a JSON:API payload.
+		// When every attribute (or relationship) property is `Optional`, the generated `Attributes`
+		// (or `Relationships`) struct can safely conform to `EmptyRepresentable`, so `Resource` can
+		// decode the resource even when the corresponding top-level member is missing.
+		let attributesEmptyRepresentable = !resourceAttributes.isEmpty && resourceAttributes.allSatisfy(\.isOptional)
+		let relationshipsEmptyRepresentable =
+			!resourceRelationships.isEmpty && resourceRelationships.allSatisfy(\.isOptional)
+
 		guard let identifier = declaration.definedVariables.first(where: \.isIdentifier) else {
 			throw DiagnosticsError(
 				syntax: declaration,
@@ -83,7 +91,9 @@ extension ExtensionDeclSyntax {
 				inheritedTypeList: inheritedTypeList,
 				resourceAttributes: resourceAttributes,
 				resourceRelationships: resourceRelationships,
-				resourceType: resourceType
+				resourceType: resourceType,
+				attributesEmptyRepresentable: attributesEmptyRepresentable,
+				relationshipsEmptyRepresentable: relationshipsEmptyRepresentable
 			)
 			try StructDeclSyntax.makeBodyDefinition(
 				modifiers: modifiers,
@@ -286,7 +296,9 @@ extension StructDeclSyntax {
 		inheritedTypeList: InheritedTypeListSyntax,
 		resourceAttributes: [VariableDeclSyntax],
 		resourceRelationships: [VariableDeclSyntax],
-		resourceType: String
+		resourceType: String,
+		attributesEmptyRepresentable: Bool,
+		relationshipsEmptyRepresentable: Bool
 	) throws -> StructDeclSyntax {
 		try StructDeclSyntax("\(modifiers)struct Definition: JSONAPI.ResourceDefinition") {
 			if !resourceAttributes.isEmpty {
@@ -297,14 +309,16 @@ extension StructDeclSyntax {
 					},
 					modifiers: modifiers,
 					inheritedTypeList: inheritedTypeList,
-					resourceAttributes: resourceAttributes
+					resourceAttributes: resourceAttributes,
+					isEmptyRepresentable: attributesEmptyRepresentable
 				)
 			}
 			if !resourceRelationships.isEmpty {
 				try StructDeclSyntax.makeDefinitionRelationships(
 					modifiers: modifiers,
 					inheritedTypeList: inheritedTypeList,
-					resourceRelationships: resourceRelationships
+					resourceRelationships: resourceRelationships,
+					isEmptyRepresentable: relationshipsEmptyRepresentable
 				)
 			}
 			DeclSyntax("\(modifiers)static let resourceType = \"\(raw: resourceType)\"")
@@ -343,9 +357,13 @@ extension StructDeclSyntax {
 		modifiers: DeclModifierListSyntax,
 		inheritedTypeList: InheritedTypeListSyntax,
 		resourceAttributes: [VariableDeclSyntax],
-		typeKeyPath: KeyPath<VariableDeclSyntax, TypeSyntax?> = \.type
+		typeKeyPath: KeyPath<VariableDeclSyntax, TypeSyntax?> = \.type,
+		isEmptyRepresentable: Bool = false
 	) throws -> StructDeclSyntax {
-		try StructDeclSyntax("\(modifiers)struct Attributes:\(inheritedTypeList)") {
+		let finalInheritedTypeList =
+			isEmptyRepresentable
+			? inheritedTypeList.appending(TypeSyntax("JSONAPI.EmptyRepresentable")) : inheritedTypeList
+		return try StructDeclSyntax("\(modifiers)struct Attributes:\(finalInheritedTypeList)") {
 			if resourceAttributes.containsResourceAttributeKeys {
 				DeclSyntax.makeCodingKeys(for: resourceAttributes, rawValueKeyPath: \.resourceAttributeKey)
 			}
@@ -367,6 +385,14 @@ extension StructDeclSyntax {
 				}
 				.with(\.trailingTrivia, .newline)
 			}
+
+			if isEmptyRepresentable {
+				DeclSyntax(
+					"""
+					\(modifiers)static var empty: Self { \(FunctionCallExprSyntax.makeEmptyAttributes(resourceAttributes)) }
+					"""
+				)
+			}
 		}
 	}
 
@@ -374,9 +400,13 @@ extension StructDeclSyntax {
 		modifiers: DeclModifierListSyntax,
 		inheritedTypeList: InheritedTypeListSyntax,
 		resourceRelationships: [VariableDeclSyntax],
-		typeKeyPath: KeyPath<VariableDeclSyntax, TypeSyntax?> = \.inlineRelationshipType
+		typeKeyPath: KeyPath<VariableDeclSyntax, TypeSyntax?> = \.inlineRelationshipType,
+		isEmptyRepresentable: Bool = false
 	) throws -> StructDeclSyntax {
-		try StructDeclSyntax("\(modifiers)struct Relationships:\(inheritedTypeList)") {
+		let finalInheritedTypeList =
+			isEmptyRepresentable
+			? inheritedTypeList.appending(TypeSyntax("JSONAPI.EmptyRepresentable")) : inheritedTypeList
+		return try StructDeclSyntax("\(modifiers)struct Relationships:\(finalInheritedTypeList)") {
 			if resourceRelationships.containsResourceRelationshipKeys {
 				DeclSyntax.makeCodingKeys(for: resourceRelationships, rawValueKeyPath: \.resourceRelationshipKey)
 			}
@@ -395,6 +425,14 @@ extension StructDeclSyntax {
 						)
 					}
 				}
+			}
+
+			if isEmptyRepresentable {
+				DeclSyntax(
+					"""
+					\(modifiers)static var empty: Self { \(FunctionCallExprSyntax.makeEmptyRelationships(resourceRelationships)) }
+					"""
+				)
 			}
 		}
 	}
@@ -442,6 +480,34 @@ extension FunctionCallExprSyntax {
 			}
 			if !resourceRelationships.isEmpty {
 				LabeledExprSyntax(label: "relationships", expression: ExprSyntax("relationships"))
+			}
+		}
+	}
+
+	fileprivate static func makeEmptyAttributes(
+		_ resourceAttributes: [VariableDeclSyntax]
+	) -> FunctionCallExprSyntax {
+		FunctionCallExprSyntax(callee: ExprSyntax("Attributes")) {
+			for resourceAttribute in resourceAttributes {
+				LabeledExprSyntax(
+					label: resourceAttribute.identifier,
+					colon: .colonToken(trailingTrivia: .space),
+					expression: ExprSyntax("nil")
+				)
+			}
+		}
+	}
+
+	fileprivate static func makeEmptyRelationships(
+		_ resourceRelationships: [VariableDeclSyntax]
+	) -> FunctionCallExprSyntax {
+		FunctionCallExprSyntax(callee: ExprSyntax("Relationships")) {
+			for resourceRelationship in resourceRelationships {
+				LabeledExprSyntax(
+					label: resourceRelationship.identifier,
+					colon: .colonToken(trailingTrivia: .space),
+					expression: ExprSyntax("nil")
+				)
 			}
 		}
 	}
@@ -524,6 +590,19 @@ extension DeclSyntax {
 }
 
 extension InheritedTypeListSyntax {
+	/// Re-applies trailing commas so every entry except the last has one.
+	fileprivate static func withNormalizedTrailingCommas(_ types: [InheritedTypeSyntax]) -> InheritedTypeListSyntax {
+		let withCommas = types.enumerated().map { index, type -> InheritedTypeSyntax in
+			guard index < types.count - 1 else { return type }
+			return type.with(\.trailingComma, .commaToken())
+		}
+		return InheritedTypeListSyntax(withCommas)
+	}
+
+	fileprivate func appending(_ type: TypeSyntax) -> InheritedTypeListSyntax {
+		Self.withNormalizedTrailingCommas(self.map { $0 } + [InheritedTypeSyntax(type: type)])
+	}
+
 	fileprivate static func makeDefinitionAssociatedTypesInheritedTypeList(
 		attachedTo declaration: some DeclGroupSyntax
 	) -> InheritedTypeListSyntax {
@@ -536,12 +615,7 @@ extension InheritedTypeListSyntax {
 			types.append(InheritedTypeSyntax(type: TypeSyntax("Sendable")))
 		}
 
-		// Re-apply trailing commas so every entry except the last has one.
-		let withCommas = types.enumerated().map { index, type -> InheritedTypeSyntax in
-			guard index < types.count - 1 else { return type }
-			return type.with(\.trailingComma, .commaToken())
-		}
-		return InheritedTypeListSyntax(withCommas)
+		return Self.withNormalizedTrailingCommas(types)
 	}
 }
 
