@@ -147,9 +147,10 @@ extension Resource: Decodable where ID: Decodable, Attributes: Decodable, Relati
 
 		if let attributes = Unit() as? Attributes {
 			self.attributes = attributes
-		} else if !container.contains(.attributes), let emptyType = Attributes.self as? any EmptyRepresentable.Type
+		} else if !container.contains(.attributes),
+			let attributes = (Attributes.self as? any EmptyRepresentable.Type)?.empty as? Attributes
 		{
-			self.attributes = emptyType.empty as! Attributes
+			self.attributes = attributes
 		} else {
 			self.attributes = try container.decode(Attributes.self, forKey: .attributes)
 		}
@@ -157,9 +158,9 @@ extension Resource: Decodable where ID: Decodable, Attributes: Decodable, Relati
 		if let relationships = Unit() as? Relationships {
 			self.relationships = relationships
 		} else if !container.contains(.relationships),
-			let emptyType = Relationships.self as? any EmptyRepresentable.Type
+			let relationships = (Relationships.self as? any EmptyRepresentable.Type)?.empty as? Relationships
 		{
-			self.relationships = emptyType.empty as! Relationships
+			self.relationships = relationships
 		} else {
 			self.relationships = try container.decode(Relationships.self, forKey: .relationships)
 		}

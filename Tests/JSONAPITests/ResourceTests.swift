@@ -298,6 +298,8 @@ final class ResourceTests: XCTestCase {
 			XCTFail("Should throw DecodingError.keyNotFound.")
 		} catch DecodingError.keyNotFound {
 			// then
+		} catch {
+			XCTFail("Expected DecodingError.keyNotFound but got \(error).")
 		}
 	}
 
@@ -345,6 +347,8 @@ final class ResourceTests: XCTestCase {
 			XCTFail("Should throw DecodingError.keyNotFound.")
 		} catch DecodingError.keyNotFound {
 			// then
+		} catch {
+			XCTFail("Expected DecodingError.keyNotFound but got \(error).")
 		}
 	}
 
