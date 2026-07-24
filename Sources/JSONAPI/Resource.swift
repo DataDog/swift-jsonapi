@@ -53,6 +53,28 @@ public enum ResourceCodingKeys: String, CodingKey {
 ///
 /// Alternatively, you can use the ``ResourceWrapper(type:)`` macro to eliminate the boilerplate required to define
 /// a JSON:API resource.
+///
+/// The JSON:API specification allows a resource object's `attributes` and `relationships` members to be entirely
+/// absent. By default, ``Resource`` requires both members to be present when decoding, throwing
+/// `DecodingError.keyNotFound` otherwise. To tolerate an absent member, conform the corresponding `Attributes` or
+/// `Relationships` type to ``EmptyRepresentable``:
+///
+/// ```swift
+/// struct PersonDefinition: ResourceDefinition {
+///   struct Attributes: Equatable, Codable, EmptyRepresentable {
+///     var firstName: String?
+///     var lastName: String?
+///     static let empty = Attributes(firstName: nil, lastName: nil)
+///   }
+///
+///   static let resourceType = "people"
+/// }
+/// ```
+///
+/// With this conformance, decoding a `people` resource with no `attributes` member at all falls back to
+/// `Attributes.empty` instead of throwing. If you use the ``ResourceWrapper(type:)`` macro, this conformance is
+/// synthesized automatically whenever every `@ResourceAttribute` (or `@ResourceRelationship`) property is
+/// `Optional`.
 @dynamicMemberLookup
 public struct Resource<ID, Definition>: ResourceDefinitionProviding, ResourceIdentifiable, ResourceLinkageProviding
 where
@@ -125,11 +147,19 @@ extension Resource: Decodable where ID: Decodable, Attributes: Decodable, Relati
 
 		if let attributes = Unit() as? Attributes {
 			self.attributes = attributes
+		} else if !container.contains(.attributes),
+			let attributes = (Attributes.self as? any EmptyRepresentable.Type)?.empty as? Attributes
+		{
+			self.attributes = attributes
 		} else {
 			self.attributes = try container.decode(Attributes.self, forKey: .attributes)
 		}
 
 		if let relationships = Unit() as? Relationships {
+			self.relationships = relationships
+		} else if !container.contains(.relationships),
+			let relationships = (Relationships.self as? any EmptyRepresentable.Type)?.empty as? Relationships
+		{
 			self.relationships = relationships
 		} else {
 			self.relationships = try container.decode(Relationships.self, forKey: .relationships)

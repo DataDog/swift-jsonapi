@@ -82,6 +82,11 @@ import Foundation
 /// It is worth noting that you need to use the ``RelationshipOne`` and
 /// ``RelationshipMany`` types to define relationships since only the
 /// relationship, not the related resource, is required in a creation or update operation.
+///
+/// The JSON:API specification allows a resource object's `attributes` and `relationships`
+/// members to be entirely absent. Conform `Attributes` or `Relationships` to
+/// ``EmptyRepresentable`` to let ``Resource`` decode successfully when the corresponding member
+/// is missing, falling back to ``EmptyRepresentable/empty``.
 public protocol ResourceDefinition {
 	associatedtype Attributes = Unit
 	associatedtype Relationships = Unit

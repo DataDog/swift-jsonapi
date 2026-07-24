@@ -272,6 +272,46 @@ let article = try decoder.decode(Article.self, from: json)
 // Ignores any missing resources in the `comments` relationship
 ```
 
+### Missing `attributes` or `relationships`
+
+The JSON:API specification allows a resource object's `attributes` and `relationships` members to
+be entirely absent. By default, decoding throws `DecodingError.keyNotFound` if either member is
+missing.
+
+If every one of a resource's attributes (or relationships) is optional, `@ResourceWrapper`
+automatically allows the corresponding member to be absent from the payload, decoding all of them
+as `nil` instead of throwing:
+
+```swift
+@ResourceWrapper(type: "people")
+struct Person: Equatable {
+  var id: String
+
+  @ResourceAttribute var firstName: String?
+  @ResourceAttribute var lastName: String?
+}
+
+let decoder = JSONAPIDecoder()
+let person = try decoder.decode(Person.self, from: json)
+// Decodes successfully with `firstName` and `lastName` set to `nil` even if `attributes` is
+// entirely absent from the payload.
+```
+
+If you define a `ResourceDefinition` by hand instead of using `@ResourceWrapper`, conform
+`Attributes` or `Relationships` to `EmptyRepresentable` to opt in to the same behavior:
+
+```swift
+struct PersonDefinition: ResourceDefinition {
+  struct Attributes: Equatable, Codable, EmptyRepresentable {
+    var firstName: String?
+    var lastName: String?
+    static let empty = Attributes(firstName: nil, lastName: nil)
+  }
+
+  static let resourceType = "people"
+}
+```
+
 ### Unhandled resource types in polymorphic relationships
 
 When decoding a polymorphic relationship, if the decoder finds a resource type not included in the resource union, it
