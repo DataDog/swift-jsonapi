@@ -17,6 +17,15 @@ public struct InlineRelationshipMany<Destination> {
 	public init(_ resources: [Destination]) {
 		self.resources = resources
 	}
+
+	/// Creates a to-many relationship from an optional array, treating `nil` the same as an empty array.
+	///
+	/// This overload exists so that a property annotated with `@ResourceRelationship` and marked as `Optional`
+	/// compiles when its wrapped type is an array (e.g. `var comments: [Comment]?`), mirroring the initializer
+	/// ``InlineRelationshipOptional`` already provides for optional to-one relationships.
+	public init(_ resources: [Destination]?) {
+		self.init(resources ?? [])
+	}
 }
 
 extension InlineRelationshipMany: RandomAccessCollection {

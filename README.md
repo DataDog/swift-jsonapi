@@ -87,7 +87,14 @@ let data = try encoder.encode(articles)
 > **_NOTE:_** To provide greater flexibility, the library allows a field annotated with `@ResourceRelationship` and marked
 > as `Optional` to be omitted from the JSON:API response. While this behavior deviates from the JSON:API specification
 > —which recommends including relationship fields even when they are empty—it can be useful in cases where strict adherence
-> to the spec is either impractical or unnecessary.
+> to the spec is either impractical or unnecessary. This applies to "to-many" relationships as well:
+>
+> ```swift
+> @ResourceRelationship var comments: [Comment]?
+> ```
+>
+> Decoding treats a missing `comments` field the same as `nil`; encoding treats `nil` the same as an empty array, since
+> there is no way to distinguish an empty "to-many" relationship from a missing one once encoded.
 
 ## Creating and updating resources
 

@@ -54,6 +54,14 @@ final class ResourceWrapperTests: XCTestCase {
 		@ResourceRelationship var favorite: ResourceWrapperTests.Person?
 	}
 
+	@ResourceWrapper(type: "teams")
+	fileprivate struct Team: Equatable {
+		var id: String
+
+		@ResourceAttribute var name: String
+		@ResourceRelationship var members: [ResourceWrapperTests.Person]?
+	}
+
 	private enum Fixtures {
 		static let article = Article(
 			id: "1",
@@ -162,12 +170,60 @@ final class ResourceWrapperTests: XCTestCase {
 		}
 	}
 
+	func testDecodeMissingArrayRelationship() throws {
+		// given
+		let json = try XCTUnwrap(
+			#"{ "data": { "type": "teams", "id": "1", "attributes": { "name": "Engineering" } } }"#
+				.data(using: .utf8)
+		)
+
+		// when
+		let team = try JSONAPIDecoder().decode(Team.self, from: json)
+
+		// then
+		XCTAssertEqual(team, Team(id: "1", name: "Engineering", members: nil))
+	}
+
+	func testDecodeEmptyArrayRelationship() throws {
+		// given
+		let json = try XCTUnwrap(
+			#"""
+			{
+			  "data": {
+			    "type": "teams",
+			    "id": "1",
+			    "attributes": { "name": "Engineering" },
+			    "relationships": { "members": { "data": [] } }
+			  }
+			}
+			"""#.data(using: .utf8)
+		)
+
+		// when
+		let team = try JSONAPIDecoder().decode(Team.self, from: json)
+
+		// then
+		XCTAssertEqual(team, Team(id: "1", name: "Engineering", members: []))
+	}
+
 	func testEncodeSingle() {
 		assertSnapshot(of: Fixtures.article, as: .jsonAPI())
 	}
 
 	func testEncodeArray() {
 		assertSnapshot(of: Fixtures.articles, as: .jsonAPI())
+	}
+
+	func testEncodeOptionalArrayRelationship() {
+		let teamWithMembers = Team(
+			id: "1",
+			name: "Engineering",
+			members: [Person(id: "9", firstName: "Dan", lastName: "Gebhardt", twitter: "dgeb")]
+		)
+		let teamWithoutMembers = Team(id: "2", name: "Support", members: nil)
+
+		assertSnapshot(of: teamWithMembers, as: .jsonAPI())
+		assertSnapshot(of: teamWithoutMembers, as: .jsonAPI())
 	}
 
 	func testEncodeBodyOnlyAttributes() {
