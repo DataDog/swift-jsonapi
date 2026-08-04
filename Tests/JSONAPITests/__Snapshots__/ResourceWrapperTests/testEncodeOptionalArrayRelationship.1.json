@@ -1,0 +1,30 @@
+{
+  "data" : {
+    "attributes" : {
+      "name" : "Engineering"
+    },
+    "id" : "1",
+    "relationships" : {
+      "members" : {
+        "data" : [
+          {
+            "id" : "9",
+            "type" : "people"
+          }
+        ]
+      }
+    },
+    "type" : "teams"
+  },
+  "included" : [
+    {
+      "attributes" : {
+        "firstName" : "Dan",
+        "lastName" : "Gebhardt",
+        "twitter" : "dgeb"
+      },
+      "id" : "9",
+      "type" : "people"
+    }
+  ]
+}
