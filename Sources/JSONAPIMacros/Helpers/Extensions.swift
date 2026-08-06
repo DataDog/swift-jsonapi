@@ -88,7 +88,7 @@ extension TypeSyntax {
 			let genericArgumentClause = identifierType.genericArgumentClause,
 			let firstArgument = genericArgumentClause.arguments.first
 		{
-			return firstArgument.argument
+			return firstArgument.argument.as(TypeSyntax.self)
 		}
 
 		return nil
@@ -122,7 +122,7 @@ extension TypeSyntax {
 			let genericArgumentClause = identifierType.genericArgumentClause,
 			let firstArgument = genericArgumentClause.arguments.first
 		{
-			return firstArgument.argument
+			return firstArgument.argument.as(TypeSyntax.self)
 		}
 
 		return nil

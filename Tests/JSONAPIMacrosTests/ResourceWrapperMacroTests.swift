@@ -88,8 +88,8 @@ final class ResourceWrapperMacroTests: XCTestCase {
 
 				@ResourceAttribute var title: String
 				@ResourceRelationship var author: Person
-				@ResourceRelationship var comments: [Comment]
-				@ResourceRelationship var edition: Edition?
+				@ResourceRelationship var comments: Array<Comment>
+				@ResourceRelationship var edition: Optional<Edition>
 				@ResourceRelationship var links: [Link]?
 			}
 			"""
@@ -100,8 +100,8 @@ final class ResourceWrapperMacroTests: XCTestCase {
 
 				var title: String
 				var author: Person
-				var comments: [Comment]
-				var edition: Edition?
+				var comments: Array<Comment>
+				var edition: Optional<Edition>
 				var links: [Link]?
 			}
 

@@ -3,6 +3,22 @@
 import CompilerPluginSupport
 import PackageDescription
 
+#if compiler(>=6.3)
+let packageDependencies: [Package.Dependency] = [
+	.package(url: "https://github.com/swiftlang/swift-syntax", "509.0.0"..<"604.0.0"),
+	.package(url: "https://github.com/pointfreeco/swift-macro-testing", from: "0.6.5"),
+	.package(url: "https://github.com/pointfreeco/swift-snapshot-testing", from: "1.19.4"),
+	.package(url: "https://github.com/apple/swift-docc-plugin", from: "1.5.0"),
+]
+#else
+let packageDependencies: [Package.Dependency] = [
+	.package(url: "https://github.com/swiftlang/swift-syntax", "509.0.0"..<"510.0.0"),
+	.package(url: "https://github.com/pointfreeco/swift-macro-testing", "0.5.2"..<"0.6.0"),
+	.package(url: "https://github.com/pointfreeco/swift-snapshot-testing", "1.17.4"..<"1.18.0"),
+	.package(url: "https://github.com/apple/swift-docc-plugin", "1.3.0"..<"1.4.0"),
+]
+#endif
+
 let package = Package(
 	name: "swift-jsonapi",
 	platforms: [
@@ -18,12 +34,7 @@ let package = Package(
 			targets: ["JSONAPI"]
 		)
 	],
-	dependencies: [
-		.package(url: "https://github.com/swiftlang/swift-syntax", "509.0.0"..<"511.0.0"),
-		.package(url: "https://github.com/pointfreeco/swift-macro-testing", from: "0.5.2"),
-		.package(url: "https://github.com/pointfreeco/swift-snapshot-testing", from: "1.15.0"),
-		.package(url: "https://github.com/apple/swift-docc-plugin", from: "1.0.0"),
-	],
+	dependencies: packageDependencies,
 	targets: [
 		.target(
 			name: "JSONAPI",
