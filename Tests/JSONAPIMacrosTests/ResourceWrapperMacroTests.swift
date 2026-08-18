@@ -105,8 +105,8 @@ final class ResourceWrapperMacroTests: XCTestCase {
 				var links: [Link]?
 			}
 
-			extension Article: JSONAPI.ResourceDefinitionProviding {
-				struct Definition: JSONAPI.ResourceDefinition {
+			nonisolated extension Article: JSONAPI.ResourceDefinitionProviding {
+				nonisolated struct Definition: JSONAPI.ResourceDefinition {
 					struct Attributes: Codable {
 						var title: String
 					}
@@ -118,7 +118,7 @@ final class ResourceWrapperMacroTests: XCTestCase {
 					}
 					static let resourceType = "articles"
 				}
-				struct BodyDefinition: JSONAPI.ResourceDefinition {
+				nonisolated struct BodyDefinition: JSONAPI.ResourceDefinition {
 					struct Attributes: Codable {
 						var title: String?
 					}
@@ -134,14 +134,14 @@ final class ResourceWrapperMacroTests: XCTestCase {
 				typealias Body = JSONAPI.ResourceBody<UUID, BodyDefinition>
 			}
 
-			extension Article: JSONAPI.ResourceIdentifiable {
+			nonisolated extension Article: JSONAPI.ResourceIdentifiable {
 			}
 
-			extension Article: JSONAPI.ResourceLinkageProviding {
+			nonisolated extension Article: JSONAPI.ResourceLinkageProviding {
 				typealias ID = UUID
 			}
 
-			extension Article: Codable {
+			nonisolated extension Article: Codable {
 				init(from decoder: any Decoder) throws {
 					let wrapped = try Wrapped(from: decoder)
 					self.id = wrapped.id
@@ -159,7 +159,7 @@ final class ResourceWrapperMacroTests: XCTestCase {
 				}
 			}
 
-			extension Article {
+			nonisolated extension Article {
 				static func createBody(id: UUID? = nil, title: String? = nil, author: JSONAPI.RelationshipOne<Person>? = nil, comments: JSONAPI.RelationshipMany<Comment>? = nil, edition: JSONAPI.RelationshipOne<Edition>? = nil, links: JSONAPI.RelationshipMany<Link>? = nil) -> Article.Body {
 					let attributes = Body.Attributes(title: title)
 					let relationships = Body.Relationships(author: author, comments: comments, edition: edition, links: links)
@@ -197,8 +197,8 @@ final class ResourceWrapperMacroTests: XCTestCase {
 				var related: Person?
 			}
 
-			extension Person: JSONAPI.ResourceDefinitionProviding {
-				struct Definition: JSONAPI.ResourceDefinition {
+			nonisolated extension Person: JSONAPI.ResourceDefinitionProviding {
+				nonisolated struct Definition: JSONAPI.ResourceDefinition {
 					struct Attributes: Equatable, Codable {
 						private enum CodingKeys: String, CodingKey {
 						    case firstName = "first_name"
@@ -218,7 +218,7 @@ final class ResourceWrapperMacroTests: XCTestCase {
 					}
 					static let resourceType = "people"
 				}
-				struct BodyDefinition: JSONAPI.ResourceDefinition {
+				nonisolated struct BodyDefinition: JSONAPI.ResourceDefinition {
 					struct Attributes: Equatable, Codable {
 						private enum CodingKeys: String, CodingKey {
 						    case firstName = "first_name"
@@ -239,14 +239,14 @@ final class ResourceWrapperMacroTests: XCTestCase {
 				typealias Body = JSONAPI.ResourceBody<String, BodyDefinition>
 			}
 
-			extension Person: JSONAPI.ResourceIdentifiable {
+			nonisolated extension Person: JSONAPI.ResourceIdentifiable {
 			}
 
-			extension Person: JSONAPI.ResourceLinkageProviding {
+			nonisolated extension Person: JSONAPI.ResourceLinkageProviding {
 				typealias ID = String
 			}
 
-			extension Person: Codable {
+			nonisolated extension Person: Codable {
 				init(from decoder: any Decoder) throws {
 					let wrapped = try Wrapped(from: decoder)
 					self.id = wrapped.id
@@ -262,7 +262,7 @@ final class ResourceWrapperMacroTests: XCTestCase {
 				}
 			}
 
-			extension Person {
+			nonisolated extension Person {
 				static func createBody(id: String? = nil, firstName: String? = nil, lastName: String? = nil, related: JSONAPI.RelationshipOne<Person>? = nil) -> Person.Body {
 					let attributes = Body.Attributes(firstName: firstName, lastName: lastName)
 					let relationships = Body.Relationships(related: related)
@@ -300,8 +300,8 @@ final class ResourceWrapperMacroTests: XCTestCase {
 				public var related: Person?
 			}
 
-			extension Person: JSONAPI.ResourceDefinitionProviding {
-				public struct Definition: JSONAPI.ResourceDefinition {
+			nonisolated extension Person: JSONAPI.ResourceDefinitionProviding {
+				public nonisolated struct Definition: JSONAPI.ResourceDefinition {
 					public struct Attributes: Equatable, Codable {
 						public var firstName: String
 						var lastName: String
@@ -314,7 +314,7 @@ final class ResourceWrapperMacroTests: XCTestCase {
 					}
 					public static let resourceType = "people"
 				}
-				public struct BodyDefinition: JSONAPI.ResourceDefinition {
+				public nonisolated struct BodyDefinition: JSONAPI.ResourceDefinition {
 					public struct Attributes: Equatable, Codable {
 						public var firstName: String?
 						var lastName: String?
@@ -328,14 +328,14 @@ final class ResourceWrapperMacroTests: XCTestCase {
 				public typealias Body = JSONAPI.ResourceBody<String, BodyDefinition>
 			}
 
-			extension Person: JSONAPI.ResourceIdentifiable {
+			nonisolated extension Person: JSONAPI.ResourceIdentifiable {
 			}
 
-			extension Person: JSONAPI.ResourceLinkageProviding {
+			nonisolated extension Person: JSONAPI.ResourceLinkageProviding {
 				public typealias ID = String
 			}
 
-			extension Person: Codable {
+			nonisolated extension Person: Codable {
 				public init(from decoder: any Decoder) throws {
 					let wrapped = try Wrapped(from: decoder)
 					self.id = wrapped.id
@@ -351,7 +351,7 @@ final class ResourceWrapperMacroTests: XCTestCase {
 				}
 			}
 
-			extension Person {
+			nonisolated extension Person {
 				public static func createBody(id: String? = nil, firstName: String? = nil, lastName: String? = nil, related: JSONAPI.RelationshipOne<Person>? = nil) -> Person.Body {
 					let attributes = Body.Attributes(firstName: firstName, lastName: lastName)
 					let relationships = Body.Relationships(related: related)
@@ -387,8 +387,8 @@ final class ResourceWrapperMacroTests: XCTestCase {
 				var related: Person?
 			}
 
-			extension Person: JSONAPI.ResourceDefinitionProviding {
-				struct Definition: JSONAPI.ResourceDefinition {
+			nonisolated extension Person: JSONAPI.ResourceDefinitionProviding {
+				nonisolated struct Definition: JSONAPI.ResourceDefinition {
 					struct Attributes: Codable, Sendable {
 						var firstName: String
 					}
@@ -400,7 +400,7 @@ final class ResourceWrapperMacroTests: XCTestCase {
 					}
 					static let resourceType = "people"
 				}
-				struct BodyDefinition: JSONAPI.ResourceDefinition {
+				nonisolated struct BodyDefinition: JSONAPI.ResourceDefinition {
 					struct Attributes: Codable, Sendable {
 						var firstName: String?
 					}
@@ -413,14 +413,14 @@ final class ResourceWrapperMacroTests: XCTestCase {
 				typealias Body = JSONAPI.ResourceBody<String, BodyDefinition>
 			}
 
-			extension Person: JSONAPI.ResourceIdentifiable {
+			nonisolated extension Person: JSONAPI.ResourceIdentifiable {
 			}
 
-			extension Person: JSONAPI.ResourceLinkageProviding {
+			nonisolated extension Person: JSONAPI.ResourceLinkageProviding {
 				typealias ID = String
 			}
 
-			extension Person: Codable {
+			nonisolated extension Person: Codable {
 				init(from decoder: any Decoder) throws {
 					let wrapped = try Wrapped(from: decoder)
 					self.id = wrapped.id
@@ -435,7 +435,7 @@ final class ResourceWrapperMacroTests: XCTestCase {
 				}
 			}
 
-			extension Person {
+			nonisolated extension Person {
 				static func createBody(id: String? = nil, firstName: String? = nil, related: JSONAPI.RelationshipOne<Person>? = nil) -> Person.Body {
 					let attributes = Body.Attributes(firstName: firstName)
 					let relationships = Body.Relationships(related: related)
@@ -468,11 +468,11 @@ final class ResourceWrapperMacroTests: XCTestCase {
 			}
 
 			@available(iOS, unavailable)
-			extension Person: JSONAPI.ResourceDefinitionProviding {
-				public struct Definition: JSONAPI.ResourceDefinition {
+			nonisolated extension Person: JSONAPI.ResourceDefinitionProviding {
+				public nonisolated struct Definition: JSONAPI.ResourceDefinition {
 					public static let resourceType = "people"
 				}
-				public struct BodyDefinition: JSONAPI.ResourceDefinition {
+				public nonisolated struct BodyDefinition: JSONAPI.ResourceDefinition {
 					public static let resourceType = Definition.resourceType
 				}
 				public typealias Wrapped = JSONAPI.Resource<String, Definition>
@@ -480,16 +480,16 @@ final class ResourceWrapperMacroTests: XCTestCase {
 			}
 
 			@available(iOS, unavailable)
-			extension Person: JSONAPI.ResourceIdentifiable {
+			nonisolated extension Person: JSONAPI.ResourceIdentifiable {
 			}
 
 			@available(iOS, unavailable)
-			extension Person: JSONAPI.ResourceLinkageProviding {
+			nonisolated extension Person: JSONAPI.ResourceLinkageProviding {
 				public typealias ID = String
 			}
 
 			@available(iOS, unavailable)
-			extension Person: Codable {
+			nonisolated extension Person: Codable {
 				public init(from decoder: any Decoder) throws {
 					let wrapped = try Wrapped(from: decoder)
 					self.id = wrapped.id
@@ -501,7 +501,7 @@ final class ResourceWrapperMacroTests: XCTestCase {
 			}
 
 			@available(iOS, unavailable)
-			extension Person {
+			nonisolated extension Person {
 				public static func createBody(id: String? = nil) -> Person.Body {
 					return Body(id: id)
 				}
@@ -533,15 +533,15 @@ final class ResourceWrapperMacroTests: XCTestCase {
 				var tags: [String]
 			}
 
-			extension Schedule: JSONAPI.ResourceDefinitionProviding {
-				struct Definition: JSONAPI.ResourceDefinition {
+			nonisolated extension Schedule: JSONAPI.ResourceDefinitionProviding {
+				nonisolated struct Definition: JSONAPI.ResourceDefinition {
 					struct Attributes: Equatable, Codable {
 						var name: String
 						@DefaultEmpty var tags: [String]
 					}
 					static let resourceType = "schedules"
 				}
-				struct BodyDefinition: JSONAPI.ResourceDefinition {
+				nonisolated struct BodyDefinition: JSONAPI.ResourceDefinition {
 					struct Attributes: Equatable, Codable {
 						var name: String?
 						var tags: [String]?
@@ -552,14 +552,14 @@ final class ResourceWrapperMacroTests: XCTestCase {
 				typealias Body = JSONAPI.ResourceBody<UUID, BodyDefinition>
 			}
 
-			extension Schedule: JSONAPI.ResourceIdentifiable {
+			nonisolated extension Schedule: JSONAPI.ResourceIdentifiable {
 			}
 
-			extension Schedule: JSONAPI.ResourceLinkageProviding {
+			nonisolated extension Schedule: JSONAPI.ResourceLinkageProviding {
 				typealias ID = UUID
 			}
 
-			extension Schedule: Codable {
+			nonisolated extension Schedule: Codable {
 				init(from decoder: any Decoder) throws {
 					let wrapped = try Wrapped(from: decoder)
 					self.id = wrapped.id
@@ -573,7 +573,7 @@ final class ResourceWrapperMacroTests: XCTestCase {
 				}
 			}
 
-			extension Schedule {
+			nonisolated extension Schedule {
 				static func createBody(id: UUID? = nil, name: String? = nil, tags: [String]? = nil) -> Schedule.Body {
 					let attributes = Body.Attributes(name: name, tags: tags)
 					return Body(id: id, attributes: attributes)
@@ -609,8 +609,8 @@ final class ResourceWrapperMacroTests: XCTestCase {
 				var related: Person?
 			}
 
-			extension Person: JSONAPI.ResourceDefinitionProviding {
-				struct Definition: JSONAPI.ResourceDefinition {
+			nonisolated extension Person: JSONAPI.ResourceDefinitionProviding {
+				nonisolated struct Definition: JSONAPI.ResourceDefinition {
 					struct Attributes: Equatable, Codable, JSONAPI.EmptyRepresentable {
 						var firstName: String?
 						var lastName: String?
@@ -626,7 +626,7 @@ final class ResourceWrapperMacroTests: XCTestCase {
 					}
 					static let resourceType = "people"
 				}
-				struct BodyDefinition: JSONAPI.ResourceDefinition {
+				nonisolated struct BodyDefinition: JSONAPI.ResourceDefinition {
 					struct Attributes: Equatable, Codable {
 						var firstName: String?
 						var lastName: String?
@@ -640,14 +640,14 @@ final class ResourceWrapperMacroTests: XCTestCase {
 				typealias Body = JSONAPI.ResourceBody<String, BodyDefinition>
 			}
 
-			extension Person: JSONAPI.ResourceIdentifiable {
+			nonisolated extension Person: JSONAPI.ResourceIdentifiable {
 			}
 
-			extension Person: JSONAPI.ResourceLinkageProviding {
+			nonisolated extension Person: JSONAPI.ResourceLinkageProviding {
 				typealias ID = String
 			}
 
-			extension Person: Codable {
+			nonisolated extension Person: Codable {
 				init(from decoder: any Decoder) throws {
 					let wrapped = try Wrapped(from: decoder)
 					self.id = wrapped.id
@@ -663,7 +663,7 @@ final class ResourceWrapperMacroTests: XCTestCase {
 				}
 			}
 
-			extension Person {
+			nonisolated extension Person {
 				static func createBody(id: String? = nil, firstName: String? = nil, lastName: String? = nil, related: JSONAPI.RelationshipOne<Person>? = nil) -> Person.Body {
 					let attributes = Body.Attributes(firstName: firstName, lastName: lastName)
 					let relationships = Body.Relationships(related: related)
@@ -699,15 +699,15 @@ final class ResourceWrapperMacroTests: XCTestCase {
 				var lastName: String?
 			}
 
-			extension Person: JSONAPI.ResourceDefinitionProviding {
-				struct Definition: JSONAPI.ResourceDefinition {
+			nonisolated extension Person: JSONAPI.ResourceDefinitionProviding {
+				nonisolated struct Definition: JSONAPI.ResourceDefinition {
 					struct Attributes: Equatable, Codable {
 						var firstName: String
 						var lastName: String?
 					}
 					static let resourceType = "people"
 				}
-				struct BodyDefinition: JSONAPI.ResourceDefinition {
+				nonisolated struct BodyDefinition: JSONAPI.ResourceDefinition {
 					struct Attributes: Equatable, Codable {
 						var firstName: String?
 						var lastName: String?
@@ -718,14 +718,14 @@ final class ResourceWrapperMacroTests: XCTestCase {
 				typealias Body = JSONAPI.ResourceBody<String, BodyDefinition>
 			}
 
-			extension Person: JSONAPI.ResourceIdentifiable {
+			nonisolated extension Person: JSONAPI.ResourceIdentifiable {
 			}
 
-			extension Person: JSONAPI.ResourceLinkageProviding {
+			nonisolated extension Person: JSONAPI.ResourceLinkageProviding {
 				typealias ID = String
 			}
 
-			extension Person: Codable {
+			nonisolated extension Person: Codable {
 				init(from decoder: any Decoder) throws {
 					let wrapped = try Wrapped(from: decoder)
 					self.id = wrapped.id
@@ -739,7 +739,7 @@ final class ResourceWrapperMacroTests: XCTestCase {
 				}
 			}
 
-			extension Person {
+			nonisolated extension Person {
 				static func createBody(id: String? = nil, firstName: String? = nil, lastName: String? = nil) -> Person.Body {
 					let attributes = Body.Attributes(firstName: firstName, lastName: lastName)
 					return Body(id: id, attributes: attributes)
@@ -773,8 +773,8 @@ final class ResourceWrapperMacroTests: XCTestCase {
 				var author: Person
 			}
 
-			extension Comment: JSONAPI.ResourceDefinitionProviding {
-				struct Definition: JSONAPI.ResourceDefinition {
+			nonisolated extension Comment: JSONAPI.ResourceDefinitionProviding {
+				nonisolated struct Definition: JSONAPI.ResourceDefinition {
 					struct Attributes: Equatable, Codable, JSONAPI.EmptyRepresentable {
 						var body: String?
 						static var empty: Self {
@@ -786,7 +786,7 @@ final class ResourceWrapperMacroTests: XCTestCase {
 					}
 					static let resourceType = "comments"
 				}
-				struct BodyDefinition: JSONAPI.ResourceDefinition {
+				nonisolated struct BodyDefinition: JSONAPI.ResourceDefinition {
 					struct Attributes: Equatable, Codable {
 						var body: String?
 					}
@@ -799,14 +799,14 @@ final class ResourceWrapperMacroTests: XCTestCase {
 				typealias Body = JSONAPI.ResourceBody<String, BodyDefinition>
 			}
 
-			extension Comment: JSONAPI.ResourceIdentifiable {
+			nonisolated extension Comment: JSONAPI.ResourceIdentifiable {
 			}
 
-			extension Comment: JSONAPI.ResourceLinkageProviding {
+			nonisolated extension Comment: JSONAPI.ResourceLinkageProviding {
 				typealias ID = String
 			}
 
-			extension Comment: Codable {
+			nonisolated extension Comment: Codable {
 				init(from decoder: any Decoder) throws {
 					let wrapped = try Wrapped(from: decoder)
 					self.id = wrapped.id
@@ -821,7 +821,7 @@ final class ResourceWrapperMacroTests: XCTestCase {
 				}
 			}
 
-			extension Comment {
+			nonisolated extension Comment {
 				static func createBody(id: String? = nil, body: String? = nil, author: JSONAPI.RelationshipOne<Person>? = nil) -> Comment.Body {
 					let attributes = Body.Attributes(body: body)
 					let relationships = Body.Relationships(author: author)

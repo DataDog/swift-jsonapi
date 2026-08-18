@@ -108,7 +108,7 @@ extension ExtensionDeclSyntax {
 		return try ExtensionDeclSyntax(
 			"""
 			\(declaration.attributes.availability)
-			extension \(type): JSONAPI.ResourceDefinitionProviding\(MemberBlockSyntax(members: members))
+			nonisolated extension \(type): JSONAPI.ResourceDefinitionProviding\(MemberBlockSyntax(members: members))
 			"""
 		)
 	}
@@ -118,7 +118,7 @@ extension ExtensionDeclSyntax {
 		providingExtensionsOf type: some TypeSyntaxProtocol
 	) throws -> ExtensionDeclSyntax {
 		try ExtensionDeclSyntax(
-			"\(declaration.attributes.availability)\nextension \(type): JSONAPI.ResourceIdentifiable {}"
+			"\(declaration.attributes.availability)\nnonisolated extension \(type): JSONAPI.ResourceIdentifiable {}"
 		)
 	}
 
@@ -147,7 +147,7 @@ extension ExtensionDeclSyntax {
 		return try ExtensionDeclSyntax(
 			"""
 			\(declaration.attributes.availability)
-			extension \(type): JSONAPI.ResourceLinkageProviding\(MemberBlockSyntax(members: members))
+			nonisolated extension \(type): JSONAPI.ResourceLinkageProviding\(MemberBlockSyntax(members: members))
 			"""
 		)
 	}
@@ -212,7 +212,7 @@ extension ExtensionDeclSyntax {
 		return try ExtensionDeclSyntax(
 			"""
 			\(declaration.attributes.availability)
-			extension \(type): Codable\(MemberBlockSyntax(members: members))
+			nonisolated extension \(type): Codable\(MemberBlockSyntax(members: members))
 			"""
 		)
 	}
@@ -285,7 +285,7 @@ extension ExtensionDeclSyntax {
 		}
 
 		return try ExtensionDeclSyntax(
-			"\(declaration.attributes.availability)\nextension \(type)\(MemberBlockSyntax(members: members))"
+			"\(declaration.attributes.availability)\nnonisolated extension \(type)\(MemberBlockSyntax(members: members))"
 		)
 	}
 }
@@ -300,7 +300,7 @@ extension StructDeclSyntax {
 		attributesEmptyRepresentable: Bool,
 		relationshipsEmptyRepresentable: Bool
 	) throws -> StructDeclSyntax {
-		try StructDeclSyntax("\(modifiers)struct Definition: JSONAPI.ResourceDefinition") {
+		try StructDeclSyntax("\(modifiers)nonisolated struct Definition: JSONAPI.ResourceDefinition") {
 			if !resourceAttributes.isEmpty {
 				try StructDeclSyntax.makeDefinitionAttributes(
 					arrayAttributes: AttributeListSyntax {
@@ -331,7 +331,7 @@ extension StructDeclSyntax {
 		resourceAttributes: [VariableDeclSyntax],
 		resourceRelationships: [VariableDeclSyntax]
 	) throws -> StructDeclSyntax {
-		try StructDeclSyntax("\(modifiers)struct BodyDefinition: JSONAPI.ResourceDefinition") {
+		try StructDeclSyntax("\(modifiers)nonisolated struct BodyDefinition: JSONAPI.ResourceDefinition") {
 			if !resourceAttributes.isEmpty {
 				try StructDeclSyntax.makeDefinitionAttributes(
 					modifiers: modifiers,
